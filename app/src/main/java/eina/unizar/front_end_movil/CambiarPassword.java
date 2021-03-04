@@ -2,6 +2,7 @@ package eina.unizar.front_end_movil;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,35 +39,29 @@ public class CambiarPassword extends AppCompatActivity {
 
         // Botón de confirmar
         Button confirmarButton = (Button) findViewById(R.id.confirmar);
-        /*confirmarButton.setOnClickListener(new View.OnClickListener() {
+        confirmarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // COMPROBAR CONTRASEÑA
-                if( usuarioCorrecto.equals(usuario.getText().toString()) && contrasenyaCorrecta.equals(password.getText().toString())){
-                        Intent intent = new Intent (v.getContext(), DecisionJuego.class);
-                        startActivityForResult(intent, OPTION_ACCEDER);
+                // COMPROBAR CONTRASEÑA es igual en ambos campos
+                if( password_new.getText().toString().equals(password_new2.getText().toString())){
+                        Intent intent = new Intent (v.getContext(), MenuPrincipal.class);
+                        startActivityForResult(intent, OPTION_CONFIRMAR);
                 }else{
                     // mensaje de error
-                    password.setError("El usuario o contraseña son incorrectos");
+                    password_new2.setError("Las contraseñas no son iguales");
                 }
             }
-        });*/
+        });
 
         // Botón de atrás
         Button atrasButton = (Button) findViewById(R.id.atras);
-        /*atrasButton.setOnClickListener(new View.OnClickListener() {
+        atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // COMPROBAR CONTRASEÑA
-                if( usuarioCorrecto.equals(usuario.getText().toString()) && contrasenyaCorrecta.equals(password.getText().toString())){
-                    Intent intent = new Intent (v.getContext(), DecisionJuego.class);
-                    startActivityForResult(intent, OPTION_ACCEDER);
-                }else{
-                    // mensaje de error
-                    password.setError("El usuario o contraseña son incorrectos");
-                }
+                Intent intent = new Intent(v.getContext(), MenuPrincipal.class);
+                startActivityForResult(intent, OPTION_ATRAS);
             }
-        });*/
+        });
     }
 }
 
