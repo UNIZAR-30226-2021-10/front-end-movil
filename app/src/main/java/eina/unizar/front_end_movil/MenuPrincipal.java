@@ -33,14 +33,14 @@ public class MenuPrincipal extends AppCompatActivity {
         getSupportActionBar().hide();
 
         //EDIT TEXT DE USUARIO
-        usuario = findViewById(R.id.nombre_usuario);
+        usuario = (EditText) findViewById(R.id.nombre_usuario);
         //EDIT TEXT DE CONTRASEÑA
-        password = findViewById(R.id.texto_contasenya);
+        password = (EditText) findViewById(R.id.texto_contasenya);
 
 
         // Probar mensajes de error para contraseña
-        String contrasenyaCorrecta = "1234";
-        String usuarioCorrecto = "wonder";
+        final String contrasenyaCorrecta = "1234";
+        final String usuarioCorrecto = "w";
 
         // Botón de acceder/iniciar sesión
         Button accederButton = (Button) findViewById(R.id.acceder);
@@ -48,21 +48,25 @@ public class MenuPrincipal extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // COMPROBAR CONTRASEÑA
-
-                Intent intent = new Intent (v.getContext(), DecisionJuego.class);
-                startActivityForResult(intent, OPTION_ACCEDER);
+                if( usuarioCorrecto.equals(usuario.getText().toString()) && contrasenyaCorrecta.equals(password.getText().toString())){
+                        Intent intent = new Intent (v.getContext(), DecisionJuego.class);
+                        startActivityForResult(intent, OPTION_ACCEDER);
+                }else{
+                    // mensaje de error
+                    password.setError("El usuario o contraseña son incorrectos");
+                }
             }
         });
 
         // Botón de olvidar la contraseña
         Button passwordButton = (Button) findViewById(R.id.password);
-        /*passwordButton.setOnClickListener(new View.OnClickListener() {
+        passwordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent (v.getContext(), CambiarPassword.class);
                 startActivityForResult(intent, OPTION_PASSWORD);
             }
-        });*/
+        });
 
         // Botón de registrarse
         Button registroButton = (Button) findViewById(R.id.registro);

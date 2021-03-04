@@ -5,4 +5,9 @@
     <item name="registro" type="id" />
     <item name="nombre_usuario" type="id" />
     <item name="texto_contasenya" type="id" />
+    <item name="email" type="id" />
+    <item name="password_new" type="id" />
+    <item name="password_new2" type="id" />
+    <item name="confirmar" type="id" />
+    <item name="atras" type="id" />
 </resources>

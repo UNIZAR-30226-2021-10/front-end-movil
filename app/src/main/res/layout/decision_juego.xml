@@ -8,10 +8,10 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="103dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="84dp"
-        android:layout_marginBottom="547dp"
+        android:layout_width="163dp"
+        android:layout_height="132dp"
+        android:layout_marginTop="115dp"
+        android:layout_marginBottom="484dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -19,111 +19,71 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@mipmap/imagenlogo" />
 
-    <TextView
-        android:layout_width="143dp"
-        android:layout_height="38dp"
-        android:layout_marginStart="54dp"
-        android:layout_marginLeft="54dp"
-        android:layout_marginTop="231dp"
-        android:layout_marginEnd="214dp"
-        android:layout_marginRight="214dp"
-        android:layout_marginBottom="462dp"
-        android:fontFamily="sans-serif-black"
-        android:text="Usuario"
-        android:textColor="@android:color/black"
-        android:textSize="25dp"
+    <Button
+        android:id="@+id/multijugador"
+        android:layout_width="276dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="309dp"
+        android:layout_marginBottom="370dp"
+        android:background="@android:color/holo_purple"
+        android:text="MODO MULTIJUGADOR"
+        android:textColor="@android:color/white"
+        android:textSize="23dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/nombre_usuario"
-        android:layout_width="301dp"
-        android:layout_height="43dp"
-        android:layout_marginTop="269dp"
-        android:layout_marginBottom="420dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:layout_width="143dp"
-        android:layout_height="38dp"
-        android:layout_marginStart="54dp"
-        android:layout_marginLeft="54dp"
-        android:layout_marginTop="329dp"
-        android:layout_marginEnd="214dp"
-        android:layout_marginRight="214dp"
-        android:layout_marginBottom="364dp"
-        android:fontFamily="sans-serif-black"
-        android:text="Contraseña"
-        android:textColor="@android:color/black"
-        android:textSize="25dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/texto_contasenya"
-        android:layout_width="301dp"
-        android:layout_height="43dp"
-        android:layout_marginTop="367dp"
-        android:layout_marginBottom="321dp"
-        android:ems="10"
-        android:inputType="textPassword"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/acceder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="451dp"
-        android:layout_marginBottom="232dp"
-        android:background="@android:color/white"
-        android:text="ACCEDER"
+        android:id="@+id/individual"
+        android:layout_width="276dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="435dp"
+        android:layout_marginBottom="244dp"
+        android:background="@android:color/holo_orange_light"
+        android:text="MODO INDIVIDUAL"
+        android:textSize="23dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/password"
+    <ImageButton
+        android:id="@+id/tienda"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="515dp"
-        android:layout_marginBottom="168dp"
+        android:layout_marginStart="31dp"
+        android:layout_marginLeft="31dp"
+        android:layout_marginTop="570dp"
+        android:layout_marginEnd="319dp"
+        android:layout_marginRight="319dp"
+        android:layout_marginBottom="102dp"
         android:background="@android:color/white"
-        android:text="  CONTRASEÑA OLVIDADA  "
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/shoppingicon" />
 
-    <Button
-        android:id="@+id/registro"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="580dp"
-        android:layout_marginBottom="103dp"
+    <ImageButton
+        android:id="@+id/perfil"
+        android:layout_width="62dp"
+        android:layout_height="59dp"
+        android:layout_marginStart="319dp"
+        android:layout_marginLeft="319dp"
+        android:layout_marginTop="570dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="102dp"
+        android:adjustViewBounds="true"
         android:background="@android:color/white"
-        android:text="  REGISTRARSE  "
+        android:scaleType="centerInside"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/perfilicon" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

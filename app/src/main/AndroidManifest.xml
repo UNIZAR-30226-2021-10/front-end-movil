@@ -15,6 +15,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="DecisionJuego"
+            android:parentActivityName="DecisionJuego" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="DecisionJuego" />
+        </activity>
+        <activity
+            android:name=".CambiarPassword"
+            android:parentActivityName=".CambiarPassword" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".CambiarPassword" />
+        </activity>
     </application>
 
 </manifest>
