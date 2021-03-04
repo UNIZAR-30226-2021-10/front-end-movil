@@ -70,13 +70,13 @@ public class MenuPrincipal extends AppCompatActivity {
 
         // Botón de registrarse
         Button registroButton = (Button) findViewById(R.id.registro);
-        /*registroButton.setOnClickListener(new View.OnClickListener() {
+        registroButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent (v.getContext(), RegistroUsuario.class);
-                startActivityForResult(intent, OPTION_CATEGORIAS);
+                startActivityForResult(intent, OPTION_REGISTRO);
             }
-        });*/
+        });
     }
 }
 
