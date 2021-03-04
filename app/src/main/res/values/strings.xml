@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">front_end_movil</string>
+    <item name="acceder" type="id" />
+    <item name="password" type="id" />
+    <item name="registro" type="id" />
+    <item name="nombre_usuario" type="id" />
+    <item name="texto_contasenya" type="id" />
 </resources>
