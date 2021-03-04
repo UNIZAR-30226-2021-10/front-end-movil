@@ -30,21 +30,29 @@ public class MenuPrincipal extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.menu_principal);
+        getSupportActionBar().hide();
 
         //EDIT TEXT DE USUARIO
         usuario = findViewById(R.id.nombre_usuario);
         //EDIT TEXT DE CONTRASEÑA
         password = findViewById(R.id.texto_contasenya);
 
+
+        // Probar mensajes de error para contraseña
+        String contrasenyaCorrecta = "1234";
+        String usuarioCorrecto = "wonder";
+
         // Botón de acceder/iniciar sesión
         Button accederButton = (Button) findViewById(R.id.acceder);
-        /*accederButton.setOnClickListener(new View.OnClickListener() {
+        accederButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // COMPROBAR CONTRASEÑA
+
                 Intent intent = new Intent (v.getContext(), DecisionJuego.class);
                 startActivityForResult(intent, OPTION_ACCEDER);
             }
-        });*/
+        });
 
         // Botón de olvidar la contraseña
         Button passwordButton = (Button) findViewById(R.id.password);
