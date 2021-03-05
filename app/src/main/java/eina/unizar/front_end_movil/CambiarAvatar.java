@@ -1,26 +1,18 @@
 package eina.unizar.front_end_movil;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
+public class CambiarAvatar extends AppCompatActivity {
 
-public class PerfilUsuario extends AppCompatActivity {
-
-    private static final int OPTION_CERRAR_SESION = 0;
+    private static final int OPTION_OK = 0;
     private static final int OPTION_ATRAS = 1;
-    private static final int OPTION_AJUSTES = 2;
-    private static final int OPTION_PERFIL = 3;
 
     private ListView listaObjetos;
     private String[] nombres = {"Traje", "Médico", "Paragüas", "Estetoscopio", "Maletín",
@@ -35,38 +27,18 @@ public class PerfilUsuario extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.perfil_usuario);
+        setContentView(R.layout.cambiar_avatar);
         getSupportActionBar().hide();
 
         listaObjetos = (ListView)findViewById(R.id.list);
         fillData();
 
-        Button ajustesButton = (Button) findViewById((R.id.ajustes));
-        ajustesButton.setOnClickListener(new View.OnClickListener() {
+        Button okButton = (Button) findViewById((R.id.ok));
+        okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), AjustesUsuario.class);
-                startActivityForResult(intent, OPTION_AJUSTES);
-            }
-        });
-
-        // Botón de sign out
-        Button perfilButton = (Button) findViewById(R.id.perfil_button);
-        perfilButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), CambiarAvatar.class);
-                startActivityForResult(intent, OPTION_PERFIL);
-            }
-        });
-
-        // Botón de sign out
-       Button signOutButton = (Button) findViewById(R.id.signout);
-        signOutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), MenuPrincipal.class);
-                startActivityForResult(intent, OPTION_CERRAR_SESION);
+                Intent intent = new Intent(v.getContext(), PerfilUsuario.class);
+                startActivityForResult(intent, OPTION_OK);
             }
         });
 
@@ -75,7 +47,7 @@ public class PerfilUsuario extends AppCompatActivity {
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), DecisionJuego.class);
+                Intent intent = new Intent(v.getContext(), PerfilUsuario.class);
                 startActivityForResult(intent, OPTION_ATRAS);
             }
         });

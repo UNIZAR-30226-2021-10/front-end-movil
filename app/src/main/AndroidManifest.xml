@@ -50,6 +50,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".PerfilUsuario" />
         </activity>
+        <activity
+            android:name=".CambiarAvatar"
+            android:parentActivityName=".CambiarAvatar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".CambiarAvatar" />
+        </activity>
     </application>
 
 </manifest>

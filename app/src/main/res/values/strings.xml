@@ -13,4 +13,6 @@
     <item name="signup" type="id" />
     <item name="ajustes" type="id" />
     <item name="signout" type="id" />
+    <item name="ok" type="id" />
+    <item name="comenzar" type="id" />
 </resources>
