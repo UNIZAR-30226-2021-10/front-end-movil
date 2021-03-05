@@ -36,6 +36,20 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".RegistroUsuario" />
         </activity>
+        <activity
+            android:name=".AjustesUsuario"
+            android:parentActivityName=".AjustesUsuario" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".AjustesUsuario" />
+        </activity>
+        <activity
+            android:name=".PerfilUsuario"
+            android:parentActivityName=".PerfilUsuario" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".PerfilUsuario" />
+        </activity>
     </application>
 
 </manifest>

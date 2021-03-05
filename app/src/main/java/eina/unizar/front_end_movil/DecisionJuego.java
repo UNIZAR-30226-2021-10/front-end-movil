@@ -1,6 +1,8 @@
 package eina.unizar.front_end_movil;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -56,13 +58,13 @@ public class DecisionJuego extends AppCompatActivity {
         });*/
 
         ImageButton perfilButton = (ImageButton) findViewById(R.id.perfil);
-        /*perfilButton.setOnClickListener(new View.OnClickListener() {
+        perfilButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent (v.getContext(), RegistroUsuario.class);
+                Intent intent = new Intent (v.getContext(), PerfilUsuario.class);
                 startActivityForResult(intent, OPTION_PERFIL);
             }
-        });*/
+        });
 
     }
 }
