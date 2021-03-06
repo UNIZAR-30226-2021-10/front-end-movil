@@ -75,18 +75,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- <ImageView
-        android:id="@+id/imageView5"
-        android:layout_width="68dp"
-        android:layout_height="63dp"
-        android:layout_marginTop="139dp"
-        android:layout_marginBottom="529dp"
+    <ImageButton
+        android:id="@+id/dado"
+        android:layout_width="63dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="145dp"
+        android:layout_marginBottom="527dp"
+        android:background="@drawable/dado1icon"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/dado1icon" />-->
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/categoria"
         android:layout_width="wrap_content"
@@ -95,7 +96,6 @@
         android:layout_marginBottom="474dp"
         android:fontFamily="sans-serif-black"
         android:gravity="center"
-        android:text="Categoría"
         android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -111,7 +111,6 @@
         android:layout_marginBottom="426dp"
         android:fontFamily="sans-serif"
         android:gravity="center"
-        android:text="¿Pregunta?"
         android:textColor="@android:color/black"
         android:textSize="17dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -131,7 +130,6 @@
         android:fontFamily="sans-serif"
         android:gravity="center"
         android:onClick="onClick"
-        android:text="Respuesta 4"
         android:textColor="@android:color/black"
         android:textSize="17dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -151,7 +149,6 @@
         android:fontFamily="sans-serif"
         android:gravity="center"
         android:onClick="onClick"
-        android:text="Respuesta 3"
         android:textColor="@android:color/black"
         android:textSize="17dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -171,7 +168,6 @@
         android:fontFamily="sans-serif"
         android:gravity="center"
         android:onClick="onClick"
-        android:text="Respuesta 1"
         android:textColor="@android:color/black"
         android:textSize="17dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -191,7 +187,6 @@
         android:fontFamily="sans-serif"
         android:gravity="center"
         android:onClick="onClick"
-        android:text="Respuesta 2"
         android:textColor="@android:color/black"
         android:textSize="17dp"
         app:layout_constraintBottom_toBottomOf="parent"

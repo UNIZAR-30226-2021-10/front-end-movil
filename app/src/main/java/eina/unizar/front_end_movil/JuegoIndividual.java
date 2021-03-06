@@ -8,27 +8,39 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Random;
 
 public class JuegoIndividual extends AppCompatActivity{
 
     private static final int OPTION_ATRAS = 0;
     private static final int OPTION_JUEGO = 1;
 
-    TextView pregunta;
-    TextView resp1;
-    TextView resp2;
-    TextView resp3;
-    TextView resp4;
-    TextView num_rondas;
-    TextView num_puntos;
-    TextView categoria;
+    private TextView pregunta;
+    private TextView resp1;
+    private TextView resp2;
+    private TextView resp3;
+    private TextView resp4;
+    private TextView num_rondas;
+    private TextView num_puntos;
+    private TextView categoria;
+    private ImageButton imagenDados;
+    private Random rndNumber = new Random();
+
+    String[] categorias = {"Arte y Literatura", "Geografía", "Historia", "Cine", "Ciencias y Naturaleza", "Deportes"};
+    String[] coloresCategorías = {"#703C02", "#0398FA", "#FFDA00", "#FC57FF", "#17B009", "#FF8D00"};
+    String[] pregunta1 = {"Georgia shares a land border with which of these countries?", "Syria", "Armenia", "Iraq", "Lebanon"};
+    String[] pregunta2 = {"Two rats can become the progenitors of 15,000 rats in less than..", "1 month", "1 week", "1 day", "1 year"};
+    String[] pregunta3 = {"What Separates Spain From Morocco?", "The North African Strait", "The Bering Strait", "The Strait Of Gibralter" , "The Strait Of Casablanca"};
+
+    int numero_ronda = 0;
+    int numero_puntos = 0;
 
     /**
      * Called when the activity is first created.
@@ -51,100 +63,12 @@ public class JuegoIndividual extends AppCompatActivity{
         num_puntos = (TextView)findViewById(R.id.num_puntos);
         categoria = (TextView)findViewById(R.id.categoria);
 
-        // text view de rondas --> para poner por qué ronda vas
-        num_rondas.setText("1");
-
-        // text view de puntos acumulados --> para poner cuántos puntos lleva
-        num_puntos.setText("0");
-
-        // text view de categoria
-        String[] categorias = {"Arte y Literatura", "Geografía", "Historia", "Cine", "Ciencias y Naturaleza", "Deportes"};
-        String[] coloresCategorías = {"#703C02", "#0398FA", "#FFDA00", "#FC57FF", "#17B009", "#FF8D00"};
-        // Esto luego no se hará por que se tendrá el dado
-        int valorDado = (int) Math.floor(Math.random()*6);
-        categoria.setText(categorias[valorDado]);
-        categoria.setTextColor((Color.parseColor(coloresCategorías[valorDado])));
-
-        // TODO: esto luego se hará con la base de datos
-        // text view de pregunta
-        pregunta.setText("¿Cúal es el río más caudaloso del mundo?");
-
-        // textview respuesta 1
-        resp1.setText("Amazonas");
-        resp1.setOnClickListener(new View.OnClickListener() {
+        imagenDados = (ImageButton) findViewById(R.id.dado);
+        imagenDados.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(final View v) {
-                // respuesta incorrecta
-                // TODO: poner if de si es incorrecta o no para el color
-                resp1.setBackgroundColor((Color.parseColor("#E35252")));
-                resp2.setBackgroundColor((Color.parseColor("#87e352")));
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Intent intent = new Intent(v.getContext(), JuegoIndividual.class);
-                        startActivityForResult(intent, OPTION_JUEGO);
-                    }
-                }, 2000);//wait 1000ms before doing the action
-            }
-        });
-
-        // textview respuesta 2
-        resp2.setText("Nilo");
-        resp2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                // respuesta correcta
-                // TODO: poner if de si es incorrecta o no para el color
-                resp2.setBackgroundColor((Color.parseColor("#87e352")));
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Intent intent = new Intent(v.getContext(), JuegoIndividual.class);
-                        startActivityForResult(intent, OPTION_JUEGO);
-                    }
-                }, 2000);//wait 1000ms before doing the action
-            }
-        });
-
-        // textview de respuesta 3
-        resp3.setText("Río Amarillo");
-        resp3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                // respuesta incorrecta
-                // TODO: poner if de si es incorrecta o no para el color
-                resp3.setBackgroundColor((Color.parseColor("#E35252")));
-                resp2.setBackgroundColor((Color.parseColor("#87e352")));
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Intent intent = new Intent(v.getContext(), JuegoIndividual.class);
-                        startActivityForResult(intent, OPTION_JUEGO);
-                    }
-                }, 2000);//wait 1000ms before doing the action
-            }
-        });
-
-        // textview de respuesta 4
-        resp4.setText("Yangste");
-        resp4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                // respuesta incorrecta
-                // TODO: poner if de si es incorrecta o no para el color
-                resp4.setBackgroundColor((Color.parseColor("#E35252")));
-                resp2.setBackgroundColor((Color.parseColor("#87e352")));
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Intent intent = new Intent(v.getContext(), JuegoIndividual.class);
-                        startActivityForResult(intent, OPTION_JUEGO);
-                    }
-                }, 2000);//wait 1000ms before doing the action
+            public void onClick(View v) {
+                resetear();
+                rollDice();
             }
         });
 
@@ -159,6 +83,109 @@ public class JuegoIndividual extends AppCompatActivity{
         });
 
 
+    }
+
+    void resetear(){
+        pregunta.setText("");
+        resp1.setText("");
+        resp2.setText("");
+        resp3.setText("");
+        resp4.setText("");
+        resp1.setBackgroundColor((Color.parseColor("#ffffffff")));
+        resp2.setBackgroundColor((Color.parseColor("#ffffffff")));
+        resp3.setBackgroundColor((Color.parseColor("#ffffffff")));
+        resp4.setBackgroundColor((Color.parseColor("#ffffffff")));
+    }
+
+    void rollDice(){
+        int random = rndNumber.nextInt(6) + 1;
+        switch(random){
+            case 1:
+                imagenDados.setBackgroundResource(R.drawable.dado1icon);
+                ponerPregunta(pregunta1[0],pregunta1[1],pregunta1[2],pregunta1[3], pregunta1[4]);
+                break;
+            case 2:
+                imagenDados.setBackgroundResource(R.drawable.dado2icon);
+                ponerPregunta(pregunta1[0],pregunta1[1],pregunta1[2],pregunta1[3], pregunta1[4]);
+                break;
+            case 3:
+                imagenDados.setBackgroundResource(R.drawable.dado3icon);
+                ponerPregunta(pregunta2[0],pregunta2[1],pregunta2[2],pregunta2[3], pregunta2[4]);
+                break;
+            case 4:
+                imagenDados.setBackgroundResource(R.drawable.dado4icon);
+                ponerPregunta(pregunta3[0],pregunta3[1],pregunta3[2],pregunta3[3], pregunta3[4]);
+                break;
+            case 5:
+                imagenDados.setBackgroundResource(R.drawable.dado5icon);
+                ponerPregunta(pregunta3[0],pregunta3[1],pregunta3[2],pregunta3[3], pregunta3[4]);
+                break;
+            case 6:
+                imagenDados.setBackgroundResource(R.drawable.dado6icon);
+                ponerPregunta(pregunta2[0],pregunta2[1],pregunta2[2],pregunta2[3], pregunta2[4]);
+                break;
+        }
+        categoria.setText(categorias[random-1]);
+        categoria.setTextColor((Color.parseColor(coloresCategorías[random-1])));
+        // text view de rondas --> para poner por qué ronda vas
+        numero_ronda++;
+        num_rondas.setText(String.valueOf(numero_ronda));
+
+        // text view de puntos acumulados --> para poner cuántos puntos lleva
+        num_puntos.setText(String.valueOf(numero_puntos));
+
+    }
+
+    void ponerPregunta(String preguntaN, String resp1N, String resp2N, String resp3N, String resp4N){
+
+        // TODO: esto luego se hará con la base de datos
+        // text view de pregunta
+        pregunta.setText(preguntaN);
+
+        // textview respuesta 1
+        resp1.setText(resp1N);
+        resp1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // respuesta incorrecta
+                // TODO: poner if de si es incorrecta o no para el color
+                resp1.setBackgroundColor((Color.parseColor("#E35252")));
+                resp2.setBackgroundColor((Color.parseColor("#87e352")));
+            }
+        });
+        // textview respuesta 2
+        resp2.setText(resp2N);
+        resp2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // respuesta correcta
+                // TODO: poner if de si es incorrecta o no para el color
+                resp2.setBackgroundColor((Color.parseColor("#87e352")));
+                numero_puntos += 50;
+            }
+        });
+        // textview de respuesta 3
+        resp3.setText(resp3N);
+        resp3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // respuesta incorrecta
+                // TODO: poner if de si es incorrecta o no para el color
+                resp3.setBackgroundColor((Color.parseColor("#E35252")));
+                resp2.setBackgroundColor((Color.parseColor("#87e352")));
+            }
+        });
+        // textview de respuesta 4
+        resp4.setText(resp4N);
+        resp4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // respuesta incorrecta
+                // TODO: poner if de si es incorrecta o no para el color
+                resp4.setBackgroundColor((Color.parseColor("#E35252")));
+                resp2.setBackgroundColor((Color.parseColor("#87e352")));
+            }
+        });
     }
 }
 
