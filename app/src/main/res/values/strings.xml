@@ -15,4 +15,12 @@
     <item name="signout" type="id" />
     <item name="ok" type="id" />
     <item name="comenzar" type="id" />
+    <item name="cancelar" type="id" />
+    <item name="posponer" type="id" />
+    <item name="abandonar" type="id" />
+    <string-array name="opciones">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+    </string-array>
 </resources>

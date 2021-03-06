@@ -57,6 +57,27 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".CambiarAvatar" />
         </activity>
+        <activity
+            android:name=".DecisionIndividual"
+            android:parentActivityName=".DecisionIndividual" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DecisionIndividual" />
+        </activity>
+        <activity
+            android:name=".AbandonarPartida"
+            android:parentActivityName=".AbandonarPartida" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".AbandonarPartida" />
+        </activity>
+        <activity
+            android:name=".JuegoIndividual"
+            android:parentActivityName=".JuegoIndividual" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".JuegoIndividual" />
+        </activity>
     </application>
 
 </manifest>

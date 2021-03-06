@@ -40,13 +40,13 @@ public class DecisionJuego extends AppCompatActivity {
 
         // Botón de empezar partida individual
         Button indvButton = (Button) findViewById(R.id.individual);
-        /*indvButton.setOnClickListener(new View.OnClickListener() {
+        indvButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent (v.getContext(), RegistroUsuario.class);
+                Intent intent = new Intent (v.getContext(), DecisionIndividual.class);
                 startActivityForResult(intent, OPTION_INDIVIDUAL);
             }
-        });*/
+        });
 
         ImageButton tiendaButton = (ImageButton) findViewById(R.id.tienda);
         /*tiendaButton.setOnClickListener(new View.OnClickListener() {
