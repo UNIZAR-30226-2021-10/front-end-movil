@@ -7,6 +7,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -30,6 +31,10 @@ public class DecisionIndividual extends AppCompatActivity implements OnItemSelec
         Spinner spinner = (Spinner) findViewById(R.id.caja_opciones);
         spinner.setOnItemSelectedListener(this);
 
+        final Bundle extras = new Bundle();
+        int numRonda = Integer.parseInt(spinner.getItemAtPosition(spinner.getSelectedItemPosition()).toString());
+        extras.putInt("rondas",numRonda);
+
 
         // Botón de empezar partida individual
         Button comenzarButton = (Button) findViewById(R.id.comenzar);
@@ -37,6 +42,7 @@ public class DecisionIndividual extends AppCompatActivity implements OnItemSelec
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent (v.getContext(), JuegoIndividual.class);
+                intent.putExtras(extras);
                 startActivityForResult(intent, OPTION_COMENZAR);
             }
         });

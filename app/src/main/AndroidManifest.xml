@@ -78,6 +78,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".JuegoIndividual" />
         </activity>
+        <activity
+            android:name=".FinPartidaIndv"
+            android:parentActivityName=".FinPartidaIndv" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".FinPartidaIndv" />
+        </activity>
     </application>
 
 </manifest>

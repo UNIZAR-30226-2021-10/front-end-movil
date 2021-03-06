@@ -18,6 +18,8 @@
     <item name="cancelar" type="id" />
     <item name="posponer" type="id" />
     <item name="abandonar" type="id" />
+    <item name="salir" type="id" />
+    <item name="nueva" type="id" />
     <string-array name="opciones">
         <item>5</item>
         <item>10</item>

@@ -3,14 +3,9 @@ package eina.unizar.front_end_movil;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,7 +15,7 @@ import java.util.Random;
 public class JuegoIndividual extends AppCompatActivity{
 
     private static final int OPTION_ATRAS = 0;
-    private static final int OPTION_JUEGO = 1;
+    private static final int OPTION_ACABAR = 1;
 
     private TextView pregunta;
     private TextView resp1;
@@ -39,6 +34,7 @@ public class JuegoIndividual extends AppCompatActivity{
     String[] pregunta2 = {"Two rats can become the progenitors of 15,000 rats in less than..", "1 month", "1 week", "1 day", "1 year"};
     String[] pregunta3 = {"What Separates Spain From Morocco?", "The North African Strait", "The Bering Strait", "The Strait Of Gibralter" , "The Strait Of Casablanca"};
 
+    private int NUM_RONDAS;
     int numero_ronda = 0;
     int numero_puntos = 0;
 
@@ -54,6 +50,9 @@ public class JuegoIndividual extends AppCompatActivity{
         setContentView(R.layout.juego_individual);
         getSupportActionBar().hide();
 
+        Bundle extras = getIntent().getExtras();
+        NUM_RONDAS = extras.getInt("rondas");
+
         pregunta = (TextView)findViewById(R.id.pregunta);
         resp1 = (TextView)findViewById(R.id.respuesta1);
         resp2 = (TextView)findViewById(R.id.respuesta2);
@@ -62,6 +61,8 @@ public class JuegoIndividual extends AppCompatActivity{
         num_rondas = (TextView)findViewById(R.id.num_rondas);
         num_puntos = (TextView)findViewById(R.id.num_puntos);
         categoria = (TextView)findViewById(R.id.categoria);
+
+        desactivar();
 
         imagenDados = (ImageButton) findViewById(R.id.dado);
         imagenDados.setOnClickListener(new View.OnClickListener() {
@@ -85,7 +86,34 @@ public class JuegoIndividual extends AppCompatActivity{
 
     }
 
+    void comprobarRondas(){
+        if (numero_ronda == NUM_RONDAS) {
+            Bundle extra = new Bundle();
+            extra.putInt("puntosTotales", numero_puntos);
+            Intent intent = new Intent(this, FinPartidaIndv.class);
+            intent.putExtras(extra);
+            startActivityForResult(intent, OPTION_ACABAR);
+        }
+    }
+
+    void activar(){
+        pregunta.setClickable(true);
+        resp1.setClickable(true);
+        resp2.setClickable(true);
+        resp3.setClickable(true);
+        resp4.setClickable(true);
+    }
+
+    void desactivar(){
+        pregunta.setClickable(false);
+        resp1.setClickable(false);
+        resp2.setClickable(false);
+        resp3.setClickable(false);
+        resp4.setClickable(false);
+    }
+
     void resetear(){
+        activar();
         pregunta.setText("");
         resp1.setText("");
         resp2.setText("");
@@ -140,6 +168,7 @@ public class JuegoIndividual extends AppCompatActivity{
 
         // TODO: esto luego se hará con la base de datos
         // text view de pregunta
+        imagenDados.setClickable(false);
         pregunta.setText(preguntaN);
 
         // textview respuesta 1
@@ -151,6 +180,9 @@ public class JuegoIndividual extends AppCompatActivity{
                 // TODO: poner if de si es incorrecta o no para el color
                 resp1.setBackgroundColor((Color.parseColor("#E35252")));
                 resp2.setBackgroundColor((Color.parseColor("#87e352")));
+                desactivar();
+                imagenDados.setClickable(true);
+                comprobarRondas();
             }
         });
         // textview respuesta 2
@@ -161,7 +193,10 @@ public class JuegoIndividual extends AppCompatActivity{
                 // respuesta correcta
                 // TODO: poner if de si es incorrecta o no para el color
                 resp2.setBackgroundColor((Color.parseColor("#87e352")));
+                desactivar();
                 numero_puntos += 50;
+                imagenDados.setClickable(true);
+                comprobarRondas();
             }
         });
         // textview de respuesta 3
@@ -173,6 +208,9 @@ public class JuegoIndividual extends AppCompatActivity{
                 // TODO: poner if de si es incorrecta o no para el color
                 resp3.setBackgroundColor((Color.parseColor("#E35252")));
                 resp2.setBackgroundColor((Color.parseColor("#87e352")));
+                desactivar();
+                imagenDados.setClickable(true);
+                comprobarRondas();
             }
         });
         // textview de respuesta 4
@@ -184,6 +222,9 @@ public class JuegoIndividual extends AppCompatActivity{
                 // TODO: poner if de si es incorrecta o no para el color
                 resp4.setBackgroundColor((Color.parseColor("#E35252")));
                 resp2.setBackgroundColor((Color.parseColor("#87e352")));
+                desactivar();
+                imagenDados.setClickable(true);
+                comprobarRondas();
             }
         });
     }
