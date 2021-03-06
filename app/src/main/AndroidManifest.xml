@@ -85,6 +85,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".FinPartidaIndv" />
         </activity>
+        <activity
+            android:name=".DecisionMultijugador"
+            android:parentActivityName=".DecisionMultijugador" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DecisionMultijugador" />
+        </activity>
     </application>
 
 </manifest>

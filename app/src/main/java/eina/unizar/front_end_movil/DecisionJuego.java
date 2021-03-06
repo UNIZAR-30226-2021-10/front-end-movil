@@ -30,13 +30,13 @@ public class DecisionJuego extends AppCompatActivity {
 
         // Botón de empezar partida multijugador
         Button multiButton = (Button) findViewById(R.id.multijugador);
-        /*multiButton.setOnClickListener(new View.OnClickListener() {
+        multiButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent (v.getContext(), CambiarPassword.class);
+                Intent intent = new Intent (v.getContext(), DecisionMultijugador.class);
                 startActivityForResult(intent, OPTION_MUTLIJUGADOR);
             }
-        });*/
+        });
 
         // Botón de empezar partida individual
         Button indvButton = (Button) findViewById(R.id.individual);
