@@ -43,7 +43,7 @@ public class DecisionJuego extends AppCompatActivity {
         indvButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent (v.getContext(), DecisionIndividual.class);
+                Intent intent = new Intent (v.getContext(), AbandonarPartida.class);
                 startActivityForResult(intent, OPTION_INDIVIDUAL);
             }
         });

@@ -12,9 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class AbandonarPartida extends AppCompatActivity {
 
-    private static final int OPTION_CANCELAR = 0;
-    private static final int OPTION_POSPONER = 1;
-    private static final int OPTION_ABANDONAR = 2;
+    private static final int OPTION_POSPONER = 0;
+    private static final int OPTION_ABANDONAR = 1;
 
     /**
      * Called when the activity is first created.
@@ -25,7 +24,7 @@ public class AbandonarPartida extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.decision_individual);
+        setContentView(R.layout.abandonar_partida);
         getSupportActionBar().hide();
 
 
@@ -34,6 +33,7 @@ public class AbandonarPartida extends AppCompatActivity {
         cancelarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Para que vuelva a donde estaba
                 finish();
             }
         });
