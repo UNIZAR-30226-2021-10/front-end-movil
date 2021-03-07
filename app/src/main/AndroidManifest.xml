@@ -92,6 +92,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".DecisionMultijugador" />
         </activity>
+        <activity
+            android:name=".CrearPartidaMultijugador"
+            android:parentActivityName=".CrearPartidaMultijugador" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".CrearPartidaMultijugador" />
+        </activity>
     </application>
 
 </manifest>

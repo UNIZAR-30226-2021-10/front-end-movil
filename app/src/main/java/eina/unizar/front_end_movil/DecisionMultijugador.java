@@ -48,13 +48,13 @@ public class DecisionMultijugador extends AppCompatActivity {
 
         // Botón de crear partida
         Button crearButton = (Button) findViewById(R.id.crear);
-        /*crearButton.setOnClickListener(new View.OnClickListener() {
+        crearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), CrearPartidaMultijugador.class);
                 startActivityForResult(intent, OPTION_CREAR_NUEVA);
             }
-        });*/
+        });
 
     }
 
