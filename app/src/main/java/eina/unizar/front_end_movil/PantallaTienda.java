@@ -9,10 +9,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -66,6 +64,9 @@ public class PantallaTienda extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView adapterView, View view, int i, long l) {
                 Intent intent = new Intent(adapterView.getContext(), ObjetoTienda.class);
+                Bundle extras = new Bundle();
+                extras.putInt("imagen",imagenesSombreros[i]);
+                intent.putExtras(extras);
                 startActivityForResult(intent, OPTION_OBJETO);
             }
         });
@@ -74,7 +75,7 @@ public class PantallaTienda extends AppCompatActivity {
         adapterColores = new ListViewAdapter(this, imagenesColores);
         listaColores.setAdapter(adapterColores);
 
-        listaVehiculos = (ListView) findViewById(R.id.listaVehículos);
+        listaVehiculos = (ListView) findViewById(R.id.listaVehiculos);
         adapterVehiculos = new ListViewAdapter(this, imagenesVehiculos);
         listaVehiculos.setAdapter(adapterVehiculos);
 
@@ -116,7 +117,7 @@ public class PantallaTienda extends AppCompatActivity {
             //http://developer.android.com/intl/es/reference/android/view/LayoutInflater.html
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-            View itemView = inflater.inflate(R.layout.objetos_tienda, parent, false);
+            View itemView = inflater.inflate(R.layout.rows_objetos_tienda, parent, false);
 
             // Locate the TextViews in listview_item.xml
             img = (ImageView) itemView.findViewById(R.id.foto_objeto);
