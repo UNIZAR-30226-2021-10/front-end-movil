@@ -49,13 +49,13 @@ public class DecisionJuego extends AppCompatActivity {
         });
 
         ImageButton tiendaButton = (ImageButton) findViewById(R.id.tienda);
-        /*tiendaButton.setOnClickListener(new View.OnClickListener() {
+        tiendaButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent (v.getContext(), RegistroUsuario.class);
+                Intent intent = new Intent (v.getContext(), PantallaTienda.class);
                 startActivityForResult(intent, OPTION_TIENDA);
             }
-        });*/
+        });
 
         ImageButton perfilButton = (ImageButton) findViewById(R.id.perfil);
         perfilButton.setOnClickListener(new View.OnClickListener() {

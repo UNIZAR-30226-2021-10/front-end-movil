@@ -121,6 +121,20 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".PantallaChat" />
         </activity>
+        <activity
+            android:name=".PantallaTienda"
+            android:parentActivityName=".PantallaTienda" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".PantallaTienda" />
+        </activity>
+        <activity
+            android:name=".ObjetoTienda"
+            android:parentActivityName=".ObjetoTienda" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ObjetoTienda" />
+        </activity>
     </application>
 
 </manifest>
