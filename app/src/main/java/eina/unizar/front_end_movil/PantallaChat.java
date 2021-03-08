@@ -8,12 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 
 public class PantallaChat extends AppCompatActivity{
+
+    private static final int OPTION_INSTRUCCIONES = 0;
 
     private TextView mensajeChat;
     private ListView listaMensajes;
@@ -66,6 +69,15 @@ public class PantallaChat extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 finish();
+            }
+        });
+
+        ImageButton instButton = (ImageButton) findViewById(R.id.instrucciones);
+        instButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent (v.getContext(), InstruccionesJuego.class);
+                startActivityForResult(intent, OPTION_INSTRUCCIONES);
             }
         });
 

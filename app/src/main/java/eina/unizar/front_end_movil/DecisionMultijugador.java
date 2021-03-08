@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +14,8 @@ public class DecisionMultijugador extends AppCompatActivity {
 
     private static final int OPTION_ACCEDER = 0;
     private static final int OPTION_CREAR_NUEVA = 1;
+    private static final int OPTION_INSTRUCCIONES = 2;
+    private static final int OPTION_ATRAS = 2;
 
     EditText codigoPartida;
 
@@ -55,6 +58,25 @@ public class DecisionMultijugador extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), CrearPartidaMultijugador.class);
                 startActivityForResult(intent, OPTION_CREAR_NUEVA);
+            }
+        });
+
+        ImageButton instButton = (ImageButton) findViewById(R.id.instrucciones);
+        instButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent (v.getContext(), InstruccionesJuego.class);
+                startActivityForResult(intent, OPTION_INSTRUCCIONES);
+            }
+        });
+
+        // Botón de atras
+        Button atrasButton = (Button) findViewById(R.id.atras);
+        atrasButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent (v.getContext(), DecisionJuego.class);
+                startActivityForResult(intent, OPTION_ATRAS);
             }
         });
 

@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,7 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
 
     private static final int OPTION_CREAR = 0;
     private static final int OPTION_ATRAS = 1;
+    private static final int OPTION_INSTRUCCIONES = 2;
 
     Spinner numJugadores;
     Spinner numRondas;
@@ -58,6 +60,15 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), DecisionMultijugador.class);
                 startActivityForResult(intent, OPTION_ATRAS);
+            }
+        });
+
+        ImageButton instButton = (ImageButton) findViewById(R.id.instrucciones);
+        instButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent (v.getContext(), InstruccionesJuego.class);
+                startActivityForResult(intent, OPTION_INSTRUCCIONES);
             }
         });
 

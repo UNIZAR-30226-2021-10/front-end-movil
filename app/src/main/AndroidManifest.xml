@@ -135,6 +135,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ObjetoTienda" />
         </activity>
+        <activity
+            android:name=".InstruccionesJuego"
+            android:parentActivityName=".InstruccionesJuego" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".InstruccionesJuego" />
+        </activity>
     </application>
 
 </manifest>

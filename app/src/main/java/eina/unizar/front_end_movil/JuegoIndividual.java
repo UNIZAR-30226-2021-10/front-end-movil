@@ -16,6 +16,7 @@ public class JuegoIndividual extends AppCompatActivity{
 
     private static final int OPTION_ATRAS = 0;
     private static final int OPTION_ACABAR = 1;
+    private static final int OPTION_INSTRUCCIONES = 2;
 
     private TextView pregunta;
     private TextView resp1;
@@ -80,6 +81,15 @@ public class JuegoIndividual extends AppCompatActivity{
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), AbandonarPartida.class);
                 startActivityForResult(intent, OPTION_ATRAS);
+            }
+        });
+
+        ImageButton instButton = (ImageButton) findViewById(R.id.instrucciones);
+        instButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent (v.getContext(), InstruccionesJuego.class);
+                startActivityForResult(intent, OPTION_INSTRUCCIONES);
             }
         });
 

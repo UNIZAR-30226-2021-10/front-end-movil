@@ -15,6 +15,7 @@ public class DecisionJuego extends AppCompatActivity {
     private static final int OPTION_INDIVIDUAL = 1;
     private static final int OPTION_TIENDA = 2;
     private static final int OPTION_PERFIL = 3;
+    private static final int OPTION_INSTRUCCIONES = 4;
 
     /**
      * Called when the activity is first created.
@@ -63,6 +64,15 @@ public class DecisionJuego extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent (v.getContext(), PerfilUsuario.class);
                 startActivityForResult(intent, OPTION_PERFIL);
+            }
+        });
+
+        ImageButton instButton = (ImageButton) findViewById(R.id.instrucciones);
+        instButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent (v.getContext(), InstruccionesJuego.class);
+                startActivityForResult(intent, OPTION_INSTRUCCIONES);
             }
         });
 
