@@ -99,6 +99,20 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".CrearPartidaMultijugador" />
         </activity>
+        <activity
+            android:name=".JuegoMultijugador"
+            android:parentActivityName=".JuegoMultijugador" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".JuegoMultijugador" />
+        </activity>
+        <activity
+            android:name=".FinPartidaMulti"
+            android:parentActivityName=".FinPartidaMulti" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".FinPartidaMulti" />
+        </activity>
     </application>
 
 </manifest>

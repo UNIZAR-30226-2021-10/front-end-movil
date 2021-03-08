@@ -34,17 +34,19 @@ public class DecisionMultijugador extends AppCompatActivity {
 
         // Botón de unirse a una partida ya creada
         Button accederButton = (Button) findViewById(R.id.acceder);
-        /*accederButton.setOnClickListener(new View.OnClickListener() {
+        accederButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String codigoInsertado = codigoPartida.getText().toString();
                 if(codigoInsertado.equals(CODIGO_PARTIDA)){
-
+                    Intent intent = new Intent (v.getContext(), JuegoMultijugador.class);
+                    startActivityForResult(intent, OPTION_ACCEDER);
+                }else{
+                    codigoPartida.setError("El código de partida es incorrecto");
                 }
-                Intent intent = new Intent (v.getContext(), JuegoMultijugador.class);
-                startActivityForResult(intent, OPTION_ACCEDER);
+
             }
-        });*/
+        });
 
         // Botón de crear partida
         Button crearButton = (Button) findViewById(R.id.crear);

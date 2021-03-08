@@ -3,10 +3,7 @@ package eina.unizar.front_end_movil;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,7 +27,7 @@ public class FinPartidaIndv extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fin_partida);
+        setContentView(R.layout.fin_partida_indv);
         getSupportActionBar().hide();
 
         Bundle extra = getIntent().getExtras();

@@ -42,14 +42,14 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
 
         // Botón de empezar partida individual
         Button crearButton = (Button) findViewById(R.id.crear);
-        /*crearButton.setOnClickListener(new View.OnClickListener() {
+        crearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent (v.getContext(), PartidaMultijugador.class);
+                Intent intent = new Intent (v.getContext(), JuegoMultijugador.class);
                 intent.putExtras(extras);
                 startActivityForResult(intent, OPTION_CREAR);
             }
-        });*/
+        });
 
         // Botón de atrás
         Button atrasButton = (Button) findViewById(R.id.atras);
