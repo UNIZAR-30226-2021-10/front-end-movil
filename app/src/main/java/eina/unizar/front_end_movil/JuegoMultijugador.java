@@ -16,6 +16,7 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     private static final int OPTION_ATRAS = 0;
     private static final int OPTION_ACABAR = 1;
+    private static final int OPTION_CHAT = 2;
 
     private TextView pregunta;
     private TextView resp1;
@@ -117,6 +118,16 @@ public class JuegoMultijugador extends AppCompatActivity{
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), AbandonarPartida.class);
                 startActivityForResult(intent, OPTION_ATRAS);
+            }
+        });
+
+        // boton de atrás
+        ImageButton chatButton = (ImageButton) findViewById(R.id.chat);
+        chatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), PantallaChat.class);
+                startActivityForResult(intent, OPTION_CHAT);
             }
         });
 

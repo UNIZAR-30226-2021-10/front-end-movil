@@ -46,9 +46,6 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent (v.getContext(), JuegoMultijugador.class);
-                System.out.println("AQUÍIIII2");
-                System.out.println(numJugadores.getSelectedItemPosition());
-                System.out.println(numRondas.getSelectedItemPosition());
                 intent.putExtras(extras);
                 startActivityForResult(intent, OPTION_CREAR);
             }
