@@ -15,6 +15,10 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
     private static final int OPTION_CREAR = 0;
     private static final int OPTION_ATRAS = 1;
 
+    Spinner numJugadores;
+    Spinner numRondas;
+    Bundle extras;
+
     /**
      * Called when the activity is first created.
      *
@@ -27,17 +31,13 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
         setContentView(R.layout.crear_partida_multijugador);
         getSupportActionBar().hide();
 
-        Spinner numJugadores = (Spinner) findViewById(R.id.numero_jugadores);
+        extras = new Bundle();
+
+        numJugadores = (Spinner) findViewById(R.id.numero_jugadores);
         numJugadores.setOnItemSelectedListener(this);
 
-        Spinner numRondas = (Spinner) findViewById(R.id.numero_rondas);
+        numRondas = (Spinner) findViewById(R.id.numero_rondas);
         numRondas.setOnItemSelectedListener(this);
-
-        final Bundle extras = new Bundle();
-        int numPlayers = Integer.parseInt(numJugadores.getItemAtPosition(numJugadores.getSelectedItemPosition()).toString());
-        extras.putInt("jugadores",numPlayers);
-        int numRounds = Integer.parseInt(numRondas.getItemAtPosition(numRondas.getSelectedItemPosition()).toString());
-        extras.putInt("rondas",numRounds);
 
 
         // Botón de empezar partida individual
@@ -46,6 +46,9 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent (v.getContext(), JuegoMultijugador.class);
+                System.out.println("AQUÍIIII2");
+                System.out.println(numJugadores.getSelectedItemPosition());
+                System.out.println(numRondas.getSelectedItemPosition());
                 intent.putExtras(extras);
                 startActivityForResult(intent, OPTION_CREAR);
             }
@@ -67,6 +70,10 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         /* para cuando clica una opción*/
         // TODO: para la BD aquí se cogerá el valor del nº de rondas
+        int numPlayers = Integer.parseInt(numJugadores.getItemAtPosition(numJugadores.getSelectedItemPosition()).toString());
+        extras.putInt("jugadores",numPlayers);
+        int numRounds = Integer.parseInt(numRondas.getItemAtPosition(numRondas.getSelectedItemPosition()).toString());
+        extras.putInt("rondas",numRounds);
     }
 
     @Override

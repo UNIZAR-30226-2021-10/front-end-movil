@@ -307,8 +307,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/usuario1_puntos"
@@ -436,9 +435,9 @@
         android:id="@+id/usuario2_nombre"
         android:layout_width="66dp"
         android:layout_height="11dp"
-        android:layout_marginStart="330dp"
-        android:layout_marginLeft="330dp"
-        android:layout_marginTop="177dp"
+        android:layout_marginStart="331dp"
+        android:layout_marginLeft="331dp"
+        android:layout_marginTop="178dp"
         android:layout_marginEnd="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginBottom="543dp"
@@ -448,8 +447,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/usuario2_puntos"

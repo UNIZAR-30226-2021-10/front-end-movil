@@ -45,12 +45,12 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     private int NUM_RONDAS;
     private int NUM_JUGADORES;
-    int numero_ronda = 1;
+    int numero_ronda = 0;
     int numero_puntos_p1 = 0;
     int numero_puntos_p2 = 0;
     int numero_puntos_p3 = 0;
     int numero_puntos_p4 = 0;
-    int rolled = 0;
+    int teToca = 0;
 
     /**
      * Called when the activity is first created.
@@ -136,7 +136,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     }
 
     void comprobarRondas(){
-        if (numero_ronda == NUM_RONDAS && rolled == NUM_JUGADORES) {
+        if (numero_ronda == NUM_RONDAS*NUM_JUGADORES) {
             Bundle extra = new Bundle();
             String ganador = quienEsGanador();
             extra.putString("ganador", ganador);
@@ -176,7 +176,6 @@ public class JuegoMultijugador extends AppCompatActivity{
     }
 
     void rollDice(){
-        rolled++;
         int random = rndNumber.nextInt(6) + 1;
         switch(random){
             case 1:
@@ -207,13 +206,13 @@ public class JuegoMultijugador extends AppCompatActivity{
         categoria.setText(categorias[random-1]);
         categoria.setTextColor((Color.parseColor(coloresCategorías[random-1])));
         // text view de rondas --> para poner por qué ronda vas
-        if(rolled == NUM_JUGADORES){
-            numero_ronda++;
-            rolled = 0;
-        }
-
+        numero_ronda++;
         num_rondas.setText(String.valueOf(numero_ronda));
-        turno_jugador.setText(String.valueOf(rolled));
+        teToca++;
+        if(teToca == NUM_JUGADORES+1){
+            teToca = 1;
+        }
+        turno_jugador.setText(String.valueOf(teToca));
 
         // asignar puntos respectivos
         usuario1_puntos.setText(String.valueOf(numero_puntos_p1));
@@ -252,11 +251,11 @@ public class JuegoMultijugador extends AppCompatActivity{
                 // TODO: poner if de si es incorrecta o no para el color
                 resp2.setBackgroundColor((Color.parseColor("#87e352")));
                 desactivar();
-                if(numero_ronda%NUM_RONDAS == 1){
+                if(teToca == 1){
                     numero_puntos_p1+= 50;
-                } else if(numero_ronda%NUM_RONDAS == 2){
+                } else if(teToca == 2){
                     numero_puntos_p2+= 50;
-                } else if(numero_ronda%NUM_RONDAS == 3){
+                } else if(teToca == 3){
                     numero_puntos_p3+= 50;
                 } else{
                     numero_puntos_p4+= 50;
