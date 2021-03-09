@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,6 +17,7 @@ public class ObjetoTienda extends AppCompatActivity {
     private static final int OPTION_ATRAS = 1;
 
     private ImageView image;
+    private TextView monedas;
     /**
      * Called when the activity is first created.
      *
@@ -29,6 +31,7 @@ public class ObjetoTienda extends AppCompatActivity {
         getSupportActionBar().hide();
 
         image = (ImageView) findViewById(R.id.imagenObjeto);
+        monedas = (TextView) findViewById(R.id.monedas_usuario);
 
         Bundle extras = getIntent().getExtras();
         int imagen = extras.getInt("imagen");
