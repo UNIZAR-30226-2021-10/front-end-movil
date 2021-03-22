@@ -104,5 +104,20 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@mipmap/instruccionesicon" />
 
+    <ImageButton
+        android:id="@+id/ranking"
+        android:layout_width="65dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="573dp"
+        android:layout_marginBottom="99dp"
+        android:background="@android:color/white"
+        android:scaleType="centerInside"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/trofeoicon" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
