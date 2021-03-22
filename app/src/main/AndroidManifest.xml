@@ -142,6 +142,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".InstruccionesJuego" />
         </activity>
+        <activity
+            android:name=".Ranking"
+            android:parentActivityName=".Ranking" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Ranking" />
+        </activity>
     </application>
 
 </manifest>
