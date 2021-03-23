@@ -43,6 +43,10 @@ public class DecisionMultijugador extends AppCompatActivity {
                 String codigoInsertado = codigoPartida.getText().toString();
                 if(codigoInsertado.equals(CODIGO_PARTIDA)){
                     Intent intent = new Intent (v.getContext(), JuegoMultijugador.class);
+                    Bundle extras = new Bundle();
+                    extras.putInt("jugadores",4);
+                    extras.putInt("rondas",5);
+                    intent.putExtras(extras);
                     startActivityForResult(intent, OPTION_ACCEDER);
                 }else{
                     codigoPartida.setError("El código de partida es incorrecto");
