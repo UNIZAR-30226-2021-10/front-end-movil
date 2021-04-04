@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+
 public class MenuPrincipal extends AppCompatActivity {
 
     /**
@@ -76,9 +77,13 @@ public class MenuPrincipal extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent (v.getContext(), RegistroUsuario.class);
                 startActivityForResult(intent, OPTION_REGISTRO);
+
+
             }
         });
     }
+
+
 }
 
 

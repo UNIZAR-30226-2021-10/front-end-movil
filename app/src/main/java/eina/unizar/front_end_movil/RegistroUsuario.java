@@ -5,8 +5,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import database_wrapper.RetrofitInterface;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.HashMap;
 
 public class RegistroUsuario extends AppCompatActivity {
 
@@ -17,6 +27,10 @@ public class RegistroUsuario extends AppCompatActivity {
     private EditText email;
     private EditText password_new;
     private EditText password_new2;
+
+    private Retrofit retrofit;
+    private RetrofitInterface retrofitInterface;
+    private String BASE_URL = "https://trivial-db.herokuapp.com/";
 
     /**
      * Called when the activity is first created.
@@ -29,6 +43,10 @@ public class RegistroUsuario extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.registro_usuario);
         getSupportActionBar().hide();
+
+        //Construirmos el objeto retrofit
+        retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+        retrofitInterface = retrofit.create(RetrofitInterface.class);
 
         //Edit text de nombre usuario
         nombre_usuario = (EditText) findViewById(R.id.nombre_usuario);
@@ -56,8 +74,9 @@ public class RegistroUsuario extends AppCompatActivity {
                 } else {
                     // COMPROBAR CONTRASEÑA es igual en ambos campos
                     if (password_new.getText().toString().equals(password_new2.getText().toString())) {
-                        Intent intent = new Intent(v.getContext(), MenuPrincipal.class);
-                        startActivityForResult(intent, OPTION_SIGN_UP);
+                       // Intent intent = new Intent(v.getContext(), MenuPrincipal.class);
+                        //startActivityForResult(intent, OPTION_SIGN_UP);
+                        handleRegister();
                     } else {
                         // mensaje de error
                         password_new2.setError("Las contraseñas no son iguales");
@@ -75,6 +94,36 @@ public class RegistroUsuario extends AppCompatActivity {
                 startActivityForResult(intent, OPTION_ATRAS);
             }
         });
+    }
+
+    private void handleRegister() {
+
+        HashMap<String,String> newUser = new HashMap<>();
+
+        newUser.put("email",email.getText().toString());
+        newUser.put("nickname",nombre_usuario.getText().toString());
+        newUser.put("password",password_new.getText().toString());
+
+        Call<Void> call = retrofitInterface.executeSignUp(newUser);
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.code() == 200) {
+                    Toast.makeText(RegistroUsuario.this,
+                            "Registrado exitosamente.", Toast.LENGTH_LONG).show();
+                } else if (response.code() == 400) {
+                    Toast.makeText(RegistroUsuario.this,
+                            "Ya existe un email con esas credenciales.", Toast.LENGTH_LONG).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(RegistroUsuario.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 }
 
