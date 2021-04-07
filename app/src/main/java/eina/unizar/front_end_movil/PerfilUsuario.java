@@ -1,6 +1,7 @@
 package eina.unizar.front_end_movil;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -10,10 +11,13 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
+
+import SessionManagement.GestorSesion;
 
 public class PerfilUsuario extends AppCompatActivity {
 
@@ -25,6 +29,8 @@ public class PerfilUsuario extends AppCompatActivity {
     private ListView listaObjetos;
     private String[] nombres = {"Traje", "Médico", "Paragüas", "Estetoscopio", "Maletín",
             "Vestido", "Corbata", "Gafas", "Balon", "Sombrero"};
+
+    private GestorSesion gestorSesion;
 
     /**
      * Called when the activity is first created.
@@ -40,6 +46,17 @@ public class PerfilUsuario extends AppCompatActivity {
 
         listaObjetos = (ListView)findViewById(R.id.list);
         fillData();
+
+        gestorSesion = new GestorSesion(PerfilUsuario.this);
+        TextView usuario =  (TextView) findViewById(R.id.user_name);
+        usuario.setText(gestorSesion.getSession());
+        TextView email = (TextView) findViewById(R.id.user_email);
+        email.setText(gestorSesion.getmailSession());
+        TextView coins = (TextView) findViewById(R.id.user_coins);
+        coins.setText(gestorSesion.getKEY_SESSION_COINS());
+        TextView points = (TextView) findViewById(R.id.user_points);
+        points.setText(gestorSesion.getpointsSession());
+
 
         Button ajustesButton = (Button) findViewById((R.id.ajustes));
         ajustesButton.setOnClickListener(new View.OnClickListener() {
@@ -65,8 +82,7 @@ public class PerfilUsuario extends AppCompatActivity {
         signOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), MenuPrincipal.class);
-                startActivityForResult(intent, OPTION_CERRAR_SESION);
+                handleLogOut();
             }
         });
 
@@ -79,6 +95,13 @@ public class PerfilUsuario extends AppCompatActivity {
                 startActivityForResult(intent, OPTION_ATRAS);
             }
         });
+    }
+
+    private void handleLogOut() {
+
+        gestorSesion.removeSession();
+        Intent intent = new Intent(PerfilUsuario.this, MenuPrincipal.class);
+        startActivityForResult(intent, OPTION_CERRAR_SESION);
     }
 
     /**

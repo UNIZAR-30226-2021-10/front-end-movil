@@ -2,11 +2,29 @@ package eina.unizar.front_end_movil;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import cn.pedant.SweetAlert.*;
+
+import database_wrapper.APIUtils;
+import database_wrapper.RetrofitInterface;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import java.util.HashMap;
+import java.util.regex.Pattern;
 
 public class RegistroUsuario extends AppCompatActivity {
 
@@ -17,6 +35,18 @@ public class RegistroUsuario extends AppCompatActivity {
     private EditText email;
     private EditText password_new;
     private EditText password_new2;
+
+    private RetrofitInterface retrofitInterface;
+    //REGEX para comprobar el email
+    private  final Pattern EMAIL_ADDRESS_PATTERN = Pattern.compile(
+            "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
+                    "\\@" +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
+                    "(" +
+                    "\\." +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
+                    ")+"
+    );
 
     /**
      * Called when the activity is first created.
@@ -29,6 +59,8 @@ public class RegistroUsuario extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.registro_usuario);
         getSupportActionBar().hide();
+        //Construimos el objeto retrofit
+        retrofitInterface = APIUtils.getAPIService();
 
         //Edit text de nombre usuario
         nombre_usuario = (EditText) findViewById(R.id.nombre_usuario);
@@ -56,8 +88,12 @@ public class RegistroUsuario extends AppCompatActivity {
                 } else {
                     // COMPROBAR CONTRASEÑA es igual en ambos campos
                     if (password_new.getText().toString().equals(password_new2.getText().toString())) {
-                        Intent intent = new Intent(v.getContext(), MenuPrincipal.class);
-                        startActivityForResult(intent, OPTION_SIGN_UP);
+                        //Comprobar email válido
+                        if(comprobarEmail(email.getText().toString())){
+                            handleRegister();
+                        }else {
+                            email.setError("El email es invalido, introduzca un email valido por ejemplo: pedro@gmail.com");
+                        }
                     } else {
                         // mensaje de error
                         password_new2.setError("Las contraseñas no son iguales");
@@ -75,6 +111,57 @@ public class RegistroUsuario extends AppCompatActivity {
                 startActivityForResult(intent, OPTION_ATRAS);
             }
         });
+    }
+
+    private void handleRegister() {
+
+        HashMap<String,String> newUser = new HashMap<>();
+
+        newUser.put("email",email.getText().toString());
+        newUser.put("nickname",nombre_usuario.getText().toString());
+        newUser.put("password",password_new.getText().toString());
+
+        Call<JsonObject> call = retrofitInterface.executeSignUp(newUser);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
+                if (response.code() == 200) {
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            new SweetAlertDialog(RegistroUsuario.this,SweetAlertDialog.SUCCESS_TYPE).setTitleText("Registrado Exitosamente!")
+                                    .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
+                                        @Override
+                                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                            Intent intent = new Intent (RegistroUsuario.this, MenuPrincipal.class);
+                                            startActivityForResult(intent,OPTION_SIGN_UP);
+                                        }
+                                    }).show();
+                        }
+
+                    },500);
+                } else if (response.code() == 400 ) {
+                    Toast.makeText(RegistroUsuario.this, "Ya existe un usuario con ese nickname, introduzca otro.", Toast.LENGTH_LONG).show();
+                    nombre_usuario.getText().clear();
+                } else if (response.code() == 410) {
+                    Toast.makeText(RegistroUsuario.this, "Ya existe un usuario con ese email, compruebe las creedenciales.", Toast.LENGTH_LONG).show();
+                    email.getText().clear();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(RegistroUsuario.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    private boolean comprobarEmail(String email) {
+        return EMAIL_ADDRESS_PATTERN.matcher(email).matches();
     }
 }
 
