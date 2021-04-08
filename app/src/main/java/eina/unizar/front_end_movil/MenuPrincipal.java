@@ -59,9 +59,9 @@ public class MenuPrincipal extends AppCompatActivity {
         //EDIT TEXT DE CONTRASEÑA
         password = (EditText) findViewById(R.id.texto_contasenya);
 
-        // Probar mensajes de error para contraseña
-        final String contrasenyaCorrecta = "1234";
-        final String usuarioCorrecto = "w";
+        // Probar mensajes de error para contraseña -- antes de base de datos
+        //final String contrasenyaCorrecta = "1234";
+        //final String usuarioCorrecto = "w";
 
         // Botón de acceder/iniciar sesión
         Button accederButton = (Button) findViewById(R.id.acceder);
@@ -120,7 +120,7 @@ public class MenuPrincipal extends AppCompatActivity {
                 if(response.code() == 200){
 
                     JsonObject jsonObject = response.body().getAsJsonObject("email");
-                    String test = jsonObject.get("email").getAsString();
+                    // String test = jsonObject.get("email").getAsString();
                     //Creamos un usuario con la información procedente de la base de datos
                     User usuario =  new User(jsonObject.get("email").getAsString(),jsonObject.get("nickname").getAsString()
                                             ,jsonObject.get("puntos").getAsString(),jsonObject.get("monedas").getAsString());
@@ -132,7 +132,6 @@ public class MenuPrincipal extends AppCompatActivity {
 
                 }else if(response.code() == 400){
                     Toast.makeText( MenuPrincipal.this, "Contraseña o usuario incorrecto.", Toast.LENGTH_LONG).show();
-
                 }
             }
 
