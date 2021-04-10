@@ -13,9 +13,9 @@ public class FinPartidaIndv extends AppCompatActivity {
 
     private static final int OPTION_NUEVA_PARTIDA = 0;
     private static final int OPTION_SALIR = 1;
-    private static final int OPTION_INSTRUCCIONES = 2;
 
     private int PUNTOS_TOTALES;
+    private int NUM_RONDAS;
 
     TextView puntosTotales;
     TextView monedasTotales;
@@ -34,11 +34,18 @@ public class FinPartidaIndv extends AppCompatActivity {
 
         Bundle extra = getIntent().getExtras();
         PUNTOS_TOTALES = extra.getInt("puntosTotales");
+        NUM_RONDAS = extra.getInt("rondas");
 
         puntosTotales = (TextView)findViewById(R.id.puntos_ganados);
         monedasTotales = (TextView)findViewById(R.id.monedas_ganadas);
         puntosTotales.setText(String.valueOf(PUNTOS_TOTALES));
         monedasTotales.setText(String.valueOf(PUNTOS_TOTALES/2));
+
+        // TODO: METER DATOS A BASE DE DATOS
+        // meter num rondas
+        // meter numero de monedas del usuario
+        // meter numero de puntos obtenidos
+        // en general meter la partida entera
 
         // Botón de empezar partida individual
         Button nuevaButton = (Button) findViewById(R.id.nueva);
