@@ -29,9 +29,11 @@ public class AjustesUsuario extends AppCompatActivity {
 
     private static final int OPTION_GUARDAR = 0;
     private static final int OPTION_ATRAS = 1;
+    private static final int OPTION_ELIMINARCUENTA = 2;
+
 
     private EditText nombre_usuario;
-    private EditText email;
+    private TextView email;
     private EditText password_new;
     private EditText password_new2;
 
@@ -68,8 +70,8 @@ public class AjustesUsuario extends AppCompatActivity {
         //Edit text de nombre usuario
         nombre_usuario = (EditText) findViewById(R.id.nombre_usuario);
         nombre_usuario.setText(gestorSesion.getSession());
-        //EDIT TEXT DE EMAIL
-        email = (EditText) findViewById(R.id.email);
+        //TEXT VIEW DEL EMAIL
+        email = (TextView) findViewById(R.id.email);
         email.setText(gestorSesion.getmailSession());
         //EDIT TEXT DE CONTRASEÑA NUEVA
         password_new = (EditText) findViewById(R.id.password_new);
@@ -113,6 +115,18 @@ public class AjustesUsuario extends AppCompatActivity {
                 startActivityForResult(intent, OPTION_ATRAS);
             }
         });
+
+        //Botón de eliminar cuenta
+        Button eliminarCuentaButton = (Button) findViewById(R.id.eliminarCuenta);
+        eliminarCuentaButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handleEliminarCuenta();
+                Intent intent = new Intent(v.getContext(), PerfilUsuario.class);
+                startActivityForResult(intent, OPTION_ELIMINARCUENTA);
+            }
+        });
+
     }
 
     private void handleSaveChanges() {
@@ -128,7 +142,6 @@ public class AjustesUsuario extends AppCompatActivity {
             //Gestionamos la respuesta de la llamada a post
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-
                 if (response.code() == 200) {
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
@@ -144,9 +157,6 @@ public class AjustesUsuario extends AppCompatActivity {
                         }
 
                     }, 500);
-                } else if (response.code() == 410) {
-                    Toast.makeText(AjustesUsuario.this, "Ya existe un usuario con ese email, compruebe las creedenciales.", Toast.LENGTH_LONG).show();
-                    email.getText().clear();
                 }
             }
 
@@ -157,27 +167,32 @@ public class AjustesUsuario extends AppCompatActivity {
         });
     }
 
-    private boolean comprobarEmail(String email) {
-        return EMAIL_ADDRESS_PATTERN.matcher(email).matches();
-    }
+    private void handleEliminarCuenta() {
 
-    /*
-    private void obtenerContrasenya(){
-        HashMap<String, String> obtenerContrasenya = new HashMap<>();
-        obtenerContrasenya.put("email", email.getText().toString());
-        Call<JsonObject> call = retrofitInterface.executeObtenerContrasenya(obtenerContrasenya);
+        HashMap<String, String> dropUser = new HashMap<>();
+        dropUser.put("email", email.getText().toString());
+
+        Call<JsonObject> call = retrofitInterface.executeDropUser(dropUser);
         call.enqueue(new Callback<JsonObject>() {
             //Gestionamos la respuesta de la llamada a post
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
 
                 if (response.code() == 200) {
-                    JsonObject jsonObject = response.body().getAsJsonObject("password");
-                    password_new.setText(jsonObject.get("password").getAsString());
-                    password_new2.setText(jsonObject.get("password").getAsString());
-                } else if (response.code() == 410) {
-                    Toast.makeText(AjustesUsuario.this, "No existe usuario con ese email", Toast.LENGTH_LONG).show();
-                    email.getText().clear();
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            new SweetAlertDialog(AjustesUsuario.this, SweetAlertDialog.SUCCESS_TYPE).setTitleText("Cuenta eliminada exitosamente!")
+                                    .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
+                                        @Override
+                                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                            Intent intent = new Intent(AjustesUsuario.this, PerfilUsuario.class);
+                                            startActivityForResult(intent, OPTION_ELIMINARCUENTA);
+                                        }
+                                    }).show();
+                        }
+
+                    }, 500);
                 }
             }
 
@@ -186,7 +201,9 @@ public class AjustesUsuario extends AppCompatActivity {
                 Toast.makeText(AjustesUsuario.this, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-    }*/
+    }
+
+
 }
 
 
