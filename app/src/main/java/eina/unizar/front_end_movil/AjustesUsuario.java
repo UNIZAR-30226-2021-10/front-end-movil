@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import com.google.gson.JsonObject;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
+import SessionManagement.GestorSesion;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import database_wrapper.RetrofitInterface;
 import retrofit2.Call;
@@ -31,6 +33,8 @@ public class AjustesUsuario extends AppCompatActivity {
     private EditText email;
     private EditText password_new;
     private EditText password_new2;
+
+    private GestorSesion gestorSesion;
 
     //MARTA
     private RetrofitInterface retrofitInterface;
@@ -57,14 +61,20 @@ public class AjustesUsuario extends AppCompatActivity {
         setContentView(R.layout.ajustes_usuario);
         getSupportActionBar().hide();
 
+        gestorSesion = new GestorSesion(AjustesUsuario.this);
+
         //Edit text de nombre usuario
         nombre_usuario = (EditText) findViewById(R.id.nombre_usuario);
+        nombre_usuario.setText(gestorSesion.getSession());
         //EDIT TEXT DE EMAIL
         email = (EditText) findViewById(R.id.email);
+        email.setText(gestorSesion.getmailSession());
         //EDIT TEXT DE CONTRASEÑA NUEVA
         password_new = (EditText) findViewById(R.id.password_new);
         // EDIT TEXT DE REPETICION DE CONTRASEÑA NUEVA
         password_new2 = (EditText) findViewById(R.id.password_new2);
+        //obtenerContrasenya();
+
 
         // Botón de sign up
         Button signUpButton = (Button) findViewById(R.id.signup);
@@ -74,8 +84,6 @@ public class AjustesUsuario extends AppCompatActivity {
                 // Comprobar que están todos los campos rellenados
                 if(nombre_usuario.getText().toString().isEmpty()){
                     nombre_usuario.setError("El campo no puede estar vacío");
-                } else if(email.getText().toString().isEmpty()){
-                    email.setError("El campo no puede estar vacío");
                 } else if(password_new.getText().toString().isEmpty()){
                     password_new.setError("El campo no puede estar vacío");
                 } else if(password_new2.getText().toString().isEmpty()){
@@ -83,15 +91,9 @@ public class AjustesUsuario extends AppCompatActivity {
                 } else {
                     // COMPROBAR CONTRASEÑA es igual en ambos campos
                     if (password_new.getText().toString().equals(password_new2.getText().toString())) {
-                        Intent intent = new Intent(v.getContext(), PerfilUsuario.class);
-                        startActivityForResult(intent, OPTION_GUARDAR);
-                        //editado por Marta
-                        //Comprobar email válido
-                        if(comprobarEmail(email.getText().toString())){
                             handleSaveChanges();
-                        }else {
-                            email.setError("El email es invalido, introduzca un email valido por ejemplo: pedro@gmail.com");
-                        }//hasta aquí
+                            Intent intent = new Intent(v.getContext(), PerfilUsuario.class);
+                            startActivityForResult(intent, OPTION_GUARDAR);
                     } else {
                         // mensaje de error
                         password_new2.setError("Las contraseñas no son iguales");
@@ -155,6 +157,32 @@ public class AjustesUsuario extends AppCompatActivity {
 
     private boolean comprobarEmail(String email) {
         return EMAIL_ADDRESS_PATTERN.matcher(email).matches();
+    }
+
+    private void obtenerContrasenya(){
+        HashMap<String, String> obtenerContrasenya = new HashMap<>();
+        obtenerContrasenya.put("email", email.getText().toString());
+        Call<JsonObject> call = retrofitInterface.executeSaveChanges(obtenerContrasenya);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
+                if (response.code() == 200) {
+                    JsonObject jsonObject = response.body().getAsJsonObject("password");
+                    password_new.setText(jsonObject.get("password").getAsString());
+                    password_new2.setText(jsonObject.get("password").getAsString());
+                } else if (response.code() == 410) {
+                    Toast.makeText(AjustesUsuario.this, "No existe usuario con ese email", Toast.LENGTH_LONG).show();
+                    email.getText().clear();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(AjustesUsuario.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
 

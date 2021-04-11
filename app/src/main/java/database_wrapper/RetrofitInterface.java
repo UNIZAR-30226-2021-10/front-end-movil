@@ -18,9 +18,13 @@ public interface RetrofitInterface {
     @POST("/MenuInicio")
     Call<JsonObject> executeLogin(@Body HashMap<String,String> map);
 
-    /*@POST("/ModoIndividual")
-    Call<JsonObject> getQuestion(@Body HashMap<String,String> map);*/
-
     @GET("/ModoIndividual")
     Call<JsonObject> getQuestion(@Query("category") String cat);
+
+    /*
+    @POST("/ObtenerContrasenya")
+    Call<JsonObject> executeObtenerContrasenya(@Body HashMap<String,String> map);*/
+
+    @POST("/AjustesUsuario")
+    Call<JsonObject> executeSaveChanges(@Body HashMap<String,String> map);
 }
