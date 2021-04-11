@@ -2,11 +2,25 @@ package eina.unizar.front_end_movil;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.gson.JsonObject;
+
+import java.util.HashMap;
+import java.util.regex.Pattern;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
+import database_wrapper.RetrofitInterface;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AjustesUsuario extends AppCompatActivity {
 
@@ -17,6 +31,19 @@ public class AjustesUsuario extends AppCompatActivity {
     private EditText email;
     private EditText password_new;
     private EditText password_new2;
+
+    //MARTA
+    private RetrofitInterface retrofitInterface;
+    //REGEX para comprobar el email
+    private  final Pattern EMAIL_ADDRESS_PATTERN = Pattern.compile(
+            "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
+                    "\\@" +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
+                    "(" +
+                    "\\." +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
+                    ")+"
+    ); //HASTA AQUI
 
     /**
      * Called when the activity is first created.
@@ -58,6 +85,13 @@ public class AjustesUsuario extends AppCompatActivity {
                     if (password_new.getText().toString().equals(password_new2.getText().toString())) {
                         Intent intent = new Intent(v.getContext(), PerfilUsuario.class);
                         startActivityForResult(intent, OPTION_GUARDAR);
+                        //editado por Marta
+                        //Comprobar email válido
+                        if(comprobarEmail(email.getText().toString())){
+                            handleSaveChanges();
+                        }else {
+                            email.setError("El email es invalido, introduzca un email valido por ejemplo: pedro@gmail.com");
+                        }//hasta aquí
                     } else {
                         // mensaje de error
                         password_new2.setError("Las contraseñas no son iguales");
@@ -75,6 +109,52 @@ public class AjustesUsuario extends AppCompatActivity {
                 startActivityForResult(intent, OPTION_ATRAS);
             }
         });
+    }
+
+    private void handleSaveChanges() {
+
+        HashMap<String, String> updateUser = new HashMap<>();
+
+        updateUser.put("email", email.getText().toString());
+        updateUser.put("nickname", nombre_usuario.getText().toString());
+        updateUser.put("password", password_new.getText().toString());
+
+        Call<JsonObject> call = retrofitInterface.executeSaveChanges(updateUser);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
+                if (response.code() == 200) {
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            new SweetAlertDialog(AjustesUsuario.this, SweetAlertDialog.SUCCESS_TYPE).setTitleText("Datos guardados exitosamente!")
+                                    .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
+                                        @Override
+                                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                            Intent intent = new Intent(AjustesUsuario.this, PerfilUsuario.class);
+                                            startActivityForResult(intent, OPTION_GUARDAR);
+                                        }
+                                    }).show();
+                        }
+
+                    }, 500);
+                } else if (response.code() == 410) {
+                    Toast.makeText(AjustesUsuario.this, "Ya existe un usuario con ese email, compruebe las creedenciales.", Toast.LENGTH_LONG).show();
+                    email.getText().clear();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(AjustesUsuario.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private boolean comprobarEmail(String email) {
+        return EMAIL_ADDRESS_PATTERN.matcher(email).matches();
     }
 }
 

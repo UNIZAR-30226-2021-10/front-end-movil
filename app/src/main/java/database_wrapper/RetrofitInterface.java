@@ -15,4 +15,5 @@ public interface RetrofitInterface {
 
     @POST("/MenuInicio")
     Call<JsonObject> executeLogin(@Body HashMap<String,String> map);
+
 }
