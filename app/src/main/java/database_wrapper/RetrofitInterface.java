@@ -30,5 +30,8 @@ public interface RetrofitInterface {
     @POST("/EliminarCuenta")
     Call<JsonObject> executeDropUser(@Body HashMap<String,String> map);
 
+    @POST("/CambiarContrasenya")
+    Call<JsonObject> executeChangePassword(@Body HashMap<String,String> map);
+
 
 }

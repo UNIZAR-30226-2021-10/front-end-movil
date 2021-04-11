@@ -9,14 +9,28 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.regex.Pattern;
+
+import database_wrapper.RetrofitInterface;
+
 public class CambiarPassword extends AppCompatActivity {
 
-    private static final int OPTION_CONFIRMAR = 0;
+    private static final int OPTION_ENVIAR_CORREO = 0;
     private static final int OPTION_ATRAS = 1;
 
     private EditText email;
-    private EditText password_new;
-    private EditText password_new2;
+
+    private RetrofitInterface retrofitInterface;
+    //REGEX para comprobar el email
+    private  final Pattern EMAIL_ADDRESS_PATTERN = Pattern.compile(
+            "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
+                    "\\@" +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
+                    "(" +
+                    "\\." +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
+                    ")+"
+    );
 
     /**
      * Called when the activity is first created.
@@ -32,23 +46,24 @@ public class CambiarPassword extends AppCompatActivity {
 
         //EDIT TEXT DE EMAIL
         email = (EditText) findViewById(R.id.email);
-        //EDIT TEXT DE CONTRASEÑA NUEVA
-        password_new = (EditText) findViewById(R.id.password_new);
-        // EDIT TEXT DE REPETICION DE CONTRASEÑA NUEVA
-        password_new2 = (EditText) findViewById(R.id.password_new2);
 
         // Botón de confirmar
         Button confirmarButton = (Button) findViewById(R.id.confirmar);
         confirmarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // COMPROBAR CONTRASEÑA es igual en ambos campos
-                if( password_new.getText().toString().equals(password_new2.getText().toString())){
-                        Intent intent = new Intent (v.getContext(), MenuPrincipal.class);
-                        startActivityForResult(intent, OPTION_CONFIRMAR);
-                }else{
-                    // mensaje de error
-                    password_new2.setError("Las contraseñas no son iguales");
+                // COMPROBAR que el campo del email es no vacio
+                if(email.getText().toString().isEmpty()) {
+                    email.setError("El campo no puede estar vacío");
+                }
+                else{
+                    if(comprobarEmail(email.getText().toString())){
+                        //handleEnviarCorreo();
+                        Intent intent = new Intent (v.getContext(), enviarCodigoVerificacion.class);
+                        startActivityForResult(intent, OPTION_ENVIAR_CORREO);
+                    }else {
+                        email.setError("El email es invalido, introduzca un email valido por ejemplo: pedro@gmail.com");
+                    }
                 }
             }
         });
@@ -62,6 +77,9 @@ public class CambiarPassword extends AppCompatActivity {
                 startActivityForResult(intent, OPTION_ATRAS);
             }
         });
+    }
+    private boolean comprobarEmail(String email) {
+        return EMAIL_ADDRESS_PATTERN.matcher(email).matches();
     }
 }
 
