@@ -1,5 +1,7 @@
 package eina.unizar.front_end_movil;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -7,10 +9,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+import com.google.gson.JsonObject;
+import java.util.HashMap;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import SessionManagement.Question;
+import database_wrapper.APIUtils;
+import database_wrapper.RetrofitInterface;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import java.util.Random;
+
+
 
 public class JuegoIndividual extends AppCompatActivity{
 
@@ -27,9 +38,12 @@ public class JuegoIndividual extends AppCompatActivity{
     private TextView num_puntos;
     private TextView categoria;
     private ImageButton imagenDados;
+    private Button empezar;
+    private Button siguiente;
     private Random rndNumber = new Random();
+    private Random rndQuestion = new Random();
 
-    String[] categorias = {"Arte y Literatura", "Geografía", "Historia", "Cine", "Ciencias y Naturaleza", "Deportes"};
+    String[] categorias = {"Art and Literature", "Geography", "History", "Film and TV", "Science", "Sport and Leisure"};
     String[] coloresCategorías = {"#703C02", "#0398FA", "#FFDA00", "#FC57FF", "#17B009", "#FF8D00"};
     String[] pregunta1 = {"Georgia shares a land border with which of these countries?", "Syria", "Armenia", "Iraq", "Lebanon"};
     String[] pregunta2 = {"Two rats can become the progenitors of 15,000 rats in less than..", "1 month", "1 week", "1 day", "1 year"};
@@ -38,6 +52,8 @@ public class JuegoIndividual extends AppCompatActivity{
     private int NUM_RONDAS;
     int numero_ronda = 0;
     int numero_puntos = 0;
+
+    private RetrofitInterface retrofitInterface;
 
     /**
      * Called when the activity is first created.
@@ -51,6 +67,9 @@ public class JuegoIndividual extends AppCompatActivity{
         setContentView(R.layout.juego_individual);
         getSupportActionBar().hide();
 
+        //Construirmos el objeto retrofit
+        retrofitInterface = APIUtils.getAPIService();
+
         Bundle extras = getIntent().getExtras();
         NUM_RONDAS = extras.getInt("rondas");
 
@@ -62,17 +81,33 @@ public class JuegoIndividual extends AppCompatActivity{
         num_rondas = (TextView)findViewById(R.id.num_rondas);
         num_puntos = (TextView)findViewById(R.id.num_puntos);
         categoria = (TextView)findViewById(R.id.categoria);
+        siguiente = (Button) findViewById(R.id.siguiente);
+        siguiente.setVisibility(View.INVISIBLE); // quitarlo hasta que le den a empezar
+        siguiente.setClickable(false);
+        empezar = (Button) findViewById(R.id.empezar);
+        empezar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetear();
+                rollDice();
+                empezar.setVisibility(View.GONE);
+                empezar.setClickable(true);
+                siguiente.setVisibility(View.VISIBLE);
+            }
+        }); // para quitar el botón
 
-        desactivar();
-
-        imagenDados = (ImageButton) findViewById(R.id.dado);
-        imagenDados.setOnClickListener(new View.OnClickListener() {
+        siguiente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 resetear();
                 rollDice();
             }
         });
+
+        desactivar();
+
+        imagenDados = (ImageButton) findViewById(R.id.dado);
+        imagenDados.setClickable(false);
 
         // boton de atrás
         Button atrasButton = (Button) findViewById(R.id.atras);
@@ -100,6 +135,7 @@ public class JuegoIndividual extends AppCompatActivity{
         if (numero_ronda == NUM_RONDAS) {
             Bundle extra = new Bundle();
             extra.putInt("puntosTotales", numero_puntos);
+            extra.putInt("rondas", NUM_RONDAS);
             Intent intent = new Intent(this, FinPartidaIndv.class);
             intent.putExtras(extra);
             startActivityForResult(intent, OPTION_ACABAR);
@@ -140,31 +176,27 @@ public class JuegoIndividual extends AppCompatActivity{
         switch(random){
             case 1:
                 imagenDados.setBackgroundResource(R.drawable.dado1icon);
-                ponerPregunta(pregunta1[0],pregunta1[1],pregunta1[2],pregunta1[3], pregunta1[4]);
                 break;
             case 2:
                 imagenDados.setBackgroundResource(R.drawable.dado2icon);
-                ponerPregunta(pregunta1[0],pregunta1[1],pregunta1[2],pregunta1[3], pregunta1[4]);
                 break;
             case 3:
                 imagenDados.setBackgroundResource(R.drawable.dado3icon);
-                ponerPregunta(pregunta2[0],pregunta2[1],pregunta2[2],pregunta2[3], pregunta2[4]);
                 break;
             case 4:
                 imagenDados.setBackgroundResource(R.drawable.dado4icon);
-                ponerPregunta(pregunta3[0],pregunta3[1],pregunta3[2],pregunta3[3], pregunta3[4]);
                 break;
             case 5:
                 imagenDados.setBackgroundResource(R.drawable.dado5icon);
-                ponerPregunta(pregunta3[0],pregunta3[1],pregunta3[2],pregunta3[3], pregunta3[4]);
                 break;
             case 6:
                 imagenDados.setBackgroundResource(R.drawable.dado6icon);
-                ponerPregunta(pregunta2[0],pregunta2[1],pregunta2[2],pregunta2[3], pregunta2[4]);
                 break;
         }
+        obtenerPregunta(random);
         categoria.setText(categorias[random-1]);
         categoria.setTextColor((Color.parseColor(coloresCategorías[random-1])));
+
         // text view de rondas --> para poner por qué ronda vas
         numero_ronda++;
         num_rondas.setText(String.valueOf(numero_ronda));
@@ -174,67 +206,96 @@ public class JuegoIndividual extends AppCompatActivity{
 
     }
 
-    void ponerPregunta(String preguntaN, String resp1N, String resp2N, String resp3N, String resp4N){
+    void ponerPregunta(String enunciado, String correcta, String incorrecta1, String incorrecta2, String incorrecta3, int posicion){
+        siguiente.setClickable(false);
+        pregunta.setText(enunciado); // text view de pregunta
 
-        // TODO: esto luego se hará con la base de datos
-        // text view de pregunta
-        imagenDados.setClickable(false);
-        pregunta.setText(preguntaN);
+        if(posicion == 1){
+            ponerBien(resp1, correcta);
+            ponerMal(resp2, incorrecta1, resp1);
+            ponerMal(resp3, incorrecta2, resp1);
+            ponerMal(resp4, incorrecta3, resp1);
+        } else if(posicion == 2){
+            ponerMal(resp1, incorrecta1, resp2);
+            ponerBien(resp2, correcta);
+            ponerMal(resp3, incorrecta2, resp2);
+            ponerMal(resp4, incorrecta3, resp2);
+        } else if(posicion == 3){
+            ponerMal(resp1, incorrecta1, resp3);
+            ponerMal(resp2, incorrecta2, resp3);
+            ponerBien(resp3, correcta);
+            ponerMal(resp4, incorrecta3, resp3);
+        } else{
+            ponerMal(resp1, incorrecta1, resp4);
+            ponerMal(resp2, incorrecta2, resp4);
+            ponerMal(resp3, incorrecta3, resp4);
+            ponerBien(resp4, correcta);
+        }
+    }
 
-        // textview respuesta 1
-        resp1.setText(resp1N);
-        resp1.setOnClickListener(new View.OnClickListener() {
+    void ponerMal(final TextView respMal, String texto, final TextView respBien){
+        respMal.setText(texto);
+        respMal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // respuesta incorrecta
-                // TODO: poner if de si es incorrecta o no para el color
-                resp1.setBackgroundColor((Color.parseColor("#E35252")));
-                resp2.setBackgroundColor((Color.parseColor("#87e352")));
+                respMal.setBackgroundColor((Color.parseColor("#E35252")));
+                respBien.setBackgroundColor((Color.parseColor("#87e352")));
                 desactivar();
-                imagenDados.setClickable(true);
+                siguiente.setClickable(true);
                 comprobarRondas();
             }
         });
-        // textview respuesta 2
-        resp2.setText(resp2N);
-        resp2.setOnClickListener(new View.OnClickListener() {
+    }
+
+    void ponerBien(final TextView respBien, String texto){
+        respBien.setText(texto);
+        respBien.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // respuesta correcta
                 // TODO: poner if de si es incorrecta o no para el color
-                resp2.setBackgroundColor((Color.parseColor("#87e352")));
+                respBien.setBackgroundColor((Color.parseColor("#87e352")));
                 desactivar();
                 numero_puntos += 50;
-                imagenDados.setClickable(true);
+                siguiente.setClickable(true);
                 comprobarRondas();
             }
         });
-        // textview de respuesta 3
-        resp3.setText(resp3N);
-        resp3.setOnClickListener(new View.OnClickListener() {
+    }
+
+
+    public void obtenerPregunta(final int random){
+        final Question[] q = new Question[1];
+        HashMap<String, String> newQuestion = new HashMap<>();
+        newQuestion.put("category",categorias[random-1]);
+
+        System.out.println("AQUÍ NO PETA " + categorias[random-1]);
+        //Call<JsonObject> call = retrofitInterface.getQuestion(newQuestion);
+        Call<JsonObject> call = retrofitInterface.getQuestion(categorias[random-1]);
+
+        call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onClick(View v) {
-                // respuesta incorrecta
-                // TODO: poner if de si es incorrecta o no para el color
-                resp3.setBackgroundColor((Color.parseColor("#E35252")));
-                resp2.setBackgroundColor((Color.parseColor("#87e352")));
-                desactivar();
-                imagenDados.setClickable(true);
-                comprobarRondas();
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if(response.code() == 200){
+                    JsonObject jsonObject = response.body().getAsJsonObject("idpregunta");
+                    //Creamos una pregunta
+                    Question q =  new Question(jsonObject.get("incorrecta1").getAsString(),
+                            jsonObject.get("incorrecta2").getAsString(),
+                            jsonObject.get("incorrecta3").getAsString(),
+                            jsonObject.get("correcta").getAsString(),
+                            jsonObject.get("enunciado").getAsString(),
+                            categorias[random-1]);
+                    int randomQuestion = rndQuestion.nextInt(4) + 1;
+                    ponerPregunta(q.getStatement(), q.getCorrect(), q.getIncorrect1(), q.getIncorrect2(), q.getIncorrect3(), randomQuestion);
+
+                }else if(response.code() == 400){
+                    Toast.makeText( JuegoIndividual.this, "No se ha conseguido la pregunta", Toast.LENGTH_LONG).show();
+                }
             }
-        });
-        // textview de respuesta 4
-        resp4.setText(resp4N);
-        resp4.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public void onClick(View v) {
-                // respuesta incorrecta
-                // TODO: poner if de si es incorrecta o no para el color
-                resp4.setBackgroundColor((Color.parseColor("#E35252")));
-                resp2.setBackgroundColor((Color.parseColor("#87e352")));
-                desactivar();
-                imagenDados.setClickable(true);
-                comprobarRondas();
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText( JuegoIndividual.this, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

@@ -18,6 +18,8 @@ public class DecisionIndividual extends AppCompatActivity implements OnItemSelec
     private static final int OPTION_ATRAS = 1;
     private static final int OPTION_INSTRUCCIONES = 2;
 
+    Bundle extras = new Bundle();
+
     /**
      * Called when the activity is first created.
      *
@@ -32,11 +34,6 @@ public class DecisionIndividual extends AppCompatActivity implements OnItemSelec
 
         Spinner spinner = (Spinner) findViewById(R.id.caja_opciones);
         spinner.setOnItemSelectedListener(this);
-
-        final Bundle extras = new Bundle();
-        int numRonda = Integer.parseInt(spinner.getItemAtPosition(spinner.getSelectedItemPosition()).toString());
-        extras.putInt("rondas",numRonda);
-
 
         // Botón de empezar partida individual
         Button comenzarButton = (Button) findViewById(R.id.comenzar);
@@ -73,7 +70,14 @@ public class DecisionIndividual extends AppCompatActivity implements OnItemSelec
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         /* para cuando clica una opción*/
-        // TODO: para la BD aquí se cogerá el valor del nº de rondas
+        System.out.println(position);
+        if(position == 0){
+            extras.putInt("rondas",5); // pasarselo a la siguiente clase
+        } else if (position == 1) {
+            extras.putInt("rondas", 10); // pasarselo a la siguiente clase
+        } else{
+            extras.putInt("rondas", 15); // pasarselo a la siguiente clase
+        }
     }
 
     @Override
