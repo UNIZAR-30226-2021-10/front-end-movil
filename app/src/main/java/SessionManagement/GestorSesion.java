@@ -38,6 +38,7 @@ public class GestorSesion {
         return sharedPreferences.getString(KEY_SESSION_POINTS,String.valueOf(1));
     }
 
+
     public String getKEY_SESSION_COINS(){
         return sharedPreferences.getString(KEY_SESSION_COINS,String.valueOf(1));
     }

@@ -24,4 +24,10 @@ public interface RetrofitInterface {
     @POST("/FinalIndividual")
     Call<JsonObject> insertNewGameInd(@Body HashMap<String,String> map);
 
+    /*
+    @POST("/ObtenerContrasenya")
+    Call<JsonObject> executeObtenerContrasenya(@Body HashMap<String,String> map);*/
+
+    @POST("/AjustesUsuario")
+    Call<JsonObject> executeSaveChanges(@Body HashMap<String,String> map);
 }
