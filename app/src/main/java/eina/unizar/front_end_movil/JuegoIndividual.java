@@ -45,9 +45,6 @@ public class JuegoIndividual extends AppCompatActivity{
 
     String[] categorias = {"Art and Literature", "Geography", "History", "Film and TV", "Science", "Sport and Leisure"};
     String[] coloresCategorías = {"#703C02", "#0398FA", "#FFDA00", "#FC57FF", "#17B009", "#FF8D00"};
-    String[] pregunta1 = {"Georgia shares a land border with which of these countries?", "Syria", "Armenia", "Iraq", "Lebanon"};
-    String[] pregunta2 = {"Two rats can become the progenitors of 15,000 rats in less than..", "1 month", "1 week", "1 day", "1 year"};
-    String[] pregunta3 = {"What Separates Spain From Morocco?", "The North African Strait", "The Bering Strait", "The Strait Of Gibralter" , "The Strait Of Casablanca"};
 
     private int NUM_RONDAS;
     int numero_ronda = 0;
@@ -253,7 +250,6 @@ public class JuegoIndividual extends AppCompatActivity{
         respBien.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: poner if de si es incorrecta o no para el color
                 respBien.setBackgroundColor((Color.parseColor("#87e352")));
                 desactivar();
                 numero_puntos += 50;
@@ -269,7 +265,6 @@ public class JuegoIndividual extends AppCompatActivity{
         HashMap<String, String> newQuestion = new HashMap<>();
         newQuestion.put("category",categorias[random-1]);
 
-        System.out.println("AQUÍ NO PETA " + categorias[random-1]);
         //Call<JsonObject> call = retrofitInterface.getQuestion(newQuestion);
         Call<JsonObject> call = retrofitInterface.getQuestion(categorias[random-1]);
 
