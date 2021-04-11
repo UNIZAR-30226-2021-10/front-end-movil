@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 
 import SessionManagement.GestorSesion;
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,8 +36,7 @@ public class AjustesUsuario extends AppCompatActivity {
     private EditText password_new2;
 
     private GestorSesion gestorSesion;
-
-    //MARTA
+    
     private RetrofitInterface retrofitInterface;
     //REGEX para comprobar el email
     private  final Pattern EMAIL_ADDRESS_PATTERN = Pattern.compile(
@@ -47,7 +47,7 @@ public class AjustesUsuario extends AppCompatActivity {
                     "\\." +
                     "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
                     ")+"
-    ); //HASTA AQUI
+    );
 
     /**
      * Called when the activity is first created.
@@ -61,8 +61,10 @@ public class AjustesUsuario extends AppCompatActivity {
         setContentView(R.layout.ajustes_usuario);
         getSupportActionBar().hide();
 
-        gestorSesion = new GestorSesion(AjustesUsuario.this);
+        //Construimos el objeto retrofit
+        retrofitInterface = APIUtils.getAPIService();
 
+        gestorSesion = new GestorSesion(AjustesUsuario.this);
         //Edit text de nombre usuario
         nombre_usuario = (EditText) findViewById(R.id.nombre_usuario);
         nombre_usuario.setText(gestorSesion.getSession());
@@ -159,10 +161,11 @@ public class AjustesUsuario extends AppCompatActivity {
         return EMAIL_ADDRESS_PATTERN.matcher(email).matches();
     }
 
+    /*
     private void obtenerContrasenya(){
         HashMap<String, String> obtenerContrasenya = new HashMap<>();
         obtenerContrasenya.put("email", email.getText().toString());
-        Call<JsonObject> call = retrofitInterface.executeSaveChanges(obtenerContrasenya);
+        Call<JsonObject> call = retrofitInterface.executeObtenerContrasenya(obtenerContrasenya);
         call.enqueue(new Callback<JsonObject>() {
             //Gestionamos la respuesta de la llamada a post
             @Override
@@ -183,7 +186,7 @@ public class AjustesUsuario extends AppCompatActivity {
                 Toast.makeText(AjustesUsuario.this, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-    }
+    }*/
 }
 
 
