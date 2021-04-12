@@ -1,12 +1,14 @@
 package eina.unizar.front_end_movil;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import cn.pedant.SweetAlert.*;
@@ -33,6 +35,7 @@ public class RegistroUsuario extends AppCompatActivity {
     private EditText email;
     private EditText password_new;
     private EditText password_new2;
+    private ImageView avatar;
 
     private RetrofitInterface retrofitInterface;
     //REGEX para comprobar el email
@@ -68,6 +71,7 @@ public class RegistroUsuario extends AppCompatActivity {
         password_new = (EditText) findViewById(R.id.password_new);
         // EDIT TEXT DE REPETICION DE CONTRASEÑA NUEVA
         password_new2 = (EditText) findViewById(R.id.password_new2);
+        avatar = (ImageView) findViewById(R.id.usuario_imagen);
 
         // Botón de sign up
         Button signUpButton = (Button) findViewById(R.id.confirmar);

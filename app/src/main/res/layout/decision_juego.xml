@@ -119,5 +119,24 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@mipmap/trofeoicon" />
 
+    <ImageButton
+        android:id="@+id/historial"
+        android:layout_width="40dp"
+        android:layout_height="37dp"
+        android:layout_marginStart="31dp"
+        android:layout_marginLeft="31dp"
+        android:layout_marginTop="99dp"
+        android:layout_marginEnd="340dp"
+        android:layout_marginRight="340dp"
+        android:layout_marginBottom="595dp"
+        android:adjustViewBounds="true"
+        android:background="@android:color/white"
+        android:scaleType="centerInside"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/historialicon" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

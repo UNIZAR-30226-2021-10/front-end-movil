@@ -45,6 +45,8 @@ public class JuegoIndividual extends AppCompatActivity{
 
     String[] categorias = {"Art and Literature", "Geography", "History", "Film and TV", "Science", "Sport and Leisure"};
     String[] coloresCategorías = {"#703C02", "#0398FA", "#FFDA00", "#FC57FF", "#17B009", "#FF8D00"};
+    int[] preguntasCogidas = new int[15];
+    int indice;
 
     private int NUM_RONDAS;
     int numero_ronda = 0;
@@ -66,6 +68,11 @@ public class JuegoIndividual extends AppCompatActivity{
 
         //Construirmos el objeto retrofit
         retrofitInterface = APIUtils.getAPIService();
+
+        indice = 0;
+        for(int i = 0; i< 15; i++){
+            preguntasCogidas[i] = 0;
+        }
 
         Bundle extras = getIntent().getExtras();
         NUM_RONDAS = extras.getInt("rondas");
@@ -262,16 +269,13 @@ public class JuegoIndividual extends AppCompatActivity{
 
     public void obtenerPregunta(final int random){
         final Question[] q = new Question[1];
-        HashMap<String, String> newQuestion = new HashMap<>();
-        newQuestion.put("category",categorias[random-1]);
-
-        //Call<JsonObject> call = retrofitInterface.getQuestion(newQuestion);
         Call<JsonObject> call = retrofitInterface.getQuestion(categorias[random-1]);
 
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if(response.code() == 200){
+                    boolean yaEsta = false;
                     JsonObject jsonObject = response.body().getAsJsonObject("idpregunta");
                     //Creamos una pregunta
                     Question q =  new Question(jsonObject.get("incorrecta1").getAsString(),
@@ -280,8 +284,19 @@ public class JuegoIndividual extends AppCompatActivity{
                             jsonObject.get("correcta").getAsString(),
                             jsonObject.get("enunciado").getAsString(),
                             categorias[random-1]);
-                    int randomQuestion = rndQuestion.nextInt(4) + 1;
-                    ponerPregunta(q.getStatement(), q.getCorrect(), q.getIncorrect1(), q.getIncorrect2(), q.getIncorrect3(), randomQuestion);
+                    for(int i = 0; i< 15; i++){
+                        if(preguntasCogidas[i] == jsonObject.get("idpregunta").getAsInt()){
+                            obtenerPregunta(random);
+                            yaEsta = true;
+                        }
+                    }
+                    if(!yaEsta){
+                        int randomQuestion = rndQuestion.nextInt(4) + 1;
+                        preguntasCogidas[indice] = jsonObject.get("idpregunta").getAsInt();
+                        //System.out.println(preguntasCogidas[indice]);
+                        indice++;
+                        ponerPregunta(q.getStatement(), q.getCorrect(), q.getIncorrect1(), q.getIncorrect2(), q.getIncorrect3(), randomQuestion);
+                    }
 
                 }else if(response.code() == 400){
                     Toast.makeText( JuegoIndividual.this, "No se ha conseguido la pregunta", Toast.LENGTH_LONG).show();

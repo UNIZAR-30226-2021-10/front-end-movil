@@ -43,8 +43,8 @@ public class AbandonarPartida extends AppCompatActivity {
         posponerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), MenuPrincipal.class);
-                startActivityForResult(intent, OPTION_POSPONER);
+                //Intent intent = new Intent(v.getContext(), MenuPrincipal.class);
+                //startActivityForResult(intent, OPTION_POSPONER);
             }
         });
 
