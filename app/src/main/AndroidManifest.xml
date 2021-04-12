@@ -158,6 +158,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Ranking" />
         </activity>
+        <activity
+            android:name=".Historial"
+            android:parentActivityName=".Historial" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Historial" />
+        </activity>
     </application>
 
 </manifest>

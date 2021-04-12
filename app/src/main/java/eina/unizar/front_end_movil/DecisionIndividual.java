@@ -51,8 +51,7 @@ public class DecisionIndividual extends AppCompatActivity implements OnItemSelec
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), DecisionJuego.class);
-                startActivityForResult(intent, OPTION_ATRAS);
+                finish();
             }
         });
 

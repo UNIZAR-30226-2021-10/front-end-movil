@@ -17,6 +17,7 @@ public class DecisionJuego extends AppCompatActivity {
     private static final int OPTION_PERFIL = 3;
     private static final int OPTION_INSTRUCCIONES = 4;
     private static final int OPTION_RANKING = 5;
+    private static final int OPTION_HISTORIAL = 6;
 
     /**
      * Called when the activity is first created.
@@ -83,6 +84,15 @@ public class DecisionJuego extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent (v.getContext(), Ranking.class);
                 startActivityForResult(intent, OPTION_RANKING);
+            }
+        });
+
+        ImageButton historialButton = (ImageButton) findViewById(R.id.historial);
+        historialButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent (v.getContext(), Historial.class);
+                startActivityForResult(intent, OPTION_HISTORIAL);
             }
         });
 

@@ -1,5 +1,6 @@
 package database_wrapper;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.util.HashMap;
@@ -32,6 +33,12 @@ public interface RetrofitInterface {
 
     @POST("/CambiarContrasenya")
     Call<JsonObject> executeChangePassword(@Body HashMap<String,String> map);
+
+    @GET("/Historial")
+    Call<JsonArray> getGames(@Query("mail") String email);
+
+    @GET("/Historial_Puntuacion")
+    Call<JsonArray> getPointsFromGames(@Query("email") String email);
 
 
 }

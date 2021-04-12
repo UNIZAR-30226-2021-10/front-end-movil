@@ -95,7 +95,7 @@ public class FinPartidaIndv extends AppCompatActivity {
     private void handleFinish(){
         HashMap<String,String> newGame = new HashMap<>();
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy--MM--dd(HH:mm:ss)", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy--MM--dd", Locale.getDefault());
         Date date = new Date();
         String fecha = dateFormat.format(date);
         System.out.println(fecha);
