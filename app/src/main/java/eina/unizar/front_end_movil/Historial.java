@@ -22,7 +22,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import SessionManagement.GestorSesion;
 import SessionManagement.Question;
@@ -34,8 +37,6 @@ import retrofit2.Response;
 
 public class Historial extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    private static final int OPTION_ATRAS = 0;
-
     private ListView listaPartidas;
     ListViewAdapterHistory adaptador;
 
@@ -44,10 +45,22 @@ public class Historial extends AppCompatActivity implements AdapterView.OnItemSe
     private String emailUsuario;
     int opcion = 0;
 
-    ArrayList<String> fechas = new ArrayList<String>();
-    ArrayList<String> puntuaciones = new ArrayList<String>();
-    ArrayList<String> numJugadores = new ArrayList<String>();
-    ArrayList<String> ganadores = new ArrayList<String>();
+
+    ArrayList<String> fechas = new ArrayList<>();
+    ArrayList<String> puntuaciones = new ArrayList<>();
+    ArrayList<String> numJugadores = new ArrayList<>();
+    ArrayList<String> ganadores = new ArrayList<>();
+
+    ArrayList<String> idInd = new ArrayList<>();
+    ArrayList<String> fechasInd = new ArrayList<>();
+    ArrayList<String> puntuacionesInd = new ArrayList<>();
+    ArrayList<String> numJugadoresInd = new ArrayList<>();
+    ArrayList<String> ganadoresInd = new ArrayList<>();
+
+    ArrayList<String> fechasMulti = new ArrayList<>();
+    ArrayList<String> puntuacionesMulti = new ArrayList<>();
+    ArrayList<String> numJugadoresMulti = new ArrayList<>();
+    ArrayList<String> ganadoresMulti = new ArrayList<>();
 
 
     /**
@@ -90,9 +103,7 @@ public class Historial extends AppCompatActivity implements AdapterView.OnItemSe
     private void fillData() {
         // en juega --> conseguir todas las partidas de el usuario y su puntuacion
         // en cada partida conseguir todos los datos
-
         Call<JsonArray> call = retrofitInterface.getGames(emailUsuario);
-
         call.enqueue(new Callback<JsonArray>() {
             @Override
             public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
@@ -102,14 +113,25 @@ public class Historial extends AppCompatActivity implements AdapterView.OnItemSe
                     for(JsonElement j : jsonObject){
                         //System.out.println(j);
                         JsonObject prueba = j.getAsJsonObject();
-                        fechas.add(prueba.get("fecha").getAsString());
+                        numJugadores.add(prueba.get("numJugadores").getAsString());
+                        numJugadoresInd.add(prueba.get("numJugadores").getAsString());
+                        numJugadoresMulti.add(prueba.get("numJugadores").getAsString());
+                        if(prueba.get("numJugadores").getAsString() == "1"){
+                            idInd.add(prueba.get("idpartida").getAsString());
+                            fechasInd.add(prueba.get("fecha").getAsString().substring(0,10));
+                            numJugadoresInd.add(prueba.get("numJugadores").getAsString());
+                            ganadoresInd.add(prueba.get("ganador").getAsString());
+                        } else{
+                            fechasMulti.add(prueba.get("fecha").getAsString().substring(0,10));
+                            numJugadoresMulti.add(prueba.get("numJugadores").getAsString());
+                            ganadoresMulti.add(prueba.get("ganador").getAsString());
+                        }
+                        fechas.add(prueba.get("fecha").getAsString().substring(0,10));
                         numJugadores.add(prueba.get("numJugadores").getAsString());
                         ganadores.add(prueba.get("ganador").getAsString());
                         System.out.println(prueba);
                     }
-
                     getPuntuacion();
-
                 }else if(response.code() == 400){
                     Toast.makeText( Historial.this, "No se ha conseguido el listado", Toast.LENGTH_LONG).show();
                 }
@@ -133,6 +155,12 @@ public class Historial extends AppCompatActivity implements AdapterView.OnItemSe
                     for(JsonElement j : jsonObject){
                         //System.out.println(j);
                         JsonObject prueba = j.getAsJsonObject();
+                        String id = prueba.get("id_partida").getAsString();
+                        if(idInd.contains(id)){
+                            puntuacionesInd.add(prueba.get("puntuacion").getAsString());
+                        } else{
+                            puntuacionesMulti.add(prueba.get("puntuacion").getAsString());
+                        }
                         puntuaciones.add(prueba.get("puntuacion").getAsString());
                     }
 
@@ -156,6 +184,14 @@ public class Historial extends AppCompatActivity implements AdapterView.OnItemSe
         /* para cuando clica una opción*/
         System.out.println(position);
         opcion = position;
+        if(opcion == 0){
+            adaptador = new ListViewAdapterHistory(Historial.this, fechas, puntuaciones, numJugadores, ganadores);
+        } else if(opcion == 1){
+            adaptador = new ListViewAdapterHistory(Historial.this, fechasInd, puntuacionesInd, numJugadoresInd, ganadoresInd);
+        } else{
+            adaptador = new ListViewAdapterHistory(Historial.this, fechasMulti, puntuacionesMulti, numJugadoresMulti, ganadoresMulti);
+        }
+        listaPartidas.setAdapter(adaptador);
     }
 
     @Override
