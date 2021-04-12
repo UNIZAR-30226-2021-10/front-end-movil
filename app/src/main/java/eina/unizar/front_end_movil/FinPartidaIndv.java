@@ -42,6 +42,8 @@ public class FinPartidaIndv extends AppCompatActivity {
     private RetrofitInterface retrofitInterface;
     private GestorSesion gestorSesion;
 
+    private String emailUsuario;
+
     /**
      * Called when the activity is first created.
      *
@@ -58,12 +60,13 @@ public class FinPartidaIndv extends AppCompatActivity {
         retrofitInterface = APIUtils.getAPIService();
 
         gestorSesion = new GestorSesion(FinPartidaIndv.this);
+        emailUsuario = gestorSesion.getmailSession();
 
         Bundle extra = getIntent().getExtras();
         PUNTOS_TOTALES = extra.getInt("puntosTotales");
         NUM_RONDAS = extra.getInt("rondas");
 
-        //handleFinish(); // llamada para insertar la partida TODO
+        handleFinish(); // llamada para insertar la partida
 
         puntosTotales = (TextView)findViewById(R.id.puntos_ganados);
         monedasTotales = (TextView)findViewById(R.id.monedas_ganadas);
@@ -95,7 +98,7 @@ public class FinPartidaIndv extends AppCompatActivity {
     private void handleFinish(){
         HashMap<String,String> newGame = new HashMap<>();
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy--MM--dd", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy--MM--dd(HH:mm:ss)", Locale.getDefault());
         Date date = new Date();
         String fecha = dateFormat.format(date);
         System.out.println(fecha);
@@ -103,7 +106,7 @@ public class FinPartidaIndv extends AppCompatActivity {
         newGame.put("fecha",fecha);
         newGame.put("numJugadores", Integer.toString(1));
         newGame.put("rondas", Integer.toString(NUM_RONDAS));
-        newGame.put("ganador",  gestorSesion.getSession());
+        newGame.put("ganador", gestorSesion.getSession());
 
         Call<JsonObject> call = retrofitInterface.insertNewGameInd(newGame);
         call.enqueue(new Callback<JsonObject>() {

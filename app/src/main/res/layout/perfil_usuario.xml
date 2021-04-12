@@ -40,6 +40,7 @@
         app:srcCompat="@android:drawable/ic_menu_manage" />
 
     <TextView
+        android:id="@+id/user_name"
         android:layout_width="182dp"
         android:layout_height="19dp"
         android:layout_marginStart="38dp"
@@ -48,9 +49,8 @@
         android:layout_marginEnd="191dp"
         android:layout_marginRight="191dp"
         android:layout_marginBottom="527dp"
-        android:fontFamily="sans-serif"
 
-        android:id="@+id/user_name"
+        android:fontFamily="sans-serif"
         android:textColor="@android:color/black"
         android:textSize="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -77,6 +77,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/user_email"
         android:layout_width="182dp"
         android:layout_height="19dp"
         android:layout_marginStart="38dp"
@@ -86,7 +87,6 @@
         android:layout_marginRight="191dp"
         android:layout_marginBottom="485dp"
         android:fontFamily="sans-serif"
-        android:id="@+id/user_email"
         android:textColor="@android:color/black"
         android:textSize="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -131,6 +131,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/user_points"
         android:layout_width="182dp"
         android:layout_height="19dp"
         android:layout_marginStart="38dp"
@@ -140,7 +141,6 @@
         android:layout_marginRight="191dp"
         android:layout_marginBottom="443dp"
         android:fontFamily="sans-serif"
-        android:id="@+id/user_points"
         android:textColor="@android:color/black"
         android:textSize="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -167,6 +167,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/user_coins"
         android:layout_width="182dp"
         android:layout_height="19dp"
         android:layout_marginStart="38dp"
@@ -176,7 +177,6 @@
         android:layout_marginRight="191dp"
         android:layout_marginBottom="401dp"
         android:fontFamily="sans-serif"
-        android:id="@+id/user_coins"
         android:textColor="@android:color/black"
         android:textSize="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -186,20 +186,19 @@
 
     <Button
         android:id="@+id/perfil_button"
-        android:layout_width="129dp"
-        android:layout_height="110dp"
-        android:layout_marginStart="246dp"
-        android:layout_marginLeft="246dp"
-        android:layout_marginTop="166dp"
-        android:layout_marginEnd="37dp"
-        android:layout_marginRight="37dp"
-        android:layout_marginBottom="437dp"
-        android:background="@mipmap/perfilicon"
+        android:layout_width="137dp"
+        android:layout_height="145dp"
+        android:layout_marginStart="239dp"
+        android:layout_marginLeft="239dp"
+        android:layout_marginTop="175dp"
+        android:layout_marginEnd="35dp"
+        android:layout_marginRight="35dp"
+        android:layout_marginBottom="411dp"
+        android:background="@mipmap/imagenusr3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:layout_width="182dp"
@@ -231,9 +230,9 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="340dp"
-            android:layout_height="204dp">
+            android:layout_height="204dp"
+            android:orientation="horizontal">
 
             <ListView
                 android:id="@+id/list"

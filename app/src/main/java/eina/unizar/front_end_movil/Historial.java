@@ -80,6 +80,8 @@ public class Historial extends AppCompatActivity implements AdapterView.OnItemSe
         gestorSesion = new GestorSesion(Historial.this);
         emailUsuario = gestorSesion.getmailSession();
 
+        resetear();
+
         Spinner spinner = (Spinner) findViewById(R.id.opciones_orden);
         spinner.setOnItemSelectedListener(this);
 
@@ -94,6 +96,23 @@ public class Historial extends AppCompatActivity implements AdapterView.OnItemSe
                 finish();
             }
         });
+    }
+
+
+    private void resetear(){
+        fechas.clear();
+        puntuaciones.clear();
+        numJugadores.clear();
+        ganadores.clear();
+        idInd.clear();
+        puntuacionesInd.clear();
+        fechasInd.clear();
+        numJugadoresInd.clear();
+        ganadoresInd.clear();
+        puntuacionesMulti.clear();
+        fechasMulti.clear();
+        numJugadoresMulti.clear();
+        ganadoresMulti.clear();
     }
 
 
@@ -133,7 +152,7 @@ public class Historial extends AppCompatActivity implements AdapterView.OnItemSe
                     }
                     getPuntuacion();
                 }else if(response.code() == 400){
-                    Toast.makeText( Historial.this, "No se ha conseguido el listado", Toast.LENGTH_LONG).show();
+                    Toast.makeText( Historial.this, "No hay partidas todavía", Toast.LENGTH_LONG).show();
                 }
             }
 

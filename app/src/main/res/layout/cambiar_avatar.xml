@@ -33,7 +33,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/perfilicon" />
+        app:srcCompat="@mipmap/imagenusr3" />
 
     <TextView
         android:layout_width="337dp"
