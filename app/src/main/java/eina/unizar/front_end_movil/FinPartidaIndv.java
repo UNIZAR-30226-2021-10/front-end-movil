@@ -34,7 +34,7 @@ public class FinPartidaIndv extends AppCompatActivity {
 
     private int PUNTOS_TOTALES;
     private int NUM_RONDAS;
-    private int ID_PARTIDA;
+    private int MONEDAS_OBTENIDAS;
 
     TextView puntosTotales;
     TextView monedasTotales;
@@ -42,7 +42,6 @@ public class FinPartidaIndv extends AppCompatActivity {
     private RetrofitInterface retrofitInterface;
     private GestorSesion gestorSesion;
 
-    private String emailUsuario;
 
     /**
      * Called when the activity is first created.
@@ -60,18 +59,20 @@ public class FinPartidaIndv extends AppCompatActivity {
         retrofitInterface = APIUtils.getAPIService();
 
         gestorSesion = new GestorSesion(FinPartidaIndv.this);
-        emailUsuario = gestorSesion.getmailSession();
 
         Bundle extra = getIntent().getExtras();
         PUNTOS_TOTALES = extra.getInt("puntosTotales");
         NUM_RONDAS = extra.getInt("rondas");
+        MONEDAS_OBTENIDAS = PUNTOS_TOTALES/2;
 
         handleFinish(); // llamada para insertar la partida
 
         puntosTotales = (TextView)findViewById(R.id.puntos_ganados);
         monedasTotales = (TextView)findViewById(R.id.monedas_ganadas);
         puntosTotales.setText(String.valueOf(PUNTOS_TOTALES));
-        monedasTotales.setText(String.valueOf(PUNTOS_TOTALES/2));
+        monedasTotales.setText(String.valueOf(MONEDAS_OBTENIDAS));
+
+        insertPointsAndCoins();
 
         // Botón de empezar partida individual
         Button nuevaButton = (Button) findViewById(R.id.nueva);
@@ -101,27 +102,55 @@ public class FinPartidaIndv extends AppCompatActivity {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy--MM--dd(HH:mm:ss)", Locale.getDefault());
         Date date = new Date();
         String fecha = dateFormat.format(date);
-        System.out.println(fecha);
 
         newGame.put("fecha",fecha);
         newGame.put("numJugadores", Integer.toString(1));
         newGame.put("rondas", Integer.toString(NUM_RONDAS));
         newGame.put("ganador", gestorSesion.getSession());
+        newGame.put("email", gestorSesion.getmailSession());
+        newGame.put("puntos", Integer.toString(PUNTOS_TOTALES));
 
         Call<JsonObject> call = retrofitInterface.insertNewGameInd(newGame);
         call.enqueue(new Callback<JsonObject>() {
             //Gestionamos la respuesta de la llamada a post
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-
                 if (response.code() == 200) {
-                    JsonObject jsonObject = response.body().getAsJsonObject("idPartida");
-                    ID_PARTIDA = jsonObject.get("idPartida").getAsInt();
-                    System.out.println(ID_PARTIDA);
-                } else {
+                    System.out.println("TODO OK");
+                } else if(response.code() == 450){
+                    Toast.makeText(FinPartidaIndv.this, "No se ha podido encontrar partida", Toast.LENGTH_LONG).show();
+                } else if(response.code() == 440) {
+                    Toast.makeText(FinPartidaIndv.this, "No se ha podido insertar jugada", Toast.LENGTH_LONG).show();
+                } else{
                     Toast.makeText(FinPartidaIndv.this, "No se ha podido insertar partida", Toast.LENGTH_LONG).show();
                 }
+            }
 
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(FinPartidaIndv.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    private void insertPointsAndCoins(){
+        HashMap<String,String> newData = new HashMap<>();
+
+        newData.put("email", gestorSesion.getmailSession());
+        newData.put("puntos", Integer.toString(PUNTOS_TOTALES));
+        newData.put("monedas", Integer.toString(MONEDAS_OBTENIDAS));
+
+        Call<JsonObject> call = retrofitInterface.insertNewData(newData);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() == 200) {
+                    System.out.println("TODO OK");
+                } else{
+                    Toast.makeText(FinPartidaIndv.this, "No se ha podido insertar monedas y puntos", Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override
