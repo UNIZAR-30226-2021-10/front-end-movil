@@ -137,15 +137,15 @@ public class Historial extends AppCompatActivity implements AdapterView.OnItemSe
                         numJugadoresMulti.add(prueba.get("numJugadores").getAsString());
                         if(prueba.get("numJugadores").getAsString() == "1"){
                             idInd.add(prueba.get("idpartida").getAsString());
-                            fechasInd.add(prueba.get("fecha").getAsString().substring(0,10));
+                            fechasInd.add(prueba.get("fecha").getAsString());
                             numJugadoresInd.add(prueba.get("numJugadores").getAsString());
                             ganadoresInd.add(prueba.get("ganador").getAsString());
                         } else{
-                            fechasMulti.add(prueba.get("fecha").getAsString().substring(0,10));
+                            fechasMulti.add(prueba.get("fecha").getAsString());
                             numJugadoresMulti.add(prueba.get("numJugadores").getAsString());
                             ganadoresMulti.add(prueba.get("ganador").getAsString());
                         }
-                        fechas.add(prueba.get("fecha").getAsString().substring(0,10));
+                        fechas.add(prueba.get("fecha").getAsString());
                         numJugadores.add(prueba.get("numJugadores").getAsString());
                         ganadores.add(prueba.get("ganador").getAsString());
                         System.out.println(prueba);

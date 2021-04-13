@@ -45,6 +45,8 @@ public class JuegoIndividual extends AppCompatActivity{
 
     String[] categorias = {"Art and Literature", "Geography", "History", "Film and TV", "Science", "Sport and Leisure"};
     String[] coloresCategorías = {"#703C02", "#0398FA", "#FFDA00", "#FC57FF", "#17B009", "#FF8D00"};
+    int[] puntosCat = {20, 30, 25, 15, 5, 10};
+
     int[] preguntasCogidas = new int[15];
     int indice;
 
@@ -210,30 +212,30 @@ public class JuegoIndividual extends AppCompatActivity{
 
     }
 
-    void ponerPregunta(String enunciado, String correcta, String incorrecta1, String incorrecta2, String incorrecta3, int posicion){
+    void ponerPregunta(String enunciado, String correcta, String incorrecta1, String incorrecta2, String incorrecta3, int posicion, int indCategoria){
         siguiente.setClickable(false);
         pregunta.setText(enunciado); // text view de pregunta
 
         if(posicion == 1){
-            ponerBien(resp1, correcta);
+            ponerBien(resp1, correcta, indCategoria);
             ponerMal(resp2, incorrecta1, resp1);
             ponerMal(resp3, incorrecta2, resp1);
             ponerMal(resp4, incorrecta3, resp1);
         } else if(posicion == 2){
             ponerMal(resp1, incorrecta1, resp2);
-            ponerBien(resp2, correcta);
+            ponerBien(resp2, correcta, indCategoria);
             ponerMal(resp3, incorrecta2, resp2);
             ponerMal(resp4, incorrecta3, resp2);
         } else if(posicion == 3){
             ponerMal(resp1, incorrecta1, resp3);
             ponerMal(resp2, incorrecta2, resp3);
-            ponerBien(resp3, correcta);
+            ponerBien(resp3, correcta, indCategoria);
             ponerMal(resp4, incorrecta3, resp3);
         } else{
             ponerMal(resp1, incorrecta1, resp4);
             ponerMal(resp2, incorrecta2, resp4);
             ponerMal(resp3, incorrecta3, resp4);
-            ponerBien(resp4, correcta);
+            ponerBien(resp4, correcta, indCategoria);
         }
     }
 
@@ -252,14 +254,14 @@ public class JuegoIndividual extends AppCompatActivity{
         });
     }
 
-    void ponerBien(final TextView respBien, String texto){
+    void ponerBien(final TextView respBien, String texto, final int cat){
         respBien.setText(texto);
         respBien.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 respBien.setBackgroundColor((Color.parseColor("#87e352")));
                 desactivar();
-                numero_puntos += 50;
+                numero_puntos += puntosCat[cat];
                 siguiente.setClickable(true);
                 comprobarRondas();
             }
@@ -295,7 +297,7 @@ public class JuegoIndividual extends AppCompatActivity{
                         preguntasCogidas[indice] = jsonObject.get("idpregunta").getAsInt();
                         //System.out.println(preguntasCogidas[indice]);
                         indice++;
-                        ponerPregunta(q.getStatement(), q.getCorrect(), q.getIncorrect1(), q.getIncorrect2(), q.getIncorrect3(), randomQuestion);
+                        ponerPregunta(q.getStatement(), q.getCorrect(), q.getIncorrect1(), q.getIncorrect2(), q.getIncorrect3(), randomQuestion, random-1);
                     }
 
                 }else if(response.code() == 400){
