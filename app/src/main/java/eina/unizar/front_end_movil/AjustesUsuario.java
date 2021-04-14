@@ -122,8 +122,7 @@ public class AjustesUsuario extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 handleEliminarCuenta();
-                Intent intent = new Intent(v.getContext(), PerfilUsuario.class);
-                startActivityForResult(intent, OPTION_ELIMINARCUENTA);
+
             }
         });
 
@@ -169,30 +168,37 @@ public class AjustesUsuario extends AppCompatActivity {
 
     private void handleEliminarCuenta() {
 
+       new SweetAlertDialog(AjustesUsuario.this,SweetAlertDialog.WARNING_TYPE)
+               .setTitleText("¿Estás seguro?")
+               .setContentText("Tu cuenta será borrada permanentemente.")
+               .setConfirmText("Sí, borrarla")
+               .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                   @Override
+                   public void onClick(SweetAlertDialog sweetAlertDialog) {
+                      eliminarUsuario();
+                   }
+               })
+               .setCancelButton("Cancelar", new SweetAlertDialog.OnSweetClickListener() {
+                   @Override
+                   public void onClick(SweetAlertDialog sweetAlertDialog) {
+                       sweetAlertDialog.dismissWithAnimation();
+                   }
+               }).show();
+    }
+
+    private void eliminarUsuario(){
         HashMap<String, String> dropUser = new HashMap<>();
         dropUser.put("email", email.getText().toString());
-
         Call<JsonObject> call = retrofitInterface.executeDropUser(dropUser);
         call.enqueue(new Callback<JsonObject>() {
-            //Gestionamos la respuesta de la llamada a post
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-
-                if (response.code() == 200) {
-                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            new SweetAlertDialog(AjustesUsuario.this, SweetAlertDialog.SUCCESS_TYPE).setTitleText("Cuenta eliminada exitosamente!")
-                                    .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
-                                        @Override
-                                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                            Intent intent = new Intent(AjustesUsuario.this, PerfilUsuario.class);
-                                            startActivityForResult(intent, OPTION_ELIMINARCUENTA);
-                                        }
-                                    }).show();
-                        }
-
-                    }, 500);
+                if(response.code() == 200){
+                    gestorSesion.removeSession();
+                    Intent intent = new Intent(AjustesUsuario.this,MenuPrincipal.class);
+                    startActivityForResult(intent,OPTION_ELIMINARCUENTA);
+                }else{
+                    Toast.makeText(AjustesUsuario.this,"Se ha producido una situación inesperada.",Toast.LENGTH_LONG).show();
                 }
             }
 
