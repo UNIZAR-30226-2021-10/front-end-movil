@@ -148,6 +148,11 @@ public class FinPartidaIndv extends AppCompatActivity {
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
                     System.out.println("TODO OK");
+                    int monedasUsuario = Integer.parseInt(gestorSesion.getKEY_SESSION_COINS());
+                    int puntosUsuario = Integer.parseInt(gestorSesion.getpointsSession());
+                    int newPoints = puntosUsuario + PUNTOS_TOTALES;
+                    int newCoins = monedasUsuario + MONEDAS_OBTENIDAS;
+                    gestorSesion.updateCoins_points(Integer.toString(newPoints) ,Integer.toString(newCoins));
                 } else{
                     Toast.makeText(FinPartidaIndv.this, "No se ha podido insertar monedas y puntos", Toast.LENGTH_LONG).show();
                 }
