@@ -41,6 +41,11 @@ public class GestorSesion {
         editor.putString(KEY_SESSION_POINTS,points).commit();
         editor.putString(KEY_SESSION_COINS,coins).commit();
     }
+
+    public void updateNickname(String nickname){
+        editor.putString(KEY_SESSION_ID,nickname).commit();
+    }
+
     public String getKEY_SESSION_COINS(){
         return sharedPreferences.getString(KEY_SESSION_COINS,String.valueOf(1));
     }

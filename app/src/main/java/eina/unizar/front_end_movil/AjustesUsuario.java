@@ -96,8 +96,6 @@ public class AjustesUsuario extends AppCompatActivity {
                     // COMPROBAR CONTRASEÑA es igual en ambos campos
                     if (password_new.getText().toString().equals(password_new2.getText().toString())) {
                             handleSaveChanges();
-                            Intent intent = new Intent(v.getContext(), PerfilUsuario.class);
-                            startActivityForResult(intent, OPTION_GUARDAR);
                     } else {
                         // mensaje de error
                         password_new2.setError("Las contraseñas no son iguales");
@@ -142,20 +140,16 @@ public class AjustesUsuario extends AppCompatActivity {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    new SweetAlertDialog(AjustesUsuario.this, SweetAlertDialog.SUCCESS_TYPE).setTitleText("Datos guardados exitosamente!").setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
                         @Override
-                        public void run() {
-                            new SweetAlertDialog(AjustesUsuario.this, SweetAlertDialog.SUCCESS_TYPE).setTitleText("Datos guardados exitosamente!")
-                                    .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
-                                        @Override
-                                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                            Intent intent = new Intent(AjustesUsuario.this, PerfilUsuario.class);
-                                            startActivityForResult(intent, OPTION_GUARDAR);
-                                        }
-                                    }).show();
+                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                            System.err.println("ESTOY AQUI");
+                            gestorSesion.updateNickname(nombre_usuario.getText().toString());
+                            Intent intent = new Intent(AjustesUsuario.this, PerfilUsuario.class);
+                            startActivityForResult(intent, OPTION_GUARDAR);
                         }
+                    }).show();
 
-                    }, 500);
                 }
             }
 
