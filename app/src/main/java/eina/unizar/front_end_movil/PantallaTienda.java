@@ -1,6 +1,7 @@
 package eina.unizar.front_end_movil;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -17,12 +18,29 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import java.util.ArrayList;
+
+import SessionManagement.GestorSesion;
+import database_wrapper.APIUtils;
+import database_wrapper.RetrofitInterface;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PantallaTienda extends AppCompatActivity {
 
     private static final int OPTION_OBJETO = 0;
 
+    private RetrofitInterface retrofitInterface;
+    private GestorSesion gestorSesion;
+
+    private String MONEDAS_USUARIO;
+
+    TextView numMonedas;
     RecyclerView rv_colores;
     RecyclerView rv_cabeza;
     RecyclerView rv_cara;
@@ -38,16 +56,21 @@ public class PantallaTienda extends AppCompatActivity {
     MainAdapter mainAdapter_cara;
     MainAdapter mainAdapter_cuerpo;
 
-    int[] imagenesCabeza = { R.mipmap.sombrero1icon, R.mipmap.sombrero2icon};
-    int[] imagenesColores = { R.mipmap.colores1icon, R.mipmap.colores2icon, R.mipmap.colores3icon };
-    int[] imagenesCara = { R.mipmap.comp1icon};
-    int[] imagenesCuerpo = {};
+    int[] imagenesCabeza = { R.mipmap.complemento_gorrito_santa};
+    int[] imagenesColores = {  R.mipmap.color_rojo, R.mipmap.color_amarillo, R.mipmap.color_azul, R.mipmap.color_naranja,
+           R.mipmap.color_rosa, R.mipmap.color_verde};
+    int[] imagenesCara = { R.mipmap.complemento_gafas_boss};
+    int[] imagenesCuerpo = {R.mipmap.disfraz_traje};
 
-    String[] nombresCabeza = {"Elegante", "Top hat"};
-    String[] nombresColores = {"Rosa", "Verde", "Arcoiris"};
-    String[] nombresCara = {"Gafas sol"};
-    String[] nombresCuerpo = {};
+    ArrayList<Integer> precioCabeza = new ArrayList<>();
+    ArrayList<Integer> precioColores = new ArrayList<>();
+    ArrayList<Integer> precioCara = new ArrayList<>();
+    ArrayList<Integer> precioCuerpo = new ArrayList<>();
 
+    ArrayList<String> nombresCabeza = new ArrayList<>();
+    ArrayList<String> nombresColores = new ArrayList<>();
+    ArrayList<String> nombresCara = new ArrayList<>();
+    ArrayList<String> nombresCuerpo = new ArrayList<>();
 
     /**
      * Called when the activity is first created.
@@ -61,10 +84,19 @@ public class PantallaTienda extends AppCompatActivity {
         setContentView(R.layout.pantalla_tienda);
         getSupportActionBar().hide();
 
-        rv_colores = findViewById(R.id.recyclerview_colores);
-        rv_cabeza = findViewById(R.id.recyclerview_sombreros);
+        gestorSesion = new GestorSesion(PantallaTienda.this);
+        numMonedas = findViewById(R.id.monedas_usuario);
+        MONEDAS_USUARIO = gestorSesion.getKEY_SESSION_COINS();
+        numMonedas.setText(MONEDAS_USUARIO);
 
-        inicializar();
+        retrofitInterface = APIUtils.getAPIService();
+
+        rv_colores = findViewById(R.id.recyclerview_colores);
+        rv_cabeza = findViewById(R.id.recyclerview_cabeza);
+        rv_cara = findViewById(R.id.recyclerview_cara);
+        rv_cuerpo = findViewById(R.id.recyclerview_cuerpo);
+
+        obtenerImagenes();
 
         Button atrasButton = (Button) findViewById(R.id.atras);
         atrasButton.setOnClickListener(new View.OnClickListener() {
@@ -78,40 +110,83 @@ public class PantallaTienda extends AppCompatActivity {
     public void inicializar(){
         mainmodels_colores = new ArrayList<>();
         mainmodels_cabeza = new ArrayList<>();
+        mainmodels_cuerpo = new ArrayList<>();
+        mainmodels_cara = new ArrayList<>();
 
-        // SOMBREROS
+        poblarListas();
+        ponerLayouts();
+        ponerAdaptadores();
+    }
+
+    public void poblarListas(){
+        // CABEZA
         for(int i = 0; i < imagenesCabeza.length; i++){
-            MainModel model = new MainModel(imagenesCabeza[i], nombresCabeza[i]);
+            MainModel model = new MainModel(imagenesCabeza[i], nombresCabeza.get(i), precioCabeza.get(i));
             mainmodels_cabeza.add(model);
         }
 
         // COLORES
         for(int i = 0; i < imagenesColores.length; i++){
-            MainModel model = new MainModel(imagenesColores[i], nombresColores[i]);
+            MainModel model = new MainModel(imagenesColores[i], nombresColores.get(i), precioColores.get(i));
             mainmodels_colores.add(model);
         }
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this,
+        // CUERPO
+        for(int i = 0; i < imagenesCuerpo.length; i++){
+            MainModel model = new MainModel(imagenesCuerpo[i], nombresCuerpo.get(i), precioCuerpo.get(i));
+            mainmodels_cuerpo.add(model);
+        }
+
+        // CARA
+        for(int i = 0; i < imagenesCara.length; i++){
+            MainModel model = new MainModel(imagenesCara[i], nombresCara.get(i), precioCara.get(i));
+            mainmodels_cara.add(model);
+        }
+    }
+
+    public void ponerLayouts(){
+        LinearLayoutManager layoutManagerCara = new LinearLayoutManager(this,
                 LinearLayoutManager.HORIZONTAL,false);
 
-        LinearLayoutManager layoutManager2 = new LinearLayoutManager(this,
+        LinearLayoutManager layoutManagerCuerpo = new LinearLayoutManager(this,
                 LinearLayoutManager.HORIZONTAL,false);
 
-        rv_colores.setLayoutManager(layoutManager);
+        LinearLayoutManager layoutManagerColor = new LinearLayoutManager(this,
+                LinearLayoutManager.HORIZONTAL,false);
+
+        LinearLayoutManager layoutManagerCabeza = new LinearLayoutManager(this,
+                LinearLayoutManager.HORIZONTAL,false);
+
+        rv_colores.setLayoutManager(layoutManagerColor);
         rv_colores.setItemAnimator(new DefaultItemAnimator());
 
-        rv_cabeza.setLayoutManager(layoutManager2);
+        rv_cabeza.setLayoutManager(layoutManagerCabeza);
         rv_cabeza.setItemAnimator(new DefaultItemAnimator());
 
+        rv_cara.setLayoutManager(layoutManagerCara);
+        rv_cara.setItemAnimator(new DefaultItemAnimator());
+
+        rv_cuerpo.setLayoutManager(layoutManagerCuerpo);
+        rv_cuerpo.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    public void ponerAdaptadores(){
         mainAdapter_colores = new MainAdapter(this, mainmodels_colores);
         mainAdapter_cabeza = new MainAdapter(this, mainmodels_cabeza);
+        mainAdapter_cara = new MainAdapter(this, mainmodels_cara);
+        mainAdapter_cuerpo = new MainAdapter(this, mainmodels_cuerpo);
 
         mainAdapter_colores.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "SELECCION: "+
-                                mainmodels_colores.get(rv_colores.getChildAdapterPosition(v)).getNombre(),
-                        Toast.LENGTH_SHORT).show();
+                Bundle extra = new Bundle();
+                extra.putString("Nombre", mainmodels_colores.get(rv_colores.getChildAdapterPosition(v)).getNombre());
+                extra.putInt("Precio", mainmodels_colores.get(rv_colores.getChildAdapterPosition(v)).getPrecio());
+                extra.putInt("Imagen", mainmodels_colores.get(rv_colores.getChildAdapterPosition(v)).getFoto());
+                extra.putString("Monedas", MONEDAS_USUARIO);
+                Intent intent = new Intent(v.getContext(), ObjetoTienda.class);
+                intent.putExtras(extra);
+                startActivityForResult(intent, OPTION_OBJETO);
             }
         });
         rv_colores.setAdapter(mainAdapter_colores);
@@ -119,22 +194,58 @@ public class PantallaTienda extends AppCompatActivity {
         mainAdapter_cabeza.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "SELECCION: "+
-                                mainmodels_cabeza.get(rv_cabeza.getChildAdapterPosition(v)).getNombre(),
-                        Toast.LENGTH_SHORT).show();
+                Bundle extra = new Bundle();
+                extra.putString("Nombre", mainmodels_cabeza.get(rv_cabeza.getChildAdapterPosition(v)).getNombre());
+                extra.putInt("Precio", mainmodels_cabeza.get(rv_cabeza.getChildAdapterPosition(v)).getPrecio());
+                extra.putInt("Imagen", mainmodels_cabeza.get(rv_cabeza.getChildAdapterPosition(v)).getFoto());
+                extra.putString("Monedas", MONEDAS_USUARIO);
+                Intent intent = new Intent(v.getContext(), ObjetoTienda.class);
+                intent.putExtras(extra);
+                startActivityForResult(intent, OPTION_OBJETO);
             }
         });
         rv_cabeza.setAdapter(mainAdapter_cabeza);
-    }
 
+        mainAdapter_cara.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle extra = new Bundle();
+                extra.putString("Nombre", mainmodels_cara.get(rv_cara.getChildAdapterPosition(v)).getNombre());
+                extra.putInt("Precio", mainmodels_cara.get(rv_cara.getChildAdapterPosition(v)).getPrecio());
+                extra.putInt("Imagen", mainmodels_cara.get(rv_cara.getChildAdapterPosition(v)).getFoto());
+                extra.putString("Monedas", MONEDAS_USUARIO);
+                Intent intent = new Intent(v.getContext(), ObjetoTienda.class);
+                intent.putExtras(extra);
+                startActivityForResult(intent, OPTION_OBJETO);
+            }
+        });
+        rv_cara.setAdapter(mainAdapter_cara);
+
+        mainAdapter_cuerpo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle extra = new Bundle();
+                extra.putString("Nombre", mainmodels_cuerpo.get(rv_cuerpo.getChildAdapterPosition(v)).getNombre());
+                extra.putInt("Precio", mainmodels_cuerpo.get(rv_cuerpo.getChildAdapterPosition(v)).getPrecio());
+                extra.putInt("Imagen", mainmodels_cuerpo.get(rv_cuerpo.getChildAdapterPosition(v)).getFoto());
+                extra.putString("Monedas", MONEDAS_USUARIO);
+                Intent intent = new Intent(v.getContext(), ObjetoTienda.class);
+                intent.putExtras(extra);
+                startActivityForResult(intent, OPTION_OBJETO);
+            }
+        });
+        rv_cuerpo.setAdapter(mainAdapter_cuerpo);
+    }
 
     public class MainModel {
         Integer foto;
         String nombre;
+        Integer precio;
 
-        public MainModel(Integer foto, String nombre){
+        public MainModel(Integer foto, String nombre, Integer precio){
             this.foto = foto;
             this.nombre = nombre;
+            this.precio = precio;
         }
 
         public Integer getFoto() {
@@ -143,6 +254,10 @@ public class PantallaTienda extends AppCompatActivity {
 
         public String getNombre() {
             return nombre;
+        }
+
+        public Integer getPrecio() {
+            return precio;
         }
     }
 
@@ -170,6 +285,7 @@ public class PantallaTienda extends AppCompatActivity {
         public void onBindViewHolder(@NonNull MainAdapter.ViewHolder holder, int position) {
             holder.foto.setImageResource(mainModels.get(position).getFoto());
             holder.nombre.setText(mainModels.get(position).getNombre());
+            holder.precio.setText(mainModels.get(position).getPrecio().toString());
         }
 
         @Override
@@ -188,23 +304,70 @@ public class PantallaTienda extends AppCompatActivity {
             }
         }
 
-
-
         public class ViewHolder  extends RecyclerView.ViewHolder{
 
             ImageView foto;
             TextView nombre;
+            TextView precio;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
 
                 foto = itemView.findViewById(R.id.foto_objeto);
                 nombre = itemView.findViewById(R.id.nombre_objeto);
+                precio = itemView.findViewById(R.id.precio_objeto);
             }
         }
     }
 
 
+    private void obtenerImagenes() {
+        Call<JsonArray> call = retrofitInterface.getObjectsShop();
+        call.enqueue(new Callback<JsonArray>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
+                if (response.code() == 200) {
+
+                    JsonArray jsonObject = response.body().getAsJsonArray();
+                    for(JsonElement j : jsonObject){
+                        //System.out.println(j);
+                        JsonObject prueba = j.getAsJsonObject();
+                        if(prueba.get("Tipo").getAsString().equals("color")){
+                            precioColores.add(prueba.get("Precio").getAsInt());
+                            nombresColores.add(prueba.get("Nombre").getAsString());
+
+                            // TODO: coger la imagen aquí
+                        } else if(prueba.get("Tipo").getAsString().equals("cara")){
+                            precioCara.add(prueba.get("Precio").getAsInt());
+                            nombresCara.add(prueba.get("Nombre").getAsString());
+                            // TODO: coger la imagen aquí
+                        } else if(prueba.get("Tipo").getAsString().equals("cuerpo")){
+                            precioCuerpo.add(prueba.get("Precio").getAsInt());
+                            nombresCuerpo.add(prueba.get("Nombre").getAsString());
+                            // TODO: coger la imagen aquí
+                        } else if(prueba.get("Tipo").getAsString().equals("cabeza")){
+                            precioCabeza.add(prueba.get("Precio").getAsInt());
+                            nombresCabeza.add(prueba.get("Nombre").getAsString());
+                            // TODO: coger la imagen aquí
+                            System.out.println(precioCabeza);
+                        }
+                        //System.out.println(prueba);
+
+                    }
+                    inicializar();
+                } else{
+                    Toast.makeText(PantallaTienda.this, "No se ha podido obtener objetos", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonArray> call, Throwable t) {
+                Toast.makeText(PantallaTienda.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
 
 
     /*

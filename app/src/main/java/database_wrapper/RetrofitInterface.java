@@ -43,5 +43,7 @@ public interface RetrofitInterface {
     @GET("/Historial_Puntuacion")
     Call<JsonArray> getPointsFromGames(@Query("email") String email);
 
+    @POST("/PantallaTienda")
+    Call<JsonArray> getObjectsShop();
 
 }

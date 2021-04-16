@@ -14,10 +14,11 @@ import androidx.appcompat.app.AppCompatActivity;
 public class ObjetoTienda extends AppCompatActivity {
 
     private static final int OPTION_COMPRAR = 0;
-    private static final int OPTION_ATRAS = 1;
 
     private ImageView image;
-    private TextView monedas;
+    private TextView monedas_usuario;
+    private TextView nombre_objeto;
+    private TextView precio_objeto;
     /**
      * Called when the activity is first created.
      *
@@ -30,13 +31,21 @@ public class ObjetoTienda extends AppCompatActivity {
         setContentView(R.layout.objeto_tienda);
         getSupportActionBar().hide();
 
-        image = (ImageView) findViewById(R.id.imagenObjeto);
-        monedas = (TextView) findViewById(R.id.monedas_usuario);
-
         Bundle extras = getIntent().getExtras();
-        int imagen = extras.getInt("imagen");
+        int imagen = extras.getInt("Imagen");
+        String nombre = extras.getString("Nombre");
+        int precio = extras.getInt("Precio");
+        String monedas = extras.getString("Monedas");
+
+        image = (ImageView) findViewById(R.id.imagenObjeto);
+        monedas_usuario = (TextView) findViewById(R.id.monedas_usuario);
+        nombre_objeto = (TextView) findViewById(R.id.nombre_objeto);
+        precio_objeto = (TextView) findViewById(R.id.precio_objeto);
 
         image.setImageResource(imagen);
+        monedas_usuario.setText(monedas);
+        nombre_objeto.setText(nombre);
+        precio_objeto.setText(String.valueOf(precio));
 
         Button comprarButton = (Button) findViewById((R.id.comprar));
         comprarButton.setOnClickListener(new View.OnClickListener() {
@@ -52,8 +61,7 @@ public class ObjetoTienda extends AppCompatActivity {
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), PantallaTienda.class);
-                startActivityForResult(intent, OPTION_ATRAS);
+                finish();
             }
         });
     }
