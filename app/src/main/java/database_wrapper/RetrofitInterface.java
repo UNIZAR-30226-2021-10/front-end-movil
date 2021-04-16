@@ -46,4 +46,10 @@ public interface RetrofitInterface {
     @POST("/PantallaTienda")
     Call<JsonArray> getObjectsShop();
 
+    @POST("/ObjetoTienda")
+    Call<JsonObject> buyObject(@Body HashMap<String,String> map);
+
+    @POST("/ObjetoTienda_RestarMonedas")
+    Call<JsonObject> updateCoins(@Body HashMap<String,String> map);
+
 }

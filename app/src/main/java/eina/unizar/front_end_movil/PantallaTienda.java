@@ -353,11 +353,10 @@ public class PantallaTienda extends AppCompatActivity {
                             System.out.println(precioCabeza);
                         }
                         //System.out.println(prueba);
-
                     }
                     inicializar();
                 } else{
-                    Toast.makeText(PantallaTienda.this, "No se ha podido obtener objetos", Toast.LENGTH_LONG).show();
+                    Toast.makeText(PantallaTienda.this, "No se han podido obtener los objetos", Toast.LENGTH_LONG).show();
                 }
             }
 

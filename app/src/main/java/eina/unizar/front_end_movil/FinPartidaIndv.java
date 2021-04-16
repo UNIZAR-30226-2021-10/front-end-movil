@@ -152,7 +152,8 @@ public class FinPartidaIndv extends AppCompatActivity {
                     int puntosUsuario = Integer.parseInt(gestorSesion.getpointsSession());
                     int newPoints = puntosUsuario + PUNTOS_TOTALES;
                     int newCoins = monedasUsuario + MONEDAS_OBTENIDAS;
-                    gestorSesion.updateCoins_points(Integer.toString(newPoints) ,Integer.toString(newCoins));
+                    gestorSesion.updateCoins(Integer.toString(newCoins));
+                    gestorSesion.updatePoints(Integer.toString(newPoints));
                 } else{
                     Toast.makeText(FinPartidaIndv.this, "No se ha podido insertar monedas y puntos", Toast.LENGTH_LONG).show();
                 }

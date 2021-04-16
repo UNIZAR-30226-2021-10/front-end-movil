@@ -37,9 +37,13 @@ public class GestorSesion {
     public String getpointsSession(){
         return sharedPreferences.getString(KEY_SESSION_POINTS,String.valueOf(1));
     }
-    public void updateCoins_points(String points, String coins){
-        editor.putString(KEY_SESSION_POINTS,points).commit();
+
+    public void updateCoins(String coins){
         editor.putString(KEY_SESSION_COINS,coins).commit();
+    }
+
+    public void updatePoints(String points){
+        editor.putString(KEY_SESSION_POINTS,points).commit();
     }
 
     public void updateNickname(String nickname){
