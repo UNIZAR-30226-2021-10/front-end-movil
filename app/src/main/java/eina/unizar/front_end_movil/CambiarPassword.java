@@ -1,15 +1,27 @@
 package eina.unizar.front_end_movil;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Menu;
+import android.os.StrictMode;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Properties;
 import java.util.regex.Pattern;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import database_wrapper.RetrofitInterface;
 
@@ -19,6 +31,10 @@ public class CambiarPassword extends AppCompatActivity {
     private static final int OPTION_ATRAS = 1;
 
     private EditText email;
+    String correo;
+    String password;
+    Session sesion;
+    String mensaje;
 
     private RetrofitInterface retrofitInterface;
     //REGEX para comprobar el email
@@ -46,6 +62,8 @@ public class CambiarPassword extends AppCompatActivity {
 
         //EDIT TEXT DE EMAIL
         email = (EditText) findViewById(R.id.email);
+        correo = "trivialProyectoSoftware@gmail.com";
+        password = "trivial1234";
 
         // Botón de confirmar
         Button confirmarButton = (Button) findViewById(R.id.confirmar);
@@ -58,9 +76,42 @@ public class CambiarPassword extends AppCompatActivity {
                 }
                 else{
                     if(comprobarEmail(email.getText().toString())){
-                        //handleEnviarCorreo();
-                        Intent intent = new Intent (v.getContext(), enviarCodigoVerificacion.class);
-                        startActivityForResult(intent, OPTION_ENVIAR_CORREO);
+                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                        StrictMode.setThreadPolicy(policy);
+                       Properties properties = new Properties();
+                       properties.put("mail.smtp.host","smtp.googlemail.com");
+                       properties.put("mail.smtp.socketFactory.port","465");
+                       properties.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
+                       properties.put("mail.smtp.auth","true");
+                       properties.put("mail.smtp.port","465");
+
+                       try{
+                           sesion = Session.getDefaultInstance(properties, new Authenticator() {
+                               @Override
+                               protected PasswordAuthentication getPasswordAuthentication() {
+                                   return new PasswordAuthentication(correo, password);
+                               }
+                           });
+
+                           if(sesion != null){
+                               Message message = new MimeMessage(sesion);
+                               message.setFrom(new InternetAddress(correo));
+                               message.setSubject("codigo de verificacion");
+                               String destinatario = email.getText().toString().trim();
+                               message.setRecipients(Message.RecipientType.TO,InternetAddress.parse(destinatario));
+                               mensaje = "Tu codigo es 1234560";
+                               message.setContent(mensaje, "text/html; charset=utf-8");
+
+                               Transport.send(message);
+
+                               Intent intent = new Intent (v.getContext(), enviarCodigoVerificacion.class);
+                               startActivityForResult(intent, OPTION_ENVIAR_CORREO);
+                           }
+
+                       }catch(Exception e){
+                           e.printStackTrace();
+                       }
+
                     }else {
                         email.setError("El email es invalido, introduzca un email valido por ejemplo: pedro@gmail.com");
                     }
