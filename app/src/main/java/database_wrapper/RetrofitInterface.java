@@ -44,7 +44,7 @@ public interface RetrofitInterface {
     Call<JsonArray> getPointsFromGames(@Query("email") String email);
 
     @POST("/PantallaTienda")
-    Call<JsonArray> getObjectsShop();
+    Call<JsonArray> getObjectsShop(@Body HashMap<String,String> map);
 
     @POST("/ObjetoTienda")
     Call<JsonObject> buyObject(@Body HashMap<String,String> map);

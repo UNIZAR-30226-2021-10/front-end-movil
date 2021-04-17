@@ -23,6 +23,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import SessionManagement.GestorSesion;
 import database_wrapper.APIUtils;
@@ -322,7 +323,9 @@ public class PantallaTienda extends AppCompatActivity {
 
 
     private void obtenerImagenes() {
-        Call<JsonArray> call = retrofitInterface.getObjectsShop();
+        HashMap<String,String> prueba = new HashMap<>();
+        prueba.put("email",gestorSesion.getmailSession());
+        Call<JsonArray> call = retrofitInterface.getObjectsShop(prueba);
         call.enqueue(new Callback<JsonArray>() {
             //Gestionamos la respuesta de la llamada a post
             @Override
@@ -336,7 +339,6 @@ public class PantallaTienda extends AppCompatActivity {
                         if(prueba.get("Tipo").getAsString().equals("color")){
                             precioColores.add(prueba.get("Precio").getAsInt());
                             nombresColores.add(prueba.get("Nombre").getAsString());
-
                             // TODO: coger la imagen aquí
                         } else if(prueba.get("Tipo").getAsString().equals("cara")){
                             precioCara.add(prueba.get("Precio").getAsInt());
