@@ -2,6 +2,8 @@ package eina.unizar.front_end_movil;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -18,6 +20,7 @@ import java.util.HashMap;
 
 import SessionManagement.GestorSesion;
 import SessionManagement.Question;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;
 import retrofit2.Call;
@@ -71,17 +74,47 @@ public class ObjetoTienda extends AppCompatActivity {
         nombre_objeto.setText(nombreObjeto);
         precio_objeto.setText(precioObjeto);
 
-        comprobarMonedasSuficientes();
+        final boolean ok = hayMonedasSuficientes();
 
         Button comprarButton = (Button) findViewById((R.id.comprar));
         comprarButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                comprarObjeto();
-                Intent intent = new Intent(v.getContext(), PantallaTienda.class);
-                startActivityForResult(intent, OPTION_COMPRAR);
-            }
+                @Override
+                public void onClick(View v) {
+                    if (ok) {
+                        comprarObjeto();
+                        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                new SweetAlertDialog(ObjetoTienda.this,SweetAlertDialog.SUCCESS_TYPE).setTitleText("¡Comprado correctamente!")
+                                        .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
+                                            @Override
+                                            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                                Intent intent = new Intent(ObjetoTienda.this, PantallaTienda.class);
+                                                startActivityForResult(intent, OPTION_COMPRAR);
+                                            }
+                                        }).show();
+                            }
+
+                        },500);
+                    } else{
+                        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                new SweetAlertDialog(ObjetoTienda.this,SweetAlertDialog.ERROR_TYPE).setTitleText("¡No tiene suficientes monedas para comprar este objeto!")
+                                        .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
+                                            @Override
+                                            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                                Intent intent = new Intent(ObjetoTienda.this, PantallaTienda.class);
+                                                startActivityForResult(intent, OPTION_COMPRAR);
+                                            }
+                                        }).show();
+                            }
+                        },500);
+                    }
+                }
         });
+
+
 
         // Botón de atrás
         Button atrasButton = (Button) findViewById(R.id.atras);
@@ -148,12 +181,12 @@ public class ObjetoTienda extends AppCompatActivity {
         });
     }
 
-    public void comprobarMonedasSuficientes(){
-        HashMap<String,String> object = new HashMap<>();
-
-        object.put("nombreObjeto",nombreObjeto);
-        object.put("email",gestorSesion.getmailSession());
-        Call<JsonObject> call = retrofitInterface.buyObject(object);
+    public boolean hayMonedasSuficientes(){
+        int monedasActuales = Integer.parseInt(gestorSesion.getKEY_SESSION_COINS());
+        if(precio > monedasActuales){
+            return false;
+        }
+        return true;
     }
 }
 
