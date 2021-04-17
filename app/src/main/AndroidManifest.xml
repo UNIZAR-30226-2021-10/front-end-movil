@@ -33,11 +33,11 @@
                 android:value=".CambiarPassword" />
         </activity>
         <activity
-            android:name=".enviarCodigoVerificacion"
-            android:parentActivityName=".enviarCodigoVerificacion" >
+            android:name=".EnviarCodigoVerificacion"
+            android:parentActivityName=".EnviarCodigoVerificacion" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".enviarCodigoVerificacion" />
+                android:value=".EnviarCodigoVerificacion" />
         </activity>
         <activity
             android:name=".RegistroUsuario"

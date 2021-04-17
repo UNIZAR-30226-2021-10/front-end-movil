@@ -1,10 +1,8 @@
 package eina.unizar.front_end_movil;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,11 +10,11 @@ import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Properties;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 import javax.mail.Authenticator;
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -35,6 +33,7 @@ public class CambiarPassword extends AppCompatActivity {
     String password;
     Session sesion;
     String mensaje;
+    int code;
 
     private RetrofitInterface retrofitInterface;
     //REGEX para comprobar el email
@@ -99,12 +98,16 @@ public class CambiarPassword extends AppCompatActivity {
                                message.setSubject("codigo de verificacion");
                                String destinatario = email.getText().toString().trim();
                                message.setRecipients(Message.RecipientType.TO,InternetAddress.parse(destinatario));
-                               mensaje = "Tu codigo es 1234560";
+                               Random r = new Random();
+                               code = r.nextInt(100000 - 10000 + 1) + 10000;
+                               String codigo = String.valueOf(code);
+                               mensaje = "Tu codigo es " + codigo;
                                message.setContent(mensaje, "text/html; charset=utf-8");
 
                                Transport.send(message);
 
-                               Intent intent = new Intent (v.getContext(), enviarCodigoVerificacion.class);
+                               Intent intent = new Intent (v.getContext(), EnviarCodigoVerificacion.class);
+                               intent.putExtra("codigo", codigo);
                                startActivityForResult(intent, OPTION_ENVIAR_CORREO);
                            }
 
