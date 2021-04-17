@@ -1,10 +1,15 @@
 package eina.unizar.front_end_movil;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +23,8 @@ public class CambiarAvatar extends AppCompatActivity {
     private String[] nombres = {"Traje", "Médico", "Paragüas", "Estetoscopio", "Maletín",
             "Vestido", "Corbata", "Gafas", "Balon", "Sombrero"};
 
+    private  ImageView imagenAvatar;
+
     /**
      * Called when the activity is first created.
      *
@@ -29,6 +36,9 @@ public class CambiarAvatar extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.cambiar_avatar);
         getSupportActionBar().hide();
+        imagenAvatar = (ImageView) findViewById(R.id.imageViewAvatar);
+        //Bitmap bitmap = Bitmap.createBitmap(imagenAvatar.getWidth(),imagenAvatar.getHeight(),Bitmap.Config.RGB_565);
+        //imagenAvatar.setImageBitmap(bitmap);
 
         listaObjetos = (ListView)findViewById(R.id.list);
         fillData();
@@ -62,6 +72,18 @@ public class CambiarAvatar extends AppCompatActivity {
         listaObjetos = (ListView) findViewById(R.id.list);
         ArrayAdapter<String> adaptador = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nombres);
         listaObjetos.setAdapter(adaptador);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if(hasFocus){
+            System.err.println(imagenAvatar.getWidth()  +  "," + imagenAvatar.getHeight());
+            //Bitmap bitmap = Bitmap.createBitmap(imagenAvatar.getWidth(),imagenAvatar.getHeight()/4,Bitmap.Config.RGB_565);
+            Bitmap bitmap = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.disfraz_traje);
+
+            imagenAvatar.setImageBitmap(bitmap);
+        }
     }
 }
 
