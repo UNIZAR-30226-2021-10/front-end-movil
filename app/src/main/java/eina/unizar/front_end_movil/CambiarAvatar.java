@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
@@ -24,6 +25,7 @@ public class CambiarAvatar extends AppCompatActivity {
     private static final int OPTION_OK = 0;
     private static final int OPTION_ATRAS = 1;
 
+    private final static String COLOR_NARANJA =  "#FFA141";
     private ListView listaObjetos;
     private String[] nombres = {"Traje", "Médico", "Paragüas", "Estetoscopio", "Maletín",
             "Vestido", "Corbata", "Gafas", "Balon", "Sombrero"};
@@ -84,24 +86,23 @@ public class CambiarAvatar extends AppCompatActivity {
         super.onWindowFocusChanged(hasFocus);
         if(hasFocus){
             System.err.println(imagenAvatar.getWidth()  +  "," + imagenAvatar.getHeight());
-
-            Bitmap bitmap = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.disfraz_traje);
+            //bitmap del traje
+            Bitmap bitmapTraje = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.disfraz_traje);
+            //bitmap del sombrero
+            Bitmap bitmapSombrero = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.complemento_gorrito_santa);
             //Obtenemos el bitmap del imageview
             BitmapDrawable bitmapOriginal = (BitmapDrawable) imagenAvatar.getDrawable();
             Bitmap bitmapAvatarStandar = bitmapOriginal.getBitmap();
-            //Height 93 Weight 93 para el traje
-            System.err.println(bitmap.getHeight() + "," + bitmap.getWidth());
+
             Bitmap bmOverlay = Bitmap.createBitmap(imagenAvatar.getWidth(),imagenAvatar.getHeight(),Bitmap.Config.RGB_565);
-            Bitmap definitivo = finalcombieimage(bitmapAvatarStandar,bitmap);
+            bitmapAvatarStandar = replaceColor(bitmapAvatarStandar,1,1);
+            Bitmap definitivo = finalcombieimage(bitmapAvatarStandar,bitmapTraje,bitmapSombrero);
             imagenAvatar.setImageBitmap(definitivo);
         }
     }
 
-    public Bitmap finalcombieimage(Bitmap c, Bitmap s) {
+    public Bitmap finalcombieimage(Bitmap c, Bitmap s, Bitmap r) {
 
-        DisplayMetrics metrics = getBaseContext().getResources().getDisplayMetrics();
-        int width = metrics.widthPixels;
-        int height = metrics.heightPixels;
         Bitmap bmOverlay = Bitmap.createBitmap(imagenAvatar.getWidth(),imagenAvatar.getHeight(),Bitmap.Config.RGB_565);
         Canvas comboImage = new Canvas(bmOverlay);
         /*
@@ -117,7 +118,40 @@ public class CambiarAvatar extends AppCompatActivity {
         comboImage.drawBitmap(c, null, dest1, null);
         Rect dest2 = new Rect(0, 0, 274, 290);
         comboImage.drawBitmap(s, null, dest2, null);
+        Rect dest3 = new Rect(0, 0, 274, 290);
+        comboImage.drawBitmap(r, null, dest3, null);
         return bmOverlay;
+    }
+
+    public Bitmap replaceColor(Bitmap src,int fromColor, int targetColor) {
+        if(src == null) {
+            return null;
+        }
+        // Source image size
+        int width = src.getWidth();
+        int height = src.getHeight();
+        int[] pixels = new int[width * height];
+        //get pixels
+        src.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        for(int x = 0; x < pixels.length; ++x) {
+            //pixels[x] = (pixels[x] == fromColor) ? targetColor : pixels[x];
+            System.out.println("Rojo: " + Color.red(pixels[x]) + " Verde:" + Color.green(pixels[x]) + " Azul:" + Color.blue(pixels[x]));
+            if (checkforSimilarColors(Color.parseColor(COLOR_NARANJA),pixels[x]) < 120){
+                pixels[x] = Color.argb(255,99,216,39);
+            }
+
+        }
+        // create result bitmap output
+        Bitmap result = Bitmap.createBitmap(width, height, src.getConfig());
+        //set pixels
+        result.setPixels(pixels, 0, width, 0, 0, width, height);
+
+        return result;
+    }
+
+    private double checkforSimilarColors(int a, int b){
+        return Math.sqrt(Math.pow(Color.red(a) - Color.red(b), 2) + Math.pow(Color.blue(a) - Color.blue(b), 2) + Math.pow(Color.green(a) - Color.green(b), 2));
     }
 }
 
