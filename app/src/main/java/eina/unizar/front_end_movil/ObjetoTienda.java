@@ -71,6 +71,8 @@ public class ObjetoTienda extends AppCompatActivity {
         nombre_objeto.setText(nombreObjeto);
         precio_objeto.setText(precioObjeto);
 
+        comprobarMonedasSuficientes();
+
         Button comprarButton = (Button) findViewById((R.id.comprar));
         comprarButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,6 +146,14 @@ public class ObjetoTienda extends AppCompatActivity {
                 Toast.makeText( ObjetoTienda.this, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    public void comprobarMonedasSuficientes(){
+        HashMap<String,String> object = new HashMap<>();
+
+        object.put("nombreObjeto",nombreObjeto);
+        object.put("email",gestorSesion.getmailSession());
+        Call<JsonObject> call = retrofitInterface.buyObject(object);
     }
 }
 
