@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,7 +24,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class enviarCodigoVerificacion extends AppCompatActivity{
+public class EnviarCodigoVerificacion extends AppCompatActivity{
     private static final int OPTION_CONFIRMAR = 0;
     private static final int OPTION_ATRAS = 1;
 
@@ -33,6 +32,8 @@ public class enviarCodigoVerificacion extends AppCompatActivity{
     private EditText codigo_verificacion;
     private EditText new_password1;
     private EditText new_password2;
+    String codigo;
+    String verificacion_code;
 
     private GestorSesion gestorSesion;
     private RetrofitInterface retrofitInterface;
@@ -61,7 +62,7 @@ public class enviarCodigoVerificacion extends AppCompatActivity{
         //Construimos el objeto retrofit
         retrofitInterface = APIUtils.getAPIService();
 
-        gestorSesion = new GestorSesion(enviarCodigoVerificacion.this);
+        gestorSesion = new GestorSesion(EnviarCodigoVerificacion.this);
 
         //EDIT TEXT DEL EMAIL
         email = (EditText) findViewById(R.id.email);
@@ -71,6 +72,10 @@ public class enviarCodigoVerificacion extends AppCompatActivity{
         new_password1 = (EditText) findViewById(R.id.password_new);
         //EDIT TEXT DE LA NUEVA CONTRASEÑA2
         new_password2 = (EditText) findViewById(R.id.password_new2);
+
+        //Para obtener el code de la actividad anterior
+        Bundle bundle = this.getIntent().getExtras();
+        codigo = bundle.getString("codigo");
 
         //Boton de confirmar
         Button confirmarButton = (Button) findViewById(R.id.confirmar);
@@ -88,14 +93,20 @@ public class enviarCodigoVerificacion extends AppCompatActivity{
                     new_password2.setError("El campo no puede estar vacío");
                 } else {
                     if(comprobarEmail(email.getText().toString())){
-                        // COMPROBAR CONTRASEÑA es igual en ambos campos
-                        if (new_password1.getText().toString().equals(new_password2.getText().toString())) {
-                            handleCambiarContrasenya();
-                            Intent intent = new Intent (v.getContext(), MenuPrincipal.class);
-                            startActivityForResult(intent, OPTION_CONFIRMAR);
-                        } else {
-                            // mensaje de error
-                            new_password2.setError("Las contraseñas no son iguales");
+                        //COMPROBAR CODIGO DE VERIFICACION
+                        verificacion_code = codigo_verificacion.getText().toString().trim();
+                        if(verificacion_code.equals(codigo)){
+                            // COMPROBAR CONTRASEÑA es igual en ambos campos
+                            if (new_password1.getText().toString().equals(new_password2.getText().toString())) {
+                                handleCambiarContrasenya();
+                                Intent intent = new Intent (v.getContext(), MenuPrincipal.class);
+                                startActivityForResult(intent, OPTION_CONFIRMAR);
+                            } else {
+                                // mensaje de error
+                                new_password2.setError("Las contraseñas no son iguales");
+                            }
+                        } else{
+                            codigo_verificacion.setError("El codigo no es correcto, revise su correo electronico.");
                         }
                     }else {
                         email.setError("El email es invalido, introduzca un email valido por ejemplo: pedro@gmail.com");
@@ -131,11 +142,11 @@ public class enviarCodigoVerificacion extends AppCompatActivity{
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            new SweetAlertDialog(enviarCodigoVerificacion.this, SweetAlertDialog.SUCCESS_TYPE).setTitleText("Contraseña modificada exitosamente!")
+                            new SweetAlertDialog(EnviarCodigoVerificacion.this, SweetAlertDialog.SUCCESS_TYPE).setTitleText("Contraseña modificada exitosamente!")
                                     .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
                                         @Override
                                         public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                            Intent intent = new Intent(enviarCodigoVerificacion.this, MenuPrincipal.class);
+                                            Intent intent = new Intent(EnviarCodigoVerificacion.this, MenuPrincipal.class);
                                             startActivityForResult(intent, OPTION_CONFIRMAR);
                                         }
                                     }).show();
@@ -147,7 +158,7 @@ public class enviarCodigoVerificacion extends AppCompatActivity{
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                Toast.makeText(enviarCodigoVerificacion.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(EnviarCodigoVerificacion.this, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
