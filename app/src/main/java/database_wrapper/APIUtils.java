@@ -14,4 +14,9 @@ public class APIUtils {
             return ClienteRetrofit.getClient(URL_LOCAL).create(RetrofitInterface.class);
         }
 
+        public static RetrofitInterface getAPIServiceImages() {
+                return ClienteRetrofit.getClient(URL_IMAGENES).create(RetrofitInterface.class);
+        }
+
+
 }

@@ -57,6 +57,8 @@ public class PantallaTienda extends AppCompatActivity {
 
     private static final int OPTION_OBJETO = 0;
 
+    private boolean esPrimeraVez = true;
+
     private RetrofitInterface retrofitInterface;
     private GestorSesion gestorSesion;
 
@@ -110,7 +112,7 @@ public class PantallaTienda extends AppCompatActivity {
         MONEDAS_USUARIO = gestorSesion.getKEY_SESSION_COINS();
         numMonedas.setText(MONEDAS_USUARIO);
 
-        retrofitInterface = APIUtils.getAPIService();
+        retrofitInterface = APIUtils.getAPIServiceImages();
 
         // Drive = "https://drive.google.com/file/d/1yBy5abUvTuvAMk5aeKDnlljuWMcBG0Ur/view?usp=sharing"
         // Imagen prueba = "http://192.168.0.26:3060/tienda/color_amarillo.png"
@@ -275,29 +277,6 @@ public class PantallaTienda extends AppCompatActivity {
         rv_cuerpo.setAdapter(mainAdapter_cuerpo);
     }
 
-    /*public static Bitmap getBitmapFromURL(String url_image){
-        HttpURLConnection connection = null;
-        try {
-            /*StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            //connection.setDoInput(true);
-            //connection.connect();
-            URL url = new URL(url_image);
-            connection = (HttpURLConnection) url.openConnection();
-            //InputStream input = new BufferedInputStream(connection.getInputStream());
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            Log.e("Bitmap","returned");
-            return myBitmap;
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("Exception",e.getMessage());
-            return null;
-        } finally{
-            connection.disconnect();
-        }
-    }*/
-
     public class MainModel {
         String foto;
         String nombre;
@@ -432,6 +411,43 @@ public class PantallaTienda extends AppCompatActivity {
 
     }
 
+    public void resetear(){
+        int sizeCabeza = imagenCabeza.size();
+        int sizeCuerpo = imagenCuerpo.size();
+        int sizeCara = imagenCara.size();
+        int sizeColor = imagenColores.size();
+        imagenCabeza.clear();
+        imagenColores.clear();
+        imagenCara.clear();
+        imagenCuerpo.clear();
+        precioCabeza.clear();
+        precioColores.clear();
+        precioCara.clear();
+        precioCuerpo.clear();
+        nombresCabeza.clear();
+        nombresColores.clear();
+        nombresCara.clear();
+        nombresCuerpo.clear();
+
+        mainAdapter_colores.notifyItemRangeRemoved(0,sizeColor);
+        mainAdapter_cara.notifyItemRangeRemoved(0,sizeCara);
+        mainAdapter_cabeza.notifyItemRangeRemoved(0,sizeCabeza);
+        mainAdapter_cuerpo.notifyItemRangeRemoved(0,sizeCuerpo);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!esPrimeraVez){
+            resetear();
+            obtenerImagenes();
+            MONEDAS_USUARIO = gestorSesion.getKEY_SESSION_COINS();
+            numMonedas.setText(MONEDAS_USUARIO);
+        }
+        esPrimeraVez = false;
+    }
+
+
 
     /*
 
@@ -488,6 +504,29 @@ public class PantallaTienda extends AppCompatActivity {
             mainmodels_colores = new ArrayList<>();
 
             return itemView;
+        }
+    }*/
+
+    /*public static Bitmap getBitmapFromURL(String url_image){
+        HttpURLConnection connection = null;
+        try {
+            /*StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            //connection.setDoInput(true);
+            //connection.connect();
+            URL url = new URL(url_image);
+            connection = (HttpURLConnection) url.openConnection();
+            //InputStream input = new BufferedInputStream(connection.getInputStream());
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            Log.e("Bitmap","returned");
+            return myBitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("Exception",e.getMessage());
+            return null;
+        } finally{
+            connection.disconnect();
         }
     }*/
 }
