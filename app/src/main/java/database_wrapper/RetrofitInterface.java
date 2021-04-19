@@ -16,6 +16,9 @@ public interface RetrofitInterface {
     @POST("/Registrarse")
     Call<JsonObject> executeSignUp(@Body HashMap<String,String> map);
 
+    @POST("/Registrarse_Foto")
+    Call<JsonObject> comprarNaranja(@Body HashMap<String,String> map);
+
     @POST("/MenuInicio")
     Call<JsonObject> executeLogin(@Body HashMap<String,String> map);
 

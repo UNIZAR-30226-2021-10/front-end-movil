@@ -126,6 +126,7 @@ public class RegistroUsuario extends AppCompatActivity {
         newUser.put("email",email.getText().toString());
         newUser.put("nickname",nombre_usuario.getText().toString());
         newUser.put("password",password_new.getText().toString());
+        newUser.put("imagen", "http://localhost:3060/tienda/color_naranja.png");
 
         Call<JsonObject> call = retrofitInterface.executeSignUp(newUser);
         call.enqueue(new Callback<JsonObject>() {
@@ -134,6 +135,7 @@ public class RegistroUsuario extends AppCompatActivity {
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
 
                 if (response.code() == 200) {
+                    //comprarNaranja(); // TODO: PONER PARA QUE INTRODUZCA EN TIENE
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -168,6 +170,36 @@ public class RegistroUsuario extends AppCompatActivity {
 
     private boolean comprobarEmail(String email) {
         return EMAIL_ADDRESS_PATTERN.matcher(email).matches();
+    }
+
+    private void comprarNaranja() {
+
+        HashMap<String,String> buyOrange = new HashMap<>();
+
+        buyOrange.put("email",email.getText().toString());
+        buyOrange.put("nombreObjeto","Naranja");
+
+        Call<JsonObject> call = retrofitInterface.comprarNaranja(buyOrange);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
+                if (response.code() == 200) {
+                    System.out.println("TODO OK");
+                } else{
+                    Toast.makeText(RegistroUsuario.this, "No se ha podido insertar en tabla tiene", Toast.LENGTH_LONG).show();
+                    nombre_usuario.getText().clear();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(RegistroUsuario.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 }
 
