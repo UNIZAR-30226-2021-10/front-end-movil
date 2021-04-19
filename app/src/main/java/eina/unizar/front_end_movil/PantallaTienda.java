@@ -3,13 +3,7 @@ package eina.unizar.front_end_movil;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.StrictMode;
-import android.printservice.CustomPrinterIconCallback;
-import android.text.format.Formatter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,25 +22,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
-
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
 import SessionManagement.GestorSesion;
 import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;
+import models.model.MainAdapter;
+import models.model.MainModel;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -276,91 +258,6 @@ public class PantallaTienda extends AppCompatActivity {
         });
         rv_cuerpo.setAdapter(mainAdapter_cuerpo);
     }
-
-    public class MainModel {
-        String foto;
-        String nombre;
-        Integer precio;
-
-        public MainModel(String foto, String nombre, Integer precio){
-            this.foto = foto;
-            this.nombre = nombre;
-            this.precio = precio;
-        }
-
-        public String getFoto() {
-            return foto;
-        }
-
-        public String getNombre() {
-            return nombre;
-        }
-
-        public Integer getPrecio() {
-            return precio;
-        }
-    }
-
-    public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> implements View.OnClickListener {
-
-        ArrayList<MainModel> mainModels;
-        Context context;
-        private View.OnClickListener listener;
-
-        public MainAdapter(Context context, ArrayList<MainModel> mainModels) {
-            this.mainModels = mainModels;
-            this.context = context;
-        }
-
-        @NonNull
-        @Override
-        public MainAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.rows_objetos_tienda,
-                    parent, false);
-            view.setOnClickListener(this);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull MainAdapter.ViewHolder holder, int position) {
-            //holder.foto.setImageBitmap(mainModels.get(position).getFoto());
-            Picasso.get().load(mainModels.get(position).getFoto()).into(holder.foto);
-            holder.nombre.setText(mainModels.get(position).getNombre());
-            holder.precio.setText(mainModels.get(position).getPrecio().toString());
-        }
-
-        @Override
-        public int getItemCount() {
-            return mainModels.size();
-        }
-
-        public void setOnClickListener(View.OnClickListener listener){
-            this.listener = listener;
-        }
-
-        @Override
-        public void onClick(View v) {
-            if(listener!=null){
-                listener.onClick(v);
-            }
-        }
-
-        public class ViewHolder  extends RecyclerView.ViewHolder{
-
-            ImageView foto;
-            TextView nombre;
-            TextView precio;
-
-            public ViewHolder(@NonNull View itemView) {
-                super(itemView);
-
-                foto = itemView.findViewById(R.id.foto_objeto);
-                nombre = itemView.findViewById(R.id.nombre_objeto);
-                precio = itemView.findViewById(R.id.precio_objeto);
-            }
-        }
-    }
-
 
     private void obtenerImagenes() {
         HashMap<String,String> prueba = new HashMap<>();
