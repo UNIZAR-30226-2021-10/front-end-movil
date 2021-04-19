@@ -120,14 +120,14 @@
 
     <TextView
         android:id="@+id/pregunta"
-        android:layout_width="343dp"
-        android:layout_height="35dp"
+        android:layout_width="384dp"
+        android:layout_height="54dp"
         android:layout_marginTop="315dp"
         android:layout_marginBottom="381dp"
         android:fontFamily="sans-serif"
         android:gravity="center"
         android:textColor="@android:color/black"
-        android:textSize="15dp"
+        android:textSize="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -136,8 +136,8 @@
 
     <TextView
         android:id="@+id/respuesta4"
-        android:layout_width="257dp"
-        android:layout_height="43dp"
+        android:layout_width="384dp"
+        android:layout_height="54dp"
         android:layout_marginTop="516dp"
         android:layout_marginBottom="172dp"
         android:background="@android:color/white"
@@ -146,7 +146,7 @@
         android:gravity="center"
         android:onClick="onClick"
         android:textColor="@android:color/black"
-        android:textSize="17dp"
+        android:textSize="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -155,8 +155,8 @@
 
     <TextView
         android:id="@+id/respuesta3"
-        android:layout_width="257dp"
-        android:layout_height="43dp"
+        android:layout_width="384dp"
+        android:layout_height="54dp"
         android:layout_marginTop="465dp"
         android:layout_marginBottom="223dp"
         android:background="@android:color/white"
@@ -165,7 +165,7 @@
         android:gravity="center"
         android:onClick="onClick"
         android:textColor="@android:color/black"
-        android:textSize="17dp"
+        android:textSize="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -174,8 +174,8 @@
 
     <TextView
         android:id="@+id/respuesta1"
-        android:layout_width="257dp"
-        android:layout_height="43dp"
+        android:layout_width="384dp"
+        android:layout_height="54dp"
         android:layout_marginTop="361dp"
         android:layout_marginBottom="327dp"
         android:background="@android:color/white"
@@ -184,7 +184,7 @@
         android:gravity="center"
         android:onClick="onClick"
         android:textColor="@android:color/black"
-        android:textSize="17dp"
+        android:textSize="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -193,8 +193,8 @@
 
     <TextView
         android:id="@+id/respuesta2"
-        android:layout_width="257dp"
-        android:layout_height="43dp"
+        android:layout_width="384dp"
+        android:layout_height="54dp"
         android:layout_marginTop="413dp"
         android:layout_marginBottom="275dp"
         android:background="@android:color/white"
@@ -203,7 +203,7 @@
         android:gravity="center"
         android:onClick="onClick"
         android:textColor="@android:color/black"
-        android:textSize="17dp"
+        android:textSize="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -241,7 +241,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/perfilicon" />
+        app:srcCompat="@mipmap/imagenusr3" />
 
     <ImageView
         android:id="@+id/usuario3_imagen"
@@ -256,8 +256,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/perfilicon" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/usuario2_imagen"
@@ -273,7 +272,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/perfilicon" />
+        app:srcCompat="@mipmap/imagenusr2" />
 
     <ImageView
         android:id="@+id/usuario4_imagen"
@@ -288,8 +287,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/perfilicon" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/usuario1_nombre"
@@ -362,6 +360,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/text_puntos4"
         android:layout_width="34dp"
         android:layout_height="13dp"
         android:layout_marginStart="362dp"
@@ -379,6 +378,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/text_puntos3"
         android:layout_width="34dp"
         android:layout_height="13dp"
         android:layout_marginStart="48dp"
@@ -520,6 +520,40 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@mipmap/chaticon" />
+
+    <Button
+        android:id="@+id/empezar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="118dp"
+        android:layout_marginLeft="118dp"
+        android:layout_marginTop="576dp"
+        android:layout_marginEnd="205dp"
+        android:layout_marginRight="205dp"
+        android:layout_marginBottom="107dp"
+        android:background="@android:color/white"
+        android:text="EMPEZAR"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/siguiente"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="229dp"
+        android:layout_marginLeft="229dp"
+        android:layout_marginTop="576dp"
+        android:layout_marginEnd="94dp"
+        android:layout_marginRight="94dp"
+        android:layout_marginBottom="107dp"
+        android:background="@android:color/white"
+        android:text="SIGUIENTE"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

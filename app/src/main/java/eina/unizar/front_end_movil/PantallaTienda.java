@@ -2,8 +2,11 @@ package eina.unizar.front_end_movil;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.text.Html;
+import android.os.StrictMode;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +25,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -57,11 +65,10 @@ public class PantallaTienda extends AppCompatActivity {
     MainAdapter mainAdapter_cara;
     MainAdapter mainAdapter_cuerpo;
 
-    int[] imagenesCabeza = { R.mipmap.complemento_gorrito_santa};
-    int[] imagenesColores = {  R.mipmap.color_rojo, R.mipmap.color_amarillo, R.mipmap.color_azul, R.mipmap.color_naranja,
-           R.mipmap.color_rosa, R.mipmap.color_verde};
-    int[] imagenesCara = { R.mipmap.complemento_gafas_boss};
-    int[] imagenesCuerpo = {R.mipmap.disfraz_traje};
+    ArrayList<String> imagenCabeza = new ArrayList<>();
+    ArrayList<String> imagenColores = new ArrayList<>();
+    ArrayList<String> imagenCara = new ArrayList<>();
+    ArrayList<String> imagenCuerpo = new ArrayList<>();
 
     ArrayList<Integer> precioCabeza = new ArrayList<>();
     ArrayList<Integer> precioColores = new ArrayList<>();
@@ -92,12 +99,16 @@ public class PantallaTienda extends AppCompatActivity {
 
         retrofitInterface = APIUtils.getAPIService();
 
+        ImageView imageView = findViewById(R.id.foto_objeto2);
+        Bitmap imagen = getBitmapFromURL("https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Full_Moon_Luc_Viatour.jpg/280px-Full_Moon_Luc_Viatour.jpg");
+        imageView.setImageBitmap(imagen);
+
         rv_colores = findViewById(R.id.recyclerview_colores);
         rv_cabeza = findViewById(R.id.recyclerview_cabeza);
         rv_cara = findViewById(R.id.recyclerview_cara);
         rv_cuerpo = findViewById(R.id.recyclerview_cuerpo);
 
-        obtenerImagenes();
+        //obtenerImagenes();
 
         Button atrasButton = (Button) findViewById(R.id.atras);
         atrasButton.setOnClickListener(new View.OnClickListener() {
@@ -120,27 +131,32 @@ public class PantallaTienda extends AppCompatActivity {
     }
 
     public void poblarListas(){
+        Bitmap bitMap;
         // CABEZA
-        for(int i = 0; i < imagenesCabeza.length; i++){
-            MainModel model = new MainModel(imagenesCabeza[i], nombresCabeza.get(i), precioCabeza.get(i));
+        for(int i = 0; i < nombresCabeza.size(); i++){
+            bitMap = getBitmapFromURL(imagenCabeza.get(i));
+            MainModel model = new MainModel(bitMap, nombresCabeza.get(i), precioCabeza.get(i));
             mainmodels_cabeza.add(model);
         }
 
         // COLORES
-        for(int i = 0; i < imagenesColores.length; i++){
-            MainModel model = new MainModel(imagenesColores[i], nombresColores.get(i), precioColores.get(i));
+        for(int i = 0; i < nombresColores.size(); i++){
+            bitMap = getBitmapFromURL(imagenColores.get(i));
+            MainModel model = new MainModel(bitMap, nombresColores.get(i), precioColores.get(i));
             mainmodels_colores.add(model);
         }
 
         // CUERPO
-        for(int i = 0; i < imagenesCuerpo.length; i++){
-            MainModel model = new MainModel(imagenesCuerpo[i], nombresCuerpo.get(i), precioCuerpo.get(i));
+        for(int i = 0; i < nombresCuerpo.size(); i++){
+            bitMap = getBitmapFromURL(imagenCuerpo.get(i));
+            MainModel model = new MainModel(bitMap, nombresCuerpo.get(i), precioCuerpo.get(i));
             mainmodels_cuerpo.add(model);
         }
 
         // CARA
-        for(int i = 0; i < imagenesCara.length; i++){
-            MainModel model = new MainModel(imagenesCara[i], nombresCara.get(i), precioCara.get(i));
+        for(int i = 0; i < nombresCara.size(); i++){
+            bitMap = getBitmapFromURL(imagenCara.get(i));
+            MainModel model = new MainModel(bitMap, nombresCara.get(i), precioCara.get(i));
             mainmodels_cara.add(model);
         }
     }
@@ -183,7 +199,7 @@ public class PantallaTienda extends AppCompatActivity {
                 Bundle extra = new Bundle();
                 extra.putString("Nombre", mainmodels_colores.get(rv_colores.getChildAdapterPosition(v)).getNombre());
                 extra.putInt("Precio", mainmodels_colores.get(rv_colores.getChildAdapterPosition(v)).getPrecio());
-                extra.putInt("Imagen", mainmodels_colores.get(rv_colores.getChildAdapterPosition(v)).getFoto());
+                //extra.putString("Imagen", mainmodels_colores.get(rv_colores.getChildAdapterPosition(v)).getFoto());
                 extra.putString("Monedas", MONEDAS_USUARIO);
                 Intent intent = new Intent(v.getContext(), ObjetoTienda.class);
                 intent.putExtras(extra);
@@ -198,7 +214,7 @@ public class PantallaTienda extends AppCompatActivity {
                 Bundle extra = new Bundle();
                 extra.putString("Nombre", mainmodels_cabeza.get(rv_cabeza.getChildAdapterPosition(v)).getNombre());
                 extra.putInt("Precio", mainmodels_cabeza.get(rv_cabeza.getChildAdapterPosition(v)).getPrecio());
-                extra.putInt("Imagen", mainmodels_cabeza.get(rv_cabeza.getChildAdapterPosition(v)).getFoto());
+                //extra.putInt("Imagen", mainmodels_cabeza.get(rv_cabeza.getChildAdapterPosition(v)).getFoto());
                 extra.putString("Monedas", MONEDAS_USUARIO);
                 Intent intent = new Intent(v.getContext(), ObjetoTienda.class);
                 intent.putExtras(extra);
@@ -213,7 +229,7 @@ public class PantallaTienda extends AppCompatActivity {
                 Bundle extra = new Bundle();
                 extra.putString("Nombre", mainmodels_cara.get(rv_cara.getChildAdapterPosition(v)).getNombre());
                 extra.putInt("Precio", mainmodels_cara.get(rv_cara.getChildAdapterPosition(v)).getPrecio());
-                extra.putInt("Imagen", mainmodels_cara.get(rv_cara.getChildAdapterPosition(v)).getFoto());
+                //extra.putInt("Imagen", mainmodels_cara.get(rv_cara.getChildAdapterPosition(v)).getFoto());
                 extra.putString("Monedas", MONEDAS_USUARIO);
                 Intent intent = new Intent(v.getContext(), ObjetoTienda.class);
                 intent.putExtras(extra);
@@ -228,7 +244,7 @@ public class PantallaTienda extends AppCompatActivity {
                 Bundle extra = new Bundle();
                 extra.putString("Nombre", mainmodels_cuerpo.get(rv_cuerpo.getChildAdapterPosition(v)).getNombre());
                 extra.putInt("Precio", mainmodels_cuerpo.get(rv_cuerpo.getChildAdapterPosition(v)).getPrecio());
-                extra.putInt("Imagen", mainmodels_cuerpo.get(rv_cuerpo.getChildAdapterPosition(v)).getFoto());
+                //extra.putInt("Imagen", mainmodels_cuerpo.get(rv_cuerpo.getChildAdapterPosition(v)).getFoto());
                 extra.putString("Monedas", MONEDAS_USUARIO);
                 Intent intent = new Intent(v.getContext(), ObjetoTienda.class);
                 intent.putExtras(extra);
@@ -238,18 +254,41 @@ public class PantallaTienda extends AppCompatActivity {
         rv_cuerpo.setAdapter(mainAdapter_cuerpo);
     }
 
+    public static Bitmap getBitmapFromURL(String url_image){
+        HttpURLConnection connection = null;
+        try {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            //connection.setDoInput(true);
+            //connection.connect();
+            URL url = new URL(url_image);
+            connection = (HttpURLConnection) url.openConnection();
+            //InputStream input = new BufferedInputStream(connection.getInputStream());
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            Log.e("Bitmap","returned");
+            return myBitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("Exception",e.getMessage());
+            return null;
+        } finally{
+            connection.disconnect();
+        }
+    }
+
     public class MainModel {
-        Integer foto;
+        Bitmap foto;
         String nombre;
         Integer precio;
 
-        public MainModel(Integer foto, String nombre, Integer precio){
+        public MainModel(Bitmap foto, String nombre, Integer precio){
             this.foto = foto;
             this.nombre = nombre;
             this.precio = precio;
         }
 
-        public Integer getFoto() {
+        public Bitmap getFoto() {
             return foto;
         }
 
@@ -284,7 +323,7 @@ public class PantallaTienda extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull MainAdapter.ViewHolder holder, int position) {
-            holder.foto.setImageResource(mainModels.get(position).getFoto());
+            holder.foto.setImageBitmap(mainModels.get(position).getFoto());
             holder.nombre.setText(mainModels.get(position).getNombre());
             holder.precio.setText(mainModels.get(position).getPrecio().toString());
         }
@@ -339,20 +378,19 @@ public class PantallaTienda extends AppCompatActivity {
                         if(prueba.get("Tipo").getAsString().equals("color")){
                             precioColores.add(prueba.get("Precio").getAsInt());
                             nombresColores.add(prueba.get("Nombre").getAsString());
-                            // TODO: coger la imagen aquí
+                            imagenColores.add(prueba.get("Imagen").getAsString());
                         } else if(prueba.get("Tipo").getAsString().equals("cara")){
                             precioCara.add(prueba.get("Precio").getAsInt());
                             nombresCara.add(prueba.get("Nombre").getAsString());
-                            // TODO: coger la imagen aquí
+                            imagenCara.add(prueba.get("Imagen").getAsString());
                         } else if(prueba.get("Tipo").getAsString().equals("cuerpo")){
                             precioCuerpo.add(prueba.get("Precio").getAsInt());
                             nombresCuerpo.add(prueba.get("Nombre").getAsString());
-                            // TODO: coger la imagen aquí
+                            imagenCuerpo.add(prueba.get("Imagen").getAsString());
                         } else if(prueba.get("Tipo").getAsString().equals("cabeza")){
                             precioCabeza.add(prueba.get("Precio").getAsInt());
                             nombresCabeza.add(prueba.get("Nombre").getAsString());
-                            // TODO: coger la imagen aquí
-                            System.out.println(precioCabeza);
+                            imagenCabeza.add(prueba.get("Imagen").getAsString());
                         }
                         //System.out.println(prueba);
                     }

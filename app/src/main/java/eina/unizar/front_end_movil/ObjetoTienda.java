@@ -5,21 +5,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.gson.JsonObject;
-
 import java.util.HashMap;
-
 import SessionManagement.GestorSesion;
-import SessionManagement.Question;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;

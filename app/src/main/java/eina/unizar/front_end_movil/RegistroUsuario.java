@@ -115,6 +115,10 @@ public class RegistroUsuario extends AppCompatActivity {
         });
     }
 
+    /* TODO: coger foto del color naranja, renombrarla, subirla al servidor de imagenes en carpeta usuarios
+       y meter el link en la base de datos
+     */
+
     private void handleRegister() {
 
         HashMap<String,String> newUser = new HashMap<>();
