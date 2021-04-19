@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.printservice.CustomPrinterIconCallback;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,9 +33,16 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 import SessionManagement.GestorSesion;
 import database_wrapper.APIUtils;
@@ -43,6 +52,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class PantallaTienda extends AppCompatActivity {
+
+    private String ip = "192.168.0.26"; //TODO: cambiar para poder usarlo todos
 
     private static final int OPTION_OBJETO = 0;
 
@@ -387,7 +398,7 @@ public class PantallaTienda extends AppCompatActivity {
                         //System.out.println(j);
                         JsonObject prueba = j.getAsJsonObject();
                         String imagen = prueba.get("Imagen").getAsString();
-                        imagen = imagen.replaceAll("localhost", "192.168.0.26");
+                        imagen = imagen.replaceAll("localhost", ip);
                         if(prueba.get("Tipo").getAsString().equals("color")){
                             precioColores.add(prueba.get("Precio").getAsInt());
                             nombresColores.add(prueba.get("Nombre").getAsString());
