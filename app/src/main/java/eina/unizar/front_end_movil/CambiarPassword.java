@@ -108,6 +108,7 @@ public class CambiarPassword extends AppCompatActivity {
 
                                Intent intent = new Intent (v.getContext(), EnviarCodigoVerificacion.class);
                                intent.putExtra("codigo", codigo);
+                               intent.putExtra("destinatario", destinatario);
                                startActivityForResult(intent, OPTION_ENVIAR_CORREO);
                            }
 

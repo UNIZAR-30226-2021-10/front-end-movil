@@ -34,6 +34,8 @@ public class EnviarCodigoVerificacion extends AppCompatActivity{
     private EditText new_password2;
     String codigo;
     String verificacion_code;
+    String mail;
+    String destinatario;
 
     private GestorSesion gestorSesion;
     private RetrofitInterface retrofitInterface;
@@ -76,6 +78,7 @@ public class EnviarCodigoVerificacion extends AppCompatActivity{
         //Para obtener el code de la actividad anterior
         Bundle bundle = this.getIntent().getExtras();
         codigo = bundle.getString("codigo");
+        destinatario = bundle.getString("destinatario");
 
         //Boton de confirmar
         Button confirmarButton = (Button) findViewById(R.id.confirmar);
@@ -93,20 +96,25 @@ public class EnviarCodigoVerificacion extends AppCompatActivity{
                     new_password2.setError("El campo no puede estar vacío");
                 } else {
                     if(comprobarEmail(email.getText().toString())){
-                        //COMPROBAR CODIGO DE VERIFICACION
-                        verificacion_code = codigo_verificacion.getText().toString().trim();
-                        if(verificacion_code.equals(codigo)){
-                            // COMPROBAR CONTRASEÑA es igual en ambos campos
-                            if (new_password1.getText().toString().equals(new_password2.getText().toString())) {
-                                handleCambiarContrasenya();
-                                Intent intent = new Intent (v.getContext(), MenuPrincipal.class);
-                                startActivityForResult(intent, OPTION_CONFIRMAR);
-                            } else {
-                                // mensaje de error
-                                new_password2.setError("Las contraseñas no son iguales");
+                        mail= email.getText().toString().trim();
+                        if(destinatario.equals(mail)){
+                            //COMPROBAR CODIGO DE VERIFICACION
+                            verificacion_code = codigo_verificacion.getText().toString().trim();
+                            if(verificacion_code.equals(codigo)){
+                                // COMPROBAR CONTRASEÑA es igual en ambos campos
+                                if (new_password1.getText().toString().equals(new_password2.getText().toString())) {
+                                    handleCambiarContrasenya();
+                                    Intent intent = new Intent (v.getContext(), MenuPrincipal.class);
+                                    startActivityForResult(intent, OPTION_CONFIRMAR);
+                                } else {
+                                    // mensaje de error
+                                    new_password2.setError("Las contraseñas no son iguales");
+                                }
+                            } else{
+                                codigo_verificacion.setError("El codigo no es correcto, revise su correo electronico.");
                             }
-                        } else{
-                            codigo_verificacion.setError("El codigo no es correcto, revise su correo electronico.");
+                        }else{
+                            email.setError("El email no es correcto, introduzca el email con el que esta registrado en el juego");
                         }
                     }else {
                         email.setError("El email es invalido, introduzca un email valido por ejemplo: pedro@gmail.com");
