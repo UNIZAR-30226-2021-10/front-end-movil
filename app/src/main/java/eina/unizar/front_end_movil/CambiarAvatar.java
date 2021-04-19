@@ -31,6 +31,7 @@ public class CambiarAvatar extends AppCompatActivity {
             "Vestido", "Corbata", "Gafas", "Balon", "Sombrero"};
 
     private  ImageView imagenAvatar;
+    private  Bitmap avatarDefinitivo;
 
     /**
      * Called when the activity is first created.
@@ -44,8 +45,7 @@ public class CambiarAvatar extends AppCompatActivity {
         setContentView(R.layout.cambiar_avatar);
         getSupportActionBar().hide();
         imagenAvatar = (ImageView) findViewById(R.id.imageViewAvatar);
-        //Bitmap bitmap = Bitmap.createBitmap(imagenAvatar.getWidth(),imagenAvatar.getHeight(),Bitmap.Config.RGB_565);
-        //imagenAvatar.setImageBitmap(bitmap);
+
 
         listaObjetos = (ListView)findViewById(R.id.list);
         fillData();
@@ -66,6 +66,14 @@ public class CambiarAvatar extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), PerfilUsuario.class);
                 startActivityForResult(intent, OPTION_ATRAS);
+            }
+        });
+
+        Button test = (Button) findViewById(R.id.test);
+        test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ;
             }
         });
     }
@@ -96,8 +104,8 @@ public class CambiarAvatar extends AppCompatActivity {
 
             Bitmap bmOverlay = Bitmap.createBitmap(imagenAvatar.getWidth(),imagenAvatar.getHeight(),Bitmap.Config.RGB_565);
             bitmapAvatarStandar = replaceColor(bitmapAvatarStandar,1,1);
-            Bitmap definitivo = finalcombieimage(bitmapAvatarStandar,bitmapTraje,bitmapSombrero);
-            imagenAvatar.setImageBitmap(definitivo);
+            avatarDefinitivo = finalcombieimage(bitmapAvatarStandar,bitmapTraje,bitmapSombrero);
+            imagenAvatar.setImageBitmap(avatarDefinitivo);
         }
     }
 
@@ -156,4 +164,3 @@ public class CambiarAvatar extends AppCompatActivity {
 }
 
 
-//Bitmap bitmap = Bitmap.createBitmap(imagenAvatar.getWidth(),imagenAvatar.getHeight()/4,Bitmap.Config.RGB_565);
