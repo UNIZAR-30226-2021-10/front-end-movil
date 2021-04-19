@@ -11,6 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.gson.JsonObject;
+import com.squareup.picasso.Picasso;
+
 import java.util.HashMap;
 import SessionManagement.GestorSesion;
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -51,7 +53,7 @@ public class ObjetoTienda extends AppCompatActivity {
         retrofitInterface = APIUtils.getAPIService();
 
         Bundle extras = getIntent().getExtras();
-        int imagen = extras.getInt("Imagen");
+        String imagen = extras.getString("Imagen");
         nombreObjeto = extras.getString("Nombre");
         precio = extras.getInt("Precio");
         String monedas = extras.getString("Monedas");
@@ -62,7 +64,7 @@ public class ObjetoTienda extends AppCompatActivity {
         nombre_objeto = (TextView) findViewById(R.id.nombre_objeto);
         precio_objeto = (TextView) findViewById(R.id.precio_objeto);
 
-        image.setImageResource(imagen);
+        Picasso.get().load(imagen).into(image);
         monedas_usuario.setText(monedas);
         nombre_objeto.setText(nombreObjeto);
         precio_objeto.setText(precioObjeto);
@@ -82,8 +84,9 @@ public class ObjetoTienda extends AppCompatActivity {
                                         .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
                                             @Override
                                             public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                                Intent intent = new Intent(ObjetoTienda.this, PantallaTienda.class);
-                                                startActivityForResult(intent, OPTION_COMPRAR);
+                                                /*Intent intent = new Intent(ObjetoTienda.this, PantallaTienda.class);
+                                                startActivityForResult(intent, OPTION_COMPRAR);*/
+                                                finish();
                                             }
                                         }).show();
                             }
@@ -97,8 +100,9 @@ public class ObjetoTienda extends AppCompatActivity {
                                         .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
                                             @Override
                                             public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                                Intent intent = new Intent(ObjetoTienda.this, PantallaTienda.class);
-                                                startActivityForResult(intent, OPTION_COMPRAR);
+                                                /*Intent intent = new Intent(ObjetoTienda.this, PantallaTienda.class);
+                                                startActivityForResult(intent, OPTION_COMPRAR);*/
+                                                finish();
                                             }
                                         }).show();
                             }
