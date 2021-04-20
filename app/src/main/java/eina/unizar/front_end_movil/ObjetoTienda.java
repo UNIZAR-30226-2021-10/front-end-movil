@@ -180,10 +180,7 @@ public class ObjetoTienda extends AppCompatActivity {
 
     public boolean hayMonedasSuficientes(){
         int monedasActuales = Integer.parseInt(gestorSesion.getKEY_SESSION_COINS());
-        if(precio > monedasActuales){
-            return false;
-        }
-        return true;
+        return precio <= monedasActuales;
     }
 }
 

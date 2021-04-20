@@ -274,7 +274,8 @@ public class PantallaTienda extends AppCompatActivity {
                         //System.out.println(j);
                         JsonObject prueba = j.getAsJsonObject();
                         String imagen = prueba.get("Imagen").getAsString();
-                        imagen = imagen.replaceAll("localhost", ip);
+                        imagen = imagen.replaceAll("http://localhost:3060", "https://trivial-images.herokuapp.com");
+                        System.err.println(imagen);
                         if(prueba.get("Tipo").getAsString().equals("color")){
                             precioColores.add(prueba.get("Precio").getAsInt());
                             nombresColores.add(prueba.get("Nombre").getAsString());
