@@ -1,5 +1,6 @@
 package eina.unizar.front_end_movil;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,13 +9,17 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -34,14 +39,17 @@ public class CambiarAvatar extends AppCompatActivity {
     private ListView listaObjetos;
     private String[] nombres = {"Quitar Traje", "Poner traje", "Pirata"};
 
-    private  ImageView imagenAvatar;
+
     private  Bitmap avatarDefinitivo;
     private static Bitmap bitmapAvatarStandar;
+    protected int ALTURA_AVATAR;
+    protected int ANCHO_AVATAR;
 
-    protected int x = 4;
+    protected Context c;
 
-    //CANVAS
-    private Canvas comboImage ;
+    private  ImageView imagenAvatar;
+
+
 
     /**
      * Called when the activity is first created.
@@ -53,6 +61,7 @@ public class CambiarAvatar extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.cambiar_avatar);
+        c = this;
         getSupportActionBar().hide();
         imagenAvatar = (ImageView) findViewById(R.id.imageViewAvatar);
 
@@ -105,21 +114,25 @@ public class CambiarAvatar extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String clickedItem = (String)parent.getItemAtPosition(position);
+
                 Toast.makeText(CambiarAvatar.this,clickedItem, Toast.LENGTH_SHORT).show();
-                if(clickedItem.equals(nombres[0])){ //quitar traje
+                if(clickedItem.equals(nombres[0])){ //quitar traje -> debe crear avatar con traje y color
                     //Obtenemos el bitmap del imageview (el que tendrá el usuario)
                     BitmapDrawable bitmapOriginal = (BitmapDrawable) imagenAvatar.getDrawable();
                     Bitmap bitmapAvatarStandar = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.color_naranja);
                     Bitmap bitmapTraje = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.disfraz_traje);
 
-                    avatarDefinitivo = eliminarBitmap(bitmapAvatarStandar, bitmapTraje);
-                    imagenAvatar.setImageBitmap(avatarDefinitivo);
+                    DrawingAvatar drawingAvatar = new DrawingAvatar(c);
+                    drawingAvatar.equiparItem(bitmapAvatarStandar,bitmapTraje,null);
+
+
                 }else if(clickedItem.equals(nombres[1])){ //poner traje
-                    BitmapDrawable bitmapOriginal = (BitmapDrawable) imagenAvatar.getDrawable();
-                    Bitmap bitmapAvatarStandar = bitmapOriginal.getBitmap();
+                    Bitmap bitmapAvatarStandar = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.color_naranja);
                     Bitmap bitmapTraje = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.disfraz_traje);
-                    avatarDefinitivo = finalcombieimage(bitmapAvatarStandar,bitmapTraje,null);
-                    imagenAvatar.setImageBitmap(avatarDefinitivo);
+
+                    DrawingAvatar drawingAvatar = new DrawingAvatar(getBaseContext());
+                    drawingAvatar.quitarItem(bitmapAvatarStandar,bitmapTraje);
+
                 }
             }
         });
@@ -129,68 +142,10 @@ public class CambiarAvatar extends AppCompatActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if(hasFocus){
-            System.err.println(imagenAvatar.getWidth()  +  "," + imagenAvatar.getHeight());
-            //bitmap del traje
-            Bitmap bitmapTraje = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.disfraz_traje);
-            //bitmap del sombrero
-            Bitmap bitmapSombrero = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.complemento_gorrito_santa);
-            //Obtenemos el bitmap del imageview (el que tendrá el usuario)
-           /* BitmapDrawable bitmapOriginal = (BitmapDrawable) imagenAvatar.getDrawable();
-            Bitmap bitmapAvatarStandar = bitmapOriginal.getBitmap();
-
-            bitmapAvatarStandar = replaceColor(bitmapAvatarStandar,1,1);
-            avatarDefinitivo = finalcombieimage(bitmapAvatarStandar,bitmapTraje,bitmapSombrero);
-            imagenAvatar.setImageBitmap(avatarDefinitivo);*/
+            ALTURA_AVATAR= imagenAvatar.getHeight();
+            ANCHO_AVATAR = imagenAvatar.getWidth();
         }
     }
-
-    public Bitmap finalcombieimage(Bitmap c, Bitmap s, Bitmap r) {
-
-        Bitmap bmOverlay = Bitmap.createBitmap(imagenAvatar.getWidth(),imagenAvatar.getHeight(),Bitmap.Config.RGB_565);
-        comboImage = new Canvas(bmOverlay);
-        /*
-         TOP: indica desde empieza desde arriba 0 lo cogerá desde el margen incial de la ImageView
-               si se aumenta el margen top la recortara de arriba hacia abajo (la estrecha)
-          BOTTOM: le indica hasta donde tiene que coger el alto de la Imageview
-          RIGHT: indica donde acaba o hasta donde va el margen derecho, tendrá que el total del ancho
-                 del imageview para que abarque la imageview entera.
-          LEFT: indica desde empieza desde el margen izquierdo del imageview, 0 empezará desde el incio
-                y si se aumenta ira acortandola en ancho
-        * */
-        Rect dest1 = new Rect(0, 0, 274, 290); // left,top,right,bottom
-        comboImage.drawBitmap(c, null, dest1, null);
-        Rect dest2 = new Rect(0, 0, 274, 290);
-        comboImage.drawBitmap(s, null, dest2, null);
-      /*  Rect dest3 = new Rect(0, 0, 274, 290);
-        comboImage.drawBitmap(r, null, dest3, null);*/
-
-        return bmOverlay;
-    }
-    public Bitmap eliminarBitmap(Bitmap c, Bitmap s) {
-
-        Bitmap bmOverlay = Bitmap.createBitmap(imagenAvatar.getWidth(),imagenAvatar.getHeight(),Bitmap.Config.RGB_565);
-        comboImage = new Canvas(bmOverlay);
-        /*
-         TOP: indica desde empieza desde arriba 0 lo cogerá desde el margen incial de la ImageView
-               si se aumenta el margen top la recortara de arriba hacia abajo (la estrecha)
-          BOTTOM: le indica hasta donde tiene que coger el alto de la Imageview
-          RIGHT: indica donde acaba o hasta donde va el margen derecho, tendrá que el total del ancho
-                 del imageview para que abarque la imageview entera.
-          LEFT: indica desde empieza desde el margen izquierdo del imageview, 0 empezará desde el incio
-                y si se aumenta ira acortandola en ancho
-        * */
-        //comboImage.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        comboImage.drawColor(Color.WHITE);
-
-        Rect dest1 = new Rect(0, 0, 274, 290); // left,top,right,bottom
-        //comboImage.drawBitmap(c, null, dest1, null);
-        comboImage.setBitmap(c);
-
-        System.err.println("Me llaman");
-
-        return bmOverlay;
-    }
-
 
     public Bitmap replaceColor(Bitmap src,int fromColor, int targetColor) {
         if(src == null) {
@@ -223,19 +178,75 @@ public class CambiarAvatar extends AppCompatActivity {
         return Math.sqrt(Math.pow(Color.red(a) - Color.red(b), 2) + Math.pow(Color.blue(a) - Color.blue(b), 2) + Math.pow(Color.green(a) - Color.green(b), 2));
     }
 
-     class DrawingAvatar extends  View{
+      class DrawingAvatar extends View {
 
-
+        //Bitmap sobre el que se va a dibujar
+         private Bitmap bmOverlay;
+         //CANVAS
+         private Canvas canvas ;
+         //Imageview
 
         public DrawingAvatar(Context context) {
             super(context);
-            setFocusable(true);
+            bmOverlay = Bitmap.createBitmap(ANCHO_AVATAR,ALTURA_AVATAR,Bitmap.Config.ARGB_8888);
+            canvas = new Canvas(bmOverlay);
+            setWillNotDraw(false);
+
         }
 
-        @Override
-        protected void onDraw(Canvas canvas) {
-            super.onDraw(canvas);
+        protected void onPoner() {
+            System.err.println("Me llaman aqui");
+            imagenAvatar.setImageBitmap(bmOverlay);
         }
+
+         public void equiparItem(Bitmap c, Bitmap s, Bitmap r) {
+
+            /*
+             TOP: indica desde empieza desde arriba 0 lo cogerá desde el margen incial de la ImageView
+                   si se aumenta el margen top la recortara de arriba hacia abajo (la estrecha)
+              BOTTOM: le indica hasta donde tiene que coger el alto de la Imageview
+              RIGHT: indica donde acaba o hasta donde va el margen derecho, tendrá que el total del ancho
+                     del imageview para que abarque la imageview entera.
+              LEFT: indica desde empieza desde el margen izquierdo del imageview, 0 empezará desde el incio
+                    y si se aumenta ira acortandola en ancho
+            * */
+             System.err.println(c);
+             Rect dest1 = new Rect(0, 0, ANCHO_AVATAR, ALTURA_AVATAR); // left,top,right,bottom
+             canvas.drawBitmap(c, null, dest1, null);
+             Rect dest2 = new Rect(0, 0, ANCHO_AVATAR, ALTURA_AVATAR);
+             canvas.drawBitmap(s, null, dest2, null);
+             onPoner();
+                /*  Rect dest3 = new Rect(0, 0, 274, 290);
+            comboImage.drawBitmap(r, null, dest3, null);*/
+
+
+         }
+
+         public void quitarItem(Bitmap c, Bitmap s) {
+
+        /*
+         TOP: indica desde empieza desde arriba 0 lo cogerá desde el margen incial de la ImageView
+               si se aumenta el margen top la recortara de arriba hacia abajo (la estrecha)
+          BOTTOM: le indica hasta donde tiene que coger el alto de la Imageview
+          RIGHT: indica donde acaba o hasta donde va el margen derecho, tendrá que el total del ancho
+                 del imageview para que abarque la imageview entera.
+          LEFT: indica desde empieza desde el margen izquierdo del imageview, 0 empezará desde el incio
+                y si se aumenta ira acortandola en ancho
+        * */
+             //comboImage.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+             limpiarCanvas();
+             Rect dest1 = new Rect(0, 0, ANCHO_AVATAR, ALTURA_AVATAR); // left,top,right,bottom
+             canvas.drawBitmap(c, null, dest1, null);
+             onPoner();
+
+         }
+
+         public void limpiarCanvas(){
+             Path path = new Path();
+             Paint clearPaint = new Paint();
+             clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+             canvas.drawRect(0, 0, 0, 0, clearPaint);
+         }
     }
 
 }
