@@ -187,7 +187,7 @@ public class PerfilUsuario extends AppCompatActivity {
                     }
                     inicializar();
                 } else{
-                    Toast.makeText(PerfilUsuario.this, "No se han podido obtener los objetos", Toast.LENGTH_LONG).show();
+                    Toast.makeText(PerfilUsuario.this, "No tienes objetos comprados", Toast.LENGTH_LONG).show();
                 }
             }
 

@@ -38,16 +38,6 @@ public class AbandonarPartida extends AppCompatActivity {
             }
         });
 
-        // Botón de posponer partida
-        Button posponerButton = (Button) findViewById(R.id.posponer);
-        posponerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Intent intent = new Intent(v.getContext(), MenuPrincipal.class);
-                //startActivityForResult(intent, OPTION_POSPONER);
-            }
-        });
-
         // Botón de abandonar partida
         Button abandonarButton = (Button) findViewById(R.id.abandonar);
         abandonarButton.setOnClickListener(new View.OnClickListener() {

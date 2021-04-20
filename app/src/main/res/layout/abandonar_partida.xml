@@ -6,24 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".MenuPrincipal">
 
-
-    <Button
-        android:id="@+id/posponer"
-        android:layout_width="121dp"
-        android:layout_height="45dp"
-        android:layout_marginStart="69dp"
-        android:layout_marginLeft="69dp"
-        android:layout_marginTop="323dp"
-        android:layout_marginEnd="221dp"
-        android:layout_marginRight="221dp"
-        android:layout_marginBottom="363dp"
-        android:background="@android:color/white"
-        android:text="POSPONER"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <Button
         android:id="@+id/cancelar"
         android:layout_width="121dp"
@@ -45,11 +27,11 @@
         android:id="@+id/abandonar"
         android:layout_width="121dp"
         android:layout_height="45dp"
-        android:layout_marginStart="217dp"
-        android:layout_marginLeft="217dp"
+        android:layout_marginStart="145dp"
+        android:layout_marginLeft="145dp"
         android:layout_marginTop="323dp"
-        android:layout_marginEnd="73dp"
-        android:layout_marginRight="73dp"
+        android:layout_marginEnd="145dp"
+        android:layout_marginRight="145dp"
         android:layout_marginBottom="363dp"
         android:background="@android:color/white"
         android:text="ABANDONAR"
