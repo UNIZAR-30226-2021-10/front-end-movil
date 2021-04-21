@@ -58,4 +58,7 @@ public interface RetrofitInterface {
     @POST("/PerfilUsuario")
     Call<JsonArray> getObjectsUser(@Body HashMap<String,String> map);
 
+    @POST("CrearMultijugador_Partida")
+    Call<JsonObject> crearPartidaMultijugador(@Body HashMap<String,String> map);
+
 }
