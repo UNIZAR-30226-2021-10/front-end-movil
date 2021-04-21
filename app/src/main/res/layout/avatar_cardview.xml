@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="3dp"
+
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="4dp">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:padding="2dp"
+            android:id="@+id/imagen_item"
+            />
+        <TextView
+            android:id="@+id/first_tview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre Item"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:layout_marginStart="5dp"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@id/imagen_item"
+            android:layout_toRightOf="@id/imagen_item"
+            android:layout_marginLeft="5dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:id="@+id/second_tview"
+            android:text="Tipo"
+            android:textStyle="italic"
+            android:textColor="@color/moradoCool"
+            android:layout_below="@id/first_tview"
+            android:layout_toEndOf="@id/imagen_item"
+            android:layout_marginStart="8dp"
+            android:layout_toRightOf="@id/imagen_item"
+            android:layout_marginLeft="8dp" />
+
+    </RelativeLayout>
+
+
+</androidx.cardview.widget.CardView>

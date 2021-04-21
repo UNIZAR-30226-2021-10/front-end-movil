@@ -56,6 +56,6 @@ public interface RetrofitInterface {
     Call<JsonObject> updateCoins(@Body HashMap<String,String> map);
 
     @POST("/PerfilUsuario")
-    Call<JsonObject> getUserItems(@Body HashMap<String,String> map);
+    Call<JsonArray> getUserItems(@Body HashMap<String,String> map);
 
 }

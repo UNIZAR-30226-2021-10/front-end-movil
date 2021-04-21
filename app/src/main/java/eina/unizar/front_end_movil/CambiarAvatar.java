@@ -18,17 +18,40 @@ import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Vector;
+
+import Avatar.ItemAvatar;
+import SessionManagement.GestorSesion;
+import database_wrapper.APIUtils;
+import database_wrapper.RetrofitInterface;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CambiarAvatar extends AppCompatActivity {
 
@@ -39,6 +62,19 @@ public class CambiarAvatar extends AppCompatActivity {
     private ListView listaObjetos;
     private String[] nombres = {"Quitar Traje", "Poner traje", "Pirata"};
 
+    //Retrofit y gestor de Sesion
+    private RetrofitInterface retrofitInterface;
+    private GestorSesion gestorSesion;
+
+    //Listas y vectores que contienen los items del usuario y los items que lleva puesto
+    private ArrayList<ItemAvatar> itemsUsuario;
+    //TODO: Crear vector para los items equipados del usuario que posteriormente se renderizaran en el Canvas
+
+    //RecyclerView y recyclerviewAdapter para hacer de puente entre listaItem y los items de la BD y el layOutManager para asignar
+    //los items al layout personalizado "avatar_cardview.xml"
+    private RecyclerView listaItem;
+    private RecyclerView.Adapter listAdapter;
+    private RecyclerView.LayoutManager mListManager;
 
     private  Bitmap avatarDefinitivo;
     private static Bitmap bitmapAvatarStandar;
@@ -49,6 +85,8 @@ public class CambiarAvatar extends AppCompatActivity {
 
     private  ImageView imagenAvatar;
 
+    public CambiarAvatar() {
+    }
 
 
     /**
@@ -63,10 +101,15 @@ public class CambiarAvatar extends AppCompatActivity {
         setContentView(R.layout.cambiar_avatar);
         c = this;
         getSupportActionBar().hide();
+
+        gestorSesion = new GestorSesion(CambiarAvatar.this);
+        retrofitInterface = APIUtils.getAPIServiceImages();
+
         imagenAvatar = (ImageView) findViewById(R.id.imageViewAvatar);
 
 
-        listaObjetos = (ListView)findViewById(R.id.list);
+
+        //Llamada al método que inicializa la recyclerView con los items del usuario.
         fillData();
 
         Button okButton = (Button) findViewById((R.id.ok));
@@ -105,37 +148,46 @@ public class CambiarAvatar extends AppCompatActivity {
      */
     private void fillData() {
         // TODO: Por ahora así hasta que decidamos como está la BD
-        // Cuando hagamos base de datos hay que cambiar esto
-        listaObjetos = (ListView) findViewById(R.id.list);
-        ArrayAdapter<String> adaptador = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nombres);
-        listaObjetos.setAdapter(adaptador);
-
-        listaObjetos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        itemsUsuario = new ArrayList<>();
+        HashMap<String,String> hashPerfilUsuario = new HashMap<>();
+        hashPerfilUsuario.put("email",gestorSesion.getmailSession());
+        //Creamos la llamada que hace la petición POST
+        Call<JsonArray> call = retrofitInterface.getUserItems(hashPerfilUsuario);
+        call.enqueue(new Callback<JsonArray>() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String clickedItem = (String)parent.getItemAtPosition(position);
-
-                Toast.makeText(CambiarAvatar.this,clickedItem, Toast.LENGTH_SHORT).show();
-                if(clickedItem.equals(nombres[0])){ //quitar traje -> debe crear avatar con traje y color
-                    //Obtenemos el bitmap del imageview (el que tendrá el usuario)
-                    BitmapDrawable bitmapOriginal = (BitmapDrawable) imagenAvatar.getDrawable();
-                    Bitmap bitmapAvatarStandar = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.color_naranja);
-                    Bitmap bitmapTraje = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.disfraz_traje);
-
-                    DrawingAvatar drawingAvatar = new DrawingAvatar(c);
-                    drawingAvatar.equiparItem(bitmapAvatarStandar,bitmapTraje,null);
-
-
-                }else if(clickedItem.equals(nombres[1])){ //poner traje
-                    Bitmap bitmapAvatarStandar = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.color_naranja);
-                    Bitmap bitmapTraje = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.disfraz_traje);
-
-                    DrawingAvatar drawingAvatar = new DrawingAvatar(getBaseContext());
-                    drawingAvatar.quitarItem(bitmapAvatarStandar,bitmapTraje);
-
+            public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
+                if(response.body() != null) {
+                    JsonArray jsonArray = response.body().getAsJsonArray();
+                    for (JsonElement json : jsonArray) {
+                        JsonObject jsonObject = json.getAsJsonObject();
+                        String image = jsonObject.get("Imagen").getAsString().replaceAll("http://localhost:3060", "https://trivial-images.herokuapp.com");
+                        itemsUsuario.add(new ItemAvatar(jsonObject.get("Nombre").getAsString(),
+                                jsonObject.get("Tipo").getAsString(), image));
+                    }
                 }
+                cargarRecyclerView();
+
+            }
+
+            @Override
+            public void onFailure(Call<JsonArray> call, Throwable t) {
+                Toast.makeText(CambiarAvatar.this, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+
+    }
+
+    private void cargarRecyclerView() {
+            listaItem = findViewById(R.id.list_items);
+            listaItem.setHasFixedSize(true);
+            mListManager = new LinearLayoutManager(this);
+            listAdapter = new AvatarAdapter(itemsUsuario);
+            if( listAdapter.getItemCount() == 0){
+                Toast.makeText(this,"Todavia no tienes items",Toast.LENGTH_LONG).show();
+                return;
+            }
+            listaItem.setLayoutManager(mListManager);
+            listaItem.setAdapter(listAdapter);
     }
 
     @Override
@@ -178,7 +230,7 @@ public class CambiarAvatar extends AppCompatActivity {
         return Math.sqrt(Math.pow(Color.red(a) - Color.red(b), 2) + Math.pow(Color.blue(a) - Color.blue(b), 2) + Math.pow(Color.green(a) - Color.green(b), 2));
     }
 
-      class DrawingAvatar extends View {
+    class DrawingAvatar extends View {
 
         //Bitmap sobre el que se va a dibujar
          private Bitmap bmOverlay;
@@ -249,6 +301,79 @@ public class CambiarAvatar extends AppCompatActivity {
          }
     }
 
+    public class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.AvatarViewHolder>{
+
+        private ArrayList<ItemAvatar> mList;
+
+        public class AvatarViewHolder extends RecyclerView.ViewHolder{
+
+            public ImageView imageView;
+            public TextView TextNombre;
+            public TextView TextTipo;
+
+            public AvatarViewHolder(@NonNull View itemView) {
+                super(itemView);
+                imageView = itemView.findViewById(R.id.imagen_item);
+                TextNombre = itemView.findViewById(R.id.first_tview);
+                TextTipo = itemView.findViewById(R.id.second_tview);
+            }
+        }
+
+        public AvatarAdapter(ArrayList<ItemAvatar> itemsAv){
+            mList = itemsAv;
+        }
+
+        @NonNull
+        @Override
+        public AvatarViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.avatar_cardview,parent,false);
+            AvatarViewHolder avatarViewHolder = new AvatarViewHolder(view);
+            return avatarViewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull AvatarViewHolder holder, int position) {
+            ItemAvatar itemAvatar = mList.get(position);
+            Picasso.get().load(itemAvatar.getImagen()).into(holder.imageView);
+            holder.TextNombre.setText(itemAvatar.getNombre());
+            holder.TextTipo.setText(itemAvatar.getTipo());
+        }
+
+        @Override
+        public int getItemCount() {
+            return mList.size();
+        }
+    }
+
+
+
+
 }
 
 
+/*listaObjetos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String clickedItem = (String)parent.getItemAtPosition(position);
+
+                Toast.makeText(CambiarAvatar.this,clickedItem, Toast.LENGTH_SHORT).show();
+                if(clickedItem.equals(nombres[0])){ //quitar traje -> debe crear avatar con traje y color
+                    //Obtenemos el bitmap del imageview (el que tendrá el usuario)
+                    BitmapDrawable bitmapOriginal = (BitmapDrawable) imagenAvatar.getDrawable();
+                    Bitmap bitmapAvatarStandar = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.color_naranja);
+                    Bitmap bitmapTraje = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.disfraz_traje);
+
+                    DrawingAvatar drawingAvatar = new DrawingAvatar(c);
+                    drawingAvatar.equiparItem(bitmapAvatarStandar,bitmapTraje,null);
+
+
+                }else if(clickedItem.equals(nombres[1])){ //poner traje
+                    Bitmap bitmapAvatarStandar = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.color_naranja);
+                    Bitmap bitmapTraje = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.disfraz_traje);
+
+                    DrawingAvatar drawingAvatar = new DrawingAvatar(getBaseContext());
+                    drawingAvatar.quitarItem(bitmapAvatarStandar,bitmapTraje);
+
+                }
+            }
+        });*/
