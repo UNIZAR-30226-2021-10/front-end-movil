@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
+import Avatar.DrawAVMethods;
 import Avatar.ItemAvatar;
 import SessionManagement.GestorSesion;
 import database_wrapper.APIUtils;
@@ -59,8 +60,6 @@ public class CambiarAvatar extends AppCompatActivity {
     private static final int OPTION_ATRAS = 1;
 
     private final static String COLOR_NARANJA =  "#FFA141";
-    private ListView listaObjetos;
-    private String[] nombres = {"Quitar Traje", "Poner traje", "Pirata"};
 
     //Retrofit y gestor de Sesion
     private RetrofitInterface retrofitInterface;
@@ -70,10 +69,10 @@ public class CambiarAvatar extends AppCompatActivity {
     private ArrayList<ItemAvatar> itemsUsuario;
     //TODO: Crear vector para los items equipados del usuario que posteriormente se renderizaran en el Canvas
 
-    //RecyclerView y recyclerviewAdapter para hacer de puente entre listaItem y los items de la BD y el layOutManager para asignar
+    //RecyclerView y recyclerviewAdapter(AvatarAdapter) para hacer de puente entre listaItem y los items de la BD y el layOutManager para asignar
     //los items al layout personalizado "avatar_cardview.xml"
     private RecyclerView listaItem;
-    private RecyclerView.Adapter listAdapter;
+    private AvatarAdapter listAdapter;
     private RecyclerView.LayoutManager mListManager;
 
     private  Bitmap avatarDefinitivo;
@@ -84,9 +83,6 @@ public class CambiarAvatar extends AppCompatActivity {
     protected Context c;
 
     private  ImageView imagenAvatar;
-
-    public CambiarAvatar() {
-    }
 
 
     /**
@@ -144,7 +140,8 @@ public class CambiarAvatar extends AppCompatActivity {
     }
 
     /**
-     * Rellena la lista.
+     * Función que se encarga de guardar el arraylist ItemsUsuario , los items resultantes de la consulta
+     * a la base de datos.
      */
     private void fillData() {
         // TODO: Por ahora así hasta que decidamos como está la BD
@@ -162,7 +159,7 @@ public class CambiarAvatar extends AppCompatActivity {
                         JsonObject jsonObject = json.getAsJsonObject();
                         String image = jsonObject.get("Imagen").getAsString().replaceAll("http://localhost:3060", "https://trivial-images.herokuapp.com");
                         itemsUsuario.add(new ItemAvatar(jsonObject.get("Nombre").getAsString(),
-                                jsonObject.get("Tipo").getAsString(), image));
+                                jsonObject.get("Tipo").getAsString(), image,false));
                     }
                 }
                 cargarRecyclerView();
@@ -177,17 +174,40 @@ public class CambiarAvatar extends AppCompatActivity {
 
     }
 
+    /** Función que se encarga de cargar en el recyclerView "listaItem" todos los productos que el
+     *  usuario tiene. Además gestiona los clicks en el recyclerView.
+     */
     private void cargarRecyclerView() {
             listaItem = findViewById(R.id.list_items);
             listaItem.setHasFixedSize(true);
             mListManager = new LinearLayoutManager(this);
             listAdapter = new AvatarAdapter(itemsUsuario);
+            //Si el usuario no tiene ningún item mostrarle que no tienen ningún item.
             if( listAdapter.getItemCount() == 0){
                 Toast.makeText(this,"Todavia no tienes items",Toast.LENGTH_LONG).show();
                 return;
             }
             listaItem.setLayoutManager(mListManager);
             listaItem.setAdapter(listAdapter);
+
+            listAdapter.setOnItemClickListener(new AvatarAdapter.OnItemClickListener(){
+
+                @Override
+                public void onItemClick(int position) {
+                    changeEquiparItem(position);
+                }
+            });
+    }
+
+    private void changeEquiparItem(int position) {
+        itemsUsuario.get(position).negateEquipped();
+        listAdapter.notifyItemChanged(position);
+        //Toast.makeText(this,String.valueOf(itemsUsuario.get(position).isEquipped()),Toast.LENGTH_LONG).show();
+        actualizarAvatarUsuario(itemsUsuario.get(position).isEquipped(),itemsUsuario.get(position).getImagen());
+    }
+
+    private void actualizarAvatarUsuario(boolean isEquipped, String urlImagen) {
+
     }
 
     @Override
@@ -199,7 +219,7 @@ public class CambiarAvatar extends AppCompatActivity {
         }
     }
 
-    public Bitmap replaceColor(Bitmap src,int fromColor, int targetColor) {
+   /* public Bitmap replaceColor(Bitmap src,int fromColor, int targetColor) {
         if(src == null) {
             return null;
         }
@@ -224,19 +244,18 @@ public class CambiarAvatar extends AppCompatActivity {
         result.setPixels(pixels, 0, width, 0, 0, width, height);
 
         return result;
-    }
+    }*/
 
-    private double checkforSimilarColors(int a, int b){
+   /* private double checkforSimilarColors(int a, int b){
         return Math.sqrt(Math.pow(Color.red(a) - Color.red(b), 2) + Math.pow(Color.blue(a) - Color.blue(b), 2) + Math.pow(Color.green(a) - Color.green(b), 2));
-    }
+    }*/
 
-    class DrawingAvatar extends View {
+    class DrawingAvatar extends View implements DrawAVMethods {
 
         //Bitmap sobre el que se va a dibujar
          private Bitmap bmOverlay;
          //CANVAS
          private Canvas canvas ;
-         //Imageview
 
         public DrawingAvatar(Context context) {
             super(context);
@@ -246,14 +265,14 @@ public class CambiarAvatar extends AppCompatActivity {
 
         }
 
-        protected void onPoner() {
-            System.err.println("Me llaman aqui");
+        @Override
+        public void onPaint() {
             imagenAvatar.setImageBitmap(bmOverlay);
         }
 
-         public void equiparItem(Bitmap c, Bitmap s, Bitmap r) {
-
-            /*
+        @Override
+        public void onUpdateItem() {
+               /*
              TOP: indica desde empieza desde arriba 0 lo cogerá desde el margen incial de la ImageView
                    si se aumenta el margen top la recortara de arriba hacia abajo (la estrecha)
               BOTTOM: le indica hasta donde tiene que coger el alto de la Imageview
@@ -262,60 +281,83 @@ public class CambiarAvatar extends AppCompatActivity {
               LEFT: indica desde empieza desde el margen izquierdo del imageview, 0 empezará desde el incio
                     y si se aumenta ira acortandola en ancho
             * */
-             System.err.println(c);
-             Rect dest1 = new Rect(0, 0, ANCHO_AVATAR, ALTURA_AVATAR); // left,top,right,bottom
-             canvas.drawBitmap(c, null, dest1, null);
-             Rect dest2 = new Rect(0, 0, ANCHO_AVATAR, ALTURA_AVATAR);
-             canvas.drawBitmap(s, null, dest2, null);
-             onPoner();
+            Bitmap c = BitmapFactory.decodeResource(getResources(),R.mipmap.color_naranja);
+            Bitmap s = BitmapFactory.decodeResource(getResources(),R.mipmap.color_naranja);
+            Rect dest1 = new Rect(0, 0, ANCHO_AVATAR, ALTURA_AVATAR); // left,top,right,bottom
+            canvas.drawBitmap(c, null, dest1, null);
+            Rect dest2 = new Rect(0, 0, ANCHO_AVATAR, ALTURA_AVATAR);
+            canvas.drawBitmap(s, null, dest2, null);
+            onPaint();
                 /*  Rect dest3 = new Rect(0, 0, 274, 290);
             comboImage.drawBitmap(r, null, dest3, null);*/
+        }
 
-
-         }
-
-         public void quitarItem(Bitmap c, Bitmap s) {
-
-        /*
-         TOP: indica desde empieza desde arriba 0 lo cogerá desde el margen incial de la ImageView
+        @Override
+        public void onRemoveItem() {
+            /*
+          TOP: indica desde empieza desde arriba 0 lo cogerá desde el margen incial de la ImageView
                si se aumenta el margen top la recortara de arriba hacia abajo (la estrecha)
           BOTTOM: le indica hasta donde tiene que coger el alto de la Imageview
           RIGHT: indica donde acaba o hasta donde va el margen derecho, tendrá que el total del ancho
                  del imageview para que abarque la imageview entera.
           LEFT: indica desde empieza desde el margen izquierdo del imageview, 0 empezará desde el incio
                 y si se aumenta ira acortandola en ancho
-        * */
-             //comboImage.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-             limpiarCanvas();
-             Rect dest1 = new Rect(0, 0, ANCHO_AVATAR, ALTURA_AVATAR); // left,top,right,bottom
-             canvas.drawBitmap(c, null, dest1, null);
-             onPoner();
+          * */
+            //comboImage.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            onClearCanvas();
+            Bitmap c = BitmapFactory.decodeResource(getResources(),R.mipmap.color_naranja);
+            Rect dest1 = new Rect(0, 0, ANCHO_AVATAR, ALTURA_AVATAR); // left,top,right,bottom
+            canvas.drawBitmap(c, null, dest1, null);
+            onPaint();
+        }
 
-         }
-
-         public void limpiarCanvas(){
-             Path path = new Path();
-             Paint clearPaint = new Paint();
-             clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-             canvas.drawRect(0, 0, 0, 0, clearPaint);
-         }
+        @Override
+        public void onClearCanvas() {
+            Path path = new Path();
+            Paint clearPaint = new Paint();
+            clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            canvas.drawRect(0, 0, 0, 0, clearPaint);
+        }
     }
 
-    public class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.AvatarViewHolder>{
+    public static class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.AvatarViewHolder>{
 
         private ArrayList<ItemAvatar> mList;
+        private OnItemClickListener mListener;
 
-        public class AvatarViewHolder extends RecyclerView.ViewHolder{
+        public interface OnItemClickListener {
+            void onItemClick (int position);
+        }
+
+        public void setOnItemClickListener(OnItemClickListener listener){
+            this.mListener = listener;
+        }
+
+        public static class AvatarViewHolder extends RecyclerView.ViewHolder{
 
             public ImageView imageView;
             public TextView TextNombre;
             public TextView TextTipo;
+            public TextView TextEquipado;
 
-            public AvatarViewHolder(@NonNull View itemView) {
+            public AvatarViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
                 super(itemView);
                 imageView = itemView.findViewById(R.id.imagen_item);
                 TextNombre = itemView.findViewById(R.id.first_tview);
                 TextTipo = itemView.findViewById(R.id.second_tview);
+                TextEquipado = itemView.findViewById(R.id.text_equipped);
+
+                itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(listener != null){
+                            int position = getAdapterPosition();
+                            if( position != RecyclerView.NO_POSITION){
+                                listener.onItemClick(position);
+                            }
+                        }
+                    }
+                });
             }
         }
 
@@ -327,7 +369,7 @@ public class CambiarAvatar extends AppCompatActivity {
         @Override
         public AvatarViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.avatar_cardview,parent,false);
-            AvatarViewHolder avatarViewHolder = new AvatarViewHolder(view);
+            AvatarViewHolder avatarViewHolder = new AvatarViewHolder(view, mListener);
             return avatarViewHolder;
         }
 
@@ -337,6 +379,10 @@ public class CambiarAvatar extends AppCompatActivity {
             Picasso.get().load(itemAvatar.getImagen()).into(holder.imageView);
             holder.TextNombre.setText(itemAvatar.getNombre());
             holder.TextTipo.setText(itemAvatar.getTipo());
+            if(itemAvatar.isEquipped()){
+                holder.TextEquipado.setText(R.string.equipado);
+                holder.TextEquipado.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_baseline_check_24,0);
+            }else{ holder.TextEquipado.setText(R.string.Noequipado); }
         }
 
         @Override
