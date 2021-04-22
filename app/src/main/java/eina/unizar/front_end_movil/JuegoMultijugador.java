@@ -15,6 +15,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.JsonObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Random;
 
 import SessionManagement.Question;
@@ -68,7 +72,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     int[] preguntasCogidas = new int[60]; // pueden llegar a ser 60 preguntas
     int indice;
     String codigo;
-
+    String ganador;
 
     private int NUM_RONDAS;
     private int NUM_JUGADORES;
@@ -221,12 +225,16 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     public String quienEsGanador() {
         if (numero_puntos_p1 > numero_puntos_p2 && numero_puntos_p1 > numero_puntos_p3 && numero_puntos_p1 > numero_puntos_p4) {
+            ganador = usuario1_nombre.getText().toString();
             return usuario1_nombre.getText().toString();
         } else if (numero_puntos_p2 > numero_puntos_p1 && numero_puntos_p2 > numero_puntos_p3 && numero_puntos_p2 > numero_puntos_p4) {
+            ganador = usuario2_nombre.getText().toString();
             return usuario2_nombre.getText().toString();
         } else if (numero_puntos_p3 > numero_puntos_p2 && numero_puntos_p3 > numero_puntos_p1 && numero_puntos_p3 > numero_puntos_p4) {
+            ganador = usuario3_nombre.getText().toString();
             return usuario3_nombre.getText().toString();
         } else {
+            ganador = usuario4_nombre.getText().toString();
             return usuario4_nombre.getText().toString();
         }
     }
@@ -236,10 +244,39 @@ public class JuegoMultijugador extends AppCompatActivity{
             Bundle extra = new Bundle();
             String ganador = quienEsGanador();
             extra.putString("ganador", ganador);
+            handleFinPartidaMulti();
             Intent intent = new Intent(this, FinPartidaMulti.class);
             intent.putExtras(extra);
             startActivityForResult(intent, OPTION_ACABAR);
         }
+    }
+
+    private void  handleFinPartidaMulti(){
+        HashMap<String,String> finPartidaMulti = new HashMap<>();
+
+        finPartidaMulti.put("ganador", ganador);
+        finPartidaMulti.put("codigo",codigo);
+
+        Call<JsonObject> call = retrofitInterface.FinalPartidaMultijugador(finPartidaMulti);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() == 200) {
+                    System.out.println("TODO OK");
+                } else if(response.code() == 450){
+                    Toast.makeText(JuegoMultijugador.this, "No se ha podido encontrar partida", Toast.LENGTH_LONG).show();
+                } else{
+                    Toast.makeText(JuegoMultijugador.this, "No se ha podido insertar partida", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(JuegoMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     void activar(){
