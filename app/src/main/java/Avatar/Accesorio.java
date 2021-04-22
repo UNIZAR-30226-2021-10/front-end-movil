@@ -1,23 +1,21 @@
 package Avatar;
 
+import android.graphics.Canvas;
+
 public class Accesorio implements  DrawAVMethods{
-    @Override
-    public void onPaint() {
 
+
+    @Override
+    public Canvas onUpdateItem(Canvas canvas) {
+
+        return canvas;
     }
 
     @Override
-    public void onUpdateItem() {
+    public Canvas onRemoveItem(Canvas canvas) {
 
+        return canvas;
     }
 
-    @Override
-    public void onRemoveItem() {
 
-    }
-
-    @Override
-    public void onClearCanvas() {
-
-    }
 }

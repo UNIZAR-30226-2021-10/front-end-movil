@@ -93,10 +93,7 @@ public class ObjetoTienda extends AppCompatActivity {
 
                         },500);
                     } else{
-                        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                new SweetAlertDialog(ObjetoTienda.this,SweetAlertDialog.ERROR_TYPE).setTitleText("¡No tiene suficientes monedas para comprar este objeto!")
+                        new SweetAlertDialog(ObjetoTienda.this,SweetAlertDialog.ERROR_TYPE).setTitleText("¡No tiene suficientes monedas para comprar este objeto!")
                                         .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
                                             @Override
                                             public void onClick(SweetAlertDialog sweetAlertDialog) {
@@ -105,8 +102,7 @@ public class ObjetoTienda extends AppCompatActivity {
                                                 finish();
                                             }
                                         }).show();
-                            }
-                        },500);
+
                     }
                 }
         });

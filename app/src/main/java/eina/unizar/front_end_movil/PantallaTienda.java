@@ -370,6 +370,7 @@ public class PantallaTienda extends AppCompatActivity {
             //Gestionamos la respuesta de la llamada a post
             @Override
             public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
+
                 if (response.code() == 200) {
 
                     JsonArray jsonObject = response.body().getAsJsonArray();

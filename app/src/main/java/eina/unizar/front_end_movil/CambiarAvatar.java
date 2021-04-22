@@ -68,6 +68,7 @@ public class CambiarAvatar extends AppCompatActivity {
     //Listas y vectores que contienen los items del usuario y los items que lleva puesto
     private ArrayList<ItemAvatar> itemsUsuario;
     //TODO: Crear vector para los items equipados del usuario que posteriormente se renderizaran en el Canvas
+    private ArrayList<Bitmap> itemsUsuarioEquipados;
 
     //RecyclerView y recyclerviewAdapter(AvatarAdapter) para hacer de puente entre listaItem y los items de la BD y el layOutManager para asignar
     //los items al layout personalizado "avatar_cardview.xml"
@@ -97,14 +98,13 @@ public class CambiarAvatar extends AppCompatActivity {
         setContentView(R.layout.cambiar_avatar);
         c = this;
         getSupportActionBar().hide();
-
+        //Construimos el gestor de Sesion y el retrofit.
         gestorSesion = new GestorSesion(CambiarAvatar.this);
         retrofitInterface = APIUtils.getAPIServiceImages();
 
         imagenAvatar = (ImageView) findViewById(R.id.imageViewAvatar);
-
-
-
+        //Cargamos el Avatar actual que el usuario tenga.
+        cargarAvatar();
         //Llamada al método que inicializa la recyclerView con los items del usuario.
         fillData();
 
@@ -139,8 +139,16 @@ public class CambiarAvatar extends AppCompatActivity {
         });
     }
 
+    private void cargarAvatar() {
+        String imageUri = gestorSesion.getAvatarSession();
+        Picasso.get().load(imageUri).fit().centerCrop()
+                .error(R.drawable.ic_baseline_error_24)
+                .placeholder(R.drawable.animacion_carga)
+                .into(imagenAvatar);
+    }
+
     /**
-     * Función que se encarga de guardar el arraylist ItemsUsuario , los items resultantes de la consulta
+     * Función que se encarga de guardar en el arraylist ItemsUsuario , los items resultantes de la consulta
      * a la base de datos.
      */
     private void fillData() {
@@ -159,7 +167,7 @@ public class CambiarAvatar extends AppCompatActivity {
                         JsonObject jsonObject = json.getAsJsonObject();
                         String image = jsonObject.get("Imagen").getAsString().replaceAll("http://localhost:3060", "https://trivial-images.herokuapp.com");
                         itemsUsuario.add(new ItemAvatar(jsonObject.get("Nombre").getAsString(),
-                                jsonObject.get("Tipo").getAsString(), image,false));
+                                jsonObject.get("Tipo").getAsString(), image, jsonObject.get("equipado").getAsString().equals("1")));
                     }
                 }
                 cargarRecyclerView();
@@ -250,28 +258,33 @@ public class CambiarAvatar extends AppCompatActivity {
         return Math.sqrt(Math.pow(Color.red(a) - Color.red(b), 2) + Math.pow(Color.blue(a) - Color.blue(b), 2) + Math.pow(Color.green(a) - Color.green(b), 2));
     }*/
 
-    class DrawingAvatar extends View implements DrawAVMethods {
+    class DrawingAvatar extends View {
 
         //Bitmap sobre el que se va a dibujar
          private Bitmap bmOverlay;
          //CANVAS
          private Canvas canvas ;
+         //Vector con los items equipados
+         private  Vector<DrawAVMethods> itemsEquipados;
 
         public DrawingAvatar(Context context) {
             super(context);
             bmOverlay = Bitmap.createBitmap(ANCHO_AVATAR,ALTURA_AVATAR,Bitmap.Config.ARGB_8888);
             canvas = new Canvas(bmOverlay);
+            itemsEquipados = new Vector<>();
             setWillNotDraw(false);
 
         }
 
-        @Override
         public void onPaint() {
             imagenAvatar.setImageBitmap(bmOverlay);
         }
 
-        @Override
         public void onUpdateItem() {
+
+            for ( Object o : itemsEquipados){
+
+            }
                /*
              TOP: indica desde empieza desde arriba 0 lo cogerá desde el margen incial de la ImageView
                    si se aumenta el margen top la recortara de arriba hacia abajo (la estrecha)
@@ -288,11 +301,9 @@ public class CambiarAvatar extends AppCompatActivity {
             Rect dest2 = new Rect(0, 0, ANCHO_AVATAR, ALTURA_AVATAR);
             canvas.drawBitmap(s, null, dest2, null);
             onPaint();
-                /*  Rect dest3 = new Rect(0, 0, 274, 290);
-            comboImage.drawBitmap(r, null, dest3, null);*/
+
         }
 
-        @Override
         public void onRemoveItem() {
             /*
           TOP: indica desde empieza desde arriba 0 lo cogerá desde el margen incial de la ImageView
@@ -311,7 +322,6 @@ public class CambiarAvatar extends AppCompatActivity {
             onPaint();
         }
 
-        @Override
         public void onClearCanvas() {
             Path path = new Path();
             Paint clearPaint = new Paint();
@@ -382,7 +392,10 @@ public class CambiarAvatar extends AppCompatActivity {
             if(itemAvatar.isEquipped()){
                 holder.TextEquipado.setText(R.string.equipado);
                 holder.TextEquipado.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_baseline_check_24,0);
-            }else{ holder.TextEquipado.setText(R.string.Noequipado); }
+            }else{
+                holder.TextEquipado.setText(R.string.Noequipado);
+                holder.TextEquipado.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0);
+            }
         }
 
         @Override

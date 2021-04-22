@@ -1,23 +1,20 @@
 package Avatar;
 
+import android.graphics.Canvas;
+
 public class Skin implements DrawAVMethods{
+
+
     @Override
-    public void onPaint() {
+    public Canvas onUpdateItem(Canvas canvas) {
+        return canvas;
 
     }
 
     @Override
-    public void onUpdateItem() {
+    public Canvas onRemoveItem(Canvas canvas) {
+        return canvas;
 
     }
 
-    @Override
-    public void onRemoveItem() {
-
-    }
-
-    @Override
-    public void onClearCanvas() {
-
-    }
 }
