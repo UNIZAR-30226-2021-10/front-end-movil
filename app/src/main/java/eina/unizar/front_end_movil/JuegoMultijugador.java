@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Random;
 
+import SessionManagement.GestorSesion;
 import SessionManagement.Question;
 import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;
@@ -84,6 +85,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     int teToca = 0;
 
     private RetrofitInterface retrofitInterface;
+    private GestorSesion gestorSesion;
 
     /**
      * Called when the activity is first created.
@@ -99,6 +101,8 @@ public class JuegoMultijugador extends AppCompatActivity{
 
         //Construirmos el objeto retrofit
         retrofitInterface = APIUtils.getAPIService();
+
+        gestorSesion = new GestorSesion(JuegoMultijugador.this);
 
         indice = 0;
         for(int i = 0; i< 60; i++){
@@ -219,7 +223,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             usuario2_nombre.setText("usuario2");
             usuario2_puntos.setText("0");
         }
-        usuario1_nombre.setText("usuario1");
+        usuario1_nombre.setText(gestorSesion.getSession());
         usuario1_puntos.setText("0");
     }
 

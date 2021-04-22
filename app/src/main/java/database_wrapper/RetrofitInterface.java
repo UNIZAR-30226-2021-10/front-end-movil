@@ -64,4 +64,7 @@ public interface RetrofitInterface {
     @POST("FinalMultijugador_Partida")
     Call<JsonObject> FinalPartidaMultijugador(@Body HashMap<String,String> map);
 
+    @POST("UnirseMultijugador_Juega")
+    Call<JsonObject> UnirseMultijugadorJuega(@Body HashMap<String,String> map);
+
 }

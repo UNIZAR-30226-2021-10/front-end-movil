@@ -7,8 +7,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.gson.JsonObject;
+
+import java.util.HashMap;
+
+import SessionManagement.GestorSesion;
+import database_wrapper.APIUtils;
+import database_wrapper.RetrofitInterface;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DecisionMultijugador extends AppCompatActivity {
 
@@ -20,6 +32,12 @@ public class DecisionMultijugador extends AppCompatActivity {
     EditText codigoPartida;
 
     String CODIGO_PARTIDA = "ABCD123";
+    String codigoInsertado;
+    //int NUM_RONDAS;
+    //int NUM_JUGADORES;
+
+    private RetrofitInterface retrofitInterface;
+    private GestorSesion gestorSesion;
 
     /**
      * Called when the activity is first created.
@@ -33,6 +51,10 @@ public class DecisionMultijugador extends AppCompatActivity {
         setContentView(R.layout.decision_multijugador);
         getSupportActionBar().hide();
 
+        retrofitInterface = APIUtils.getAPIService();
+
+        gestorSesion = new GestorSesion(DecisionMultijugador.this);
+
         codigoPartida = (EditText) findViewById(R.id.code);
 
         // Botón de unirse a una partida ya creada
@@ -40,18 +62,14 @@ public class DecisionMultijugador extends AppCompatActivity {
         accederButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String codigoInsertado = codigoPartida.getText().toString();
-                if(codigoInsertado.equals(CODIGO_PARTIDA)){
-                    Intent intent = new Intent (v.getContext(), JuegoMultijugador.class);
-                    Bundle extras = new Bundle();
-                    extras.putInt("jugadores",4);
-                    extras.putInt("rondas",5);
-                    intent.putExtras(extras);
-                    startActivityForResult(intent, OPTION_ACCEDER);
-                }else{
-                    codigoPartida.setError("El código de partida es incorrecto");
-                }
-
+                codigoInsertado = codigoPartida.getText().toString();
+                handleUnirsePartida();
+                Intent intent = new Intent (v.getContext(), JuegoMultijugador.class);
+                Bundle extras = new Bundle();
+                extras.putInt("jugadores",4);
+                extras.putInt("rondas",5);
+                intent.putExtras(extras);
+                startActivityForResult(intent, OPTION_ACCEDER);
             }
         });
 
@@ -86,6 +104,35 @@ public class DecisionMultijugador extends AppCompatActivity {
 
     }
 
+    private void  handleUnirsePartida() {
+        HashMap<String, String> unirsePartida = new HashMap<>();
+
+        unirsePartida.put("codigo", codigoInsertado);
+        unirsePartida.put("usuario_email", gestorSesion.getSession());
+        unirsePartida.put("puntuacion", Integer.toString(0));
+
+        Call<JsonObject> call = retrofitInterface.UnirseMultijugadorJuega(unirsePartida);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() == 200) {
+                    System.out.println("TODO OK");
+                } else if (response.code() == 450) {
+                    Toast.makeText(DecisionMultijugador.this, "No se ha podido encontrar partida", Toast.LENGTH_LONG).show();
+                } else if (response.code() == 440) {
+                    Toast.makeText(DecisionMultijugador.this, "No se ha podido insertar jugada", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(DecisionMultijugador.this, "No se ha podido insertar partida", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(DecisionMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 }
 
 
