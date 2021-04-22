@@ -67,7 +67,6 @@ public class JuegoMultijugador extends AppCompatActivity{
     int[] puntosCat = {20, 30, 25, 15, 5, 10};
     int[] preguntasCogidas = new int[60]; // pueden llegar a ser 60 preguntas
     int indice;
-    int code;
     String codigo;
 
 
@@ -97,11 +96,6 @@ public class JuegoMultijugador extends AppCompatActivity{
         //Construirmos el objeto retrofit
         retrofitInterface = APIUtils.getAPIService();
 
-        //Para obtener el code de la actividad anterior
-        //Bundle bundle = this.getIntent().getExtras();
-        //codigo = bundle.getString("codigo");
-        //code = Integer.parseInt(codigo);
-
         indice = 0;
         for(int i = 0; i< 60; i++){
             preguntasCogidas[i] = 0;
@@ -110,6 +104,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         Bundle extras = getIntent().getExtras();
         NUM_RONDAS = extras.getInt("rondas");
         NUM_JUGADORES = extras.getInt("jugadores");
+        codigo = extras.getString("codigo");
 
         pregunta = (TextView)findViewById(R.id.pregunta);
         resp1 = (TextView)findViewById(R.id.respuesta1);
@@ -121,7 +116,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         turno_jugador = (TextView)findViewById(R.id.turno_jugador);
         categoria = (TextView)findViewById(R.id.categoria);
         partida_code = (TextView)findViewById(R.id.partida_code);
-        //partida_code.setText(String.valueOf(code));
+        partida_code.setText(String.valueOf(codigo));
 
         usuario1_nombre = (TextView)findViewById(R.id.usuario1_nombre);
         usuario2_nombre = (TextView)findViewById(R.id.usuario2_nombre);

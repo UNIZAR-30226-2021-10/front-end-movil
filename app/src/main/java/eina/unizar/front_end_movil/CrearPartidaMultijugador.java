@@ -44,7 +44,8 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
     Bundle extras;
     String jugadores;
     String rondas;
-    int codigo;
+    int code;
+    String codigo;
 
     /**
      * Called when the activity is first created.
@@ -81,11 +82,12 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
             @Override
             public void onClick(View v) {
                 Random r = new Random();
-                codigo = r.nextInt(100000 - 10000 + 1) + 10000;
+                code = r.nextInt(100000 - 10000 + 1) + 10000;
+                codigo = Integer.toString(code);
                 handleRegistrarPartida();
+                extras.putString("codigo", codigo);
                 Intent intent = new Intent (v.getContext(), JuegoMultijugador.class);
                 intent.putExtras(extras);
-                //intent.putExtra("codigo", codigo);
                 startActivityForResult(intent, OPTION_CREAR);
             }
         });
