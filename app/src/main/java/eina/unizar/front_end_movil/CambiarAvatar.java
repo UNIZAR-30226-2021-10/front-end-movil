@@ -36,12 +36,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -68,7 +71,7 @@ public class CambiarAvatar extends AppCompatActivity {
     //Listas y vectores que contienen los items del usuario y los items que lleva puesto
     private ArrayList<ItemAvatar> itemsUsuario;
     //TODO: Crear vector para los items equipados del usuario que posteriormente se renderizaran en el Canvas
-    private ArrayList<Bitmap> itemsUsuarioEquipados;
+    private Bitmap []itemsUsuarioEquipados = new Bitmap[4];
 
     //RecyclerView y recyclerviewAdapter(AvatarAdapter) para hacer de puente entre listaItem y los items de la BD y el layOutManager para asignar
     //los items al layout personalizado "avatar_cardview.xml"
@@ -76,8 +79,15 @@ public class CambiarAvatar extends AppCompatActivity {
     private AvatarAdapter listAdapter;
     private RecyclerView.LayoutManager mListManager;
 
-    private  Bitmap avatarDefinitivo;
-    private static Bitmap bitmapAvatarStandar;
+    //Traduccion
+    //Componentes 0:color 1:cabeza 2:cara 3:cuerpo
+    private final HashMap<String,Integer> traduccion = new HashMap<String, Integer>(){{
+        put("color",0);
+        put("cabeza",1);
+        put("cara",2);
+        put("cuerpo",3);
+    }};
+    //Alto y Ancho del ImageView del Avatar
     protected int ALTURA_AVATAR;
     protected int ANCHO_AVATAR;
 
@@ -108,6 +118,7 @@ public class CambiarAvatar extends AppCompatActivity {
         //Llamada al método que inicializa la recyclerView con los items del usuario.
         fillData();
 
+
         Button okButton = (Button) findViewById((R.id.ok));
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,17 +138,38 @@ public class CambiarAvatar extends AppCompatActivity {
             }
         });
 
-        Button test = (Button) findViewById(R.id.test);
-        test.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Obtenemos el bitmap del imageview (el que tendrá el usuario)
-                BitmapDrawable bitmapOriginal = (BitmapDrawable) imagenAvatar.getDrawable();
-                bitmapAvatarStandar = bitmapOriginal.getBitmap();
 
-            }
-        });
     }
+
+    private void loadItemsEquipped()  {
+
+        for (final ItemAvatar i : itemsUsuario) {
+                if (i.isEquipped()) {
+                    Picasso.get().load(i.getImagen()).into(new Target() {
+                        @Override
+                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                            try {
+                                itemsUsuarioEquipados[traduccion.get(i.getTipo())] = bitmap;
+                            }catch (NullPointerException e){
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                            e.printStackTrace();
+                        }
+
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                        }
+                    });
+
+                }
+            }
+    }
+
 
     private void cargarAvatar() {
         String imageUri = gestorSesion.getAvatarSession();
@@ -169,7 +201,9 @@ public class CambiarAvatar extends AppCompatActivity {
                         itemsUsuario.add(new ItemAvatar(jsonObject.get("Nombre").getAsString(),
                                 jsonObject.get("Tipo").getAsString(), image, jsonObject.get("equipado").getAsString().equals("1")));
                     }
+                    loadItemsEquipped();
                 }
+
                 cargarRecyclerView();
 
             }
@@ -208,14 +242,28 @@ public class CambiarAvatar extends AppCompatActivity {
     }
 
     private void changeEquiparItem(int position) {
+        boolean cambiarColor = itemsUsuario.get(position).getTipo().equals("color");
+        boolean equipado = itemsUsuario.get(position).isEquipped();
+        if(cambiarColor && equipado) {
+            Toast.makeText(this,"No puedes desequiparte un color, si quieres cambiarlo selecciona otro diferente",Toast.LENGTH_SHORT).show();
+            return;
+        }else if(!equipado){
+            for (ItemAvatar i : itemsUsuario){
+                if(i.isEquipped() && i.getTipo().equals(itemsUsuario.get(position).getTipo())){
+                    i.negateEquipped();
+                    listAdapter.notifyDataSetChanged();
+                    break;
+                }
+            }
+        }
         itemsUsuario.get(position).negateEquipped();
         listAdapter.notifyItemChanged(position);
-        //Toast.makeText(this,String.valueOf(itemsUsuario.get(position).isEquipped()),Toast.LENGTH_LONG).show();
-        actualizarAvatarUsuario(itemsUsuario.get(position).isEquipped(),itemsUsuario.get(position).getImagen());
+        actualizarAvatarUsuario(itemsUsuario.get(position).getImagen(), itemsUsuario.get(position).getTipo(), itemsUsuario.get(position).isEquipped());
     }
 
-    private void actualizarAvatarUsuario(boolean isEquipped, String urlImagen) {
-
+    private void actualizarAvatarUsuario( final String urlImagen, final String tipo, final boolean equipped) {
+        DrawingAvatar drawingAvatar = new DrawingAvatar(c);
+        drawingAvatar.onUpdateItem(urlImagen,tipo,equipped);
     }
 
     @Override
@@ -227,51 +275,18 @@ public class CambiarAvatar extends AppCompatActivity {
         }
     }
 
-   /* public Bitmap replaceColor(Bitmap src,int fromColor, int targetColor) {
-        if(src == null) {
-            return null;
-        }
-        // Source image size
-        int width = src.getWidth();
-        int height = src.getHeight();
-        int[] pixels = new int[width * height];
-        //get pixels
-        src.getPixels(pixels, 0, width, 0, 0, width, height);
-
-        for(int x = 0; x < pixels.length; ++x) {
-            //pixels[x] = (pixels[x] == fromColor) ? targetColor : pixels[x];
-            System.out.println("Rojo: " + Color.red(pixels[x]) + " Verde:" + Color.green(pixels[x]) + " Azul:" + Color.blue(pixels[x]));
-            if (checkforSimilarColors(Color.parseColor(COLOR_NARANJA),pixels[x]) < 120){
-                pixels[x] = Color.argb(255,99,216,39);
-            }
-
-        }
-        // create result bitmap output
-        Bitmap result = Bitmap.createBitmap(width, height, src.getConfig());
-        //set pixels
-        result.setPixels(pixels, 0, width, 0, 0, width, height);
-
-        return result;
-    }*/
-
-   /* private double checkforSimilarColors(int a, int b){
-        return Math.sqrt(Math.pow(Color.red(a) - Color.red(b), 2) + Math.pow(Color.blue(a) - Color.blue(b), 2) + Math.pow(Color.green(a) - Color.green(b), 2));
-    }*/
-
     class DrawingAvatar extends View {
 
         //Bitmap sobre el que se va a dibujar
          private Bitmap bmOverlay;
          //CANVAS
          private Canvas canvas ;
-         //Vector con los items equipados
-         private  Vector<DrawAVMethods> itemsEquipados;
+
 
         public DrawingAvatar(Context context) {
             super(context);
             bmOverlay = Bitmap.createBitmap(ANCHO_AVATAR,ALTURA_AVATAR,Bitmap.Config.ARGB_8888);
             canvas = new Canvas(bmOverlay);
-            itemsEquipados = new Vector<>();
             setWillNotDraw(false);
 
         }
@@ -280,46 +295,57 @@ public class CambiarAvatar extends AppCompatActivity {
             imagenAvatar.setImageBitmap(bmOverlay);
         }
 
-        public void onUpdateItem() {
+        public void onUpdateItem(String urlSrc, final String tipo, final Boolean equipped) {
 
-            for ( Object o : itemsEquipados){
+             Picasso.get().load(urlSrc).into(new Target() {
+                  @Override
+                  public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                      //Actualizamos el bitmap en funcion de si esta o no equipado
+                      if(equipped) {
+                          itemsUsuarioEquipados[traduccion.get(tipo)] = bitmap;
+                      }else{
+                          itemsUsuarioEquipados[traduccion.get(tipo)] = null;
+                      }
+                      System.out.println(Arrays.toString(itemsUsuarioEquipados));
+                      onUpdateCanvas();
+                  }
 
-            }
-               /*
-             TOP: indica desde empieza desde arriba 0 lo cogerá desde el margen incial de la ImageView
-                   si se aumenta el margen top la recortara de arriba hacia abajo (la estrecha)
-              BOTTOM: le indica hasta donde tiene que coger el alto de la Imageview
-              RIGHT: indica donde acaba o hasta donde va el margen derecho, tendrá que el total del ancho
-                     del imageview para que abarque la imageview entera.
-              LEFT: indica desde empieza desde el margen izquierdo del imageview, 0 empezará desde el incio
-                    y si se aumenta ira acortandola en ancho
-            * */
-            Bitmap c = BitmapFactory.decodeResource(getResources(),R.mipmap.color_naranja);
-            Bitmap s = BitmapFactory.decodeResource(getResources(),R.mipmap.color_naranja);
-            Rect dest1 = new Rect(0, 0, ANCHO_AVATAR, ALTURA_AVATAR); // left,top,right,bottom
-            canvas.drawBitmap(c, null, dest1, null);
-            Rect dest2 = new Rect(0, 0, ANCHO_AVATAR, ALTURA_AVATAR);
-            canvas.drawBitmap(s, null, dest2, null);
-            onPaint();
+                  @Override
+                  public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                        e.printStackTrace();
+                  }
+
+                  @Override
+                  public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                  }
+              });
+
+
 
         }
+        public void spy(){
+            System.out.println(itemsUsuarioEquipados.length);
+        }
 
-        public void onRemoveItem() {
-            /*
-          TOP: indica desde empieza desde arriba 0 lo cogerá desde el margen incial de la ImageView
-               si se aumenta el margen top la recortara de arriba hacia abajo (la estrecha)
-          BOTTOM: le indica hasta donde tiene que coger el alto de la Imageview
-          RIGHT: indica donde acaba o hasta donde va el margen derecho, tendrá que el total del ancho
-                 del imageview para que abarque la imageview entera.
-          LEFT: indica desde empieza desde el margen izquierdo del imageview, 0 empezará desde el incio
-                y si se aumenta ira acortandola en ancho
-          * */
-            //comboImage.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        public void onUpdateCanvas() {
             onClearCanvas();
-            Bitmap c = BitmapFactory.decodeResource(getResources(),R.mipmap.color_naranja);
-            Rect dest1 = new Rect(0, 0, ANCHO_AVATAR, ALTURA_AVATAR); // left,top,right,bottom
-            canvas.drawBitmap(c, null, dest1, null);
-            onPaint();
+            for (int i = 0; i<itemsUsuarioEquipados.length; i++) {
+                   /*
+                     TOP: indica desde empieza desde arriba 0 lo cogerá desde el margen incial de la ImageView
+                           si se aumenta el margen top la recortara de arriba hacia abajo (la estrecha)
+                      BOTTOM: le indica hasta donde tiene que coger el alto de la Imageview
+                      RIGHT: indica donde acaba o hasta donde va el margen derecho, tendrá que el total del ancho
+                             del imageview para que abarque la imageview entera.
+                      LEFT: indica desde empieza desde el margen izquierdo del imageview, 0 empezará desde el incio
+                            y si se aumenta ira acortandola en ancho
+                   **/
+                if(itemsUsuarioEquipados[i] == null) continue;
+                Rect rect = new Rect(0, 0, ANCHO_AVATAR
+                        , ALTURA_AVATAR); //left,top,right,bottom
+                canvas.drawBitmap(itemsUsuarioEquipados[i], null, rect, null);
+            }
+           onPaint();
         }
 
         public void onClearCanvas() {
@@ -436,3 +462,34 @@ public class CambiarAvatar extends AppCompatActivity {
                 }
             }
         });*/
+
+/* public Bitmap replaceColor(Bitmap src,int fromColor, int targetColor) {
+        if(src == null) {
+            return null;
+        }
+        // Source image size
+        int width = src.getWidth();
+        int height = src.getHeight();
+        int[] pixels = new int[width * height];
+        //get pixels
+        src.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        for(int x = 0; x < pixels.length; ++x) {
+            //pixels[x] = (pixels[x] == fromColor) ? targetColor : pixels[x];
+            System.out.println("Rojo: " + Color.red(pixels[x]) + " Verde:" + Color.green(pixels[x]) + " Azul:" + Color.blue(pixels[x]));
+            if (checkforSimilarColors(Color.parseColor(COLOR_NARANJA),pixels[x]) < 120){
+                pixels[x] = Color.argb(255,99,216,39);
+            }
+
+        }
+        // create result bitmap output
+        Bitmap result = Bitmap.createBitmap(width, height, src.getConfig());
+        //set pixels
+        result.setPixels(pixels, 0, width, 0, 0, width, height);
+
+        return result;
+    }*/
+
+   /* private double checkforSimilarColors(int a, int b){
+        return Math.sqrt(Math.pow(Color.red(a) - Color.red(b), 2) + Math.pow(Color.blue(a) - Color.blue(b), 2) + Math.pow(Color.green(a) - Color.green(b), 2));
+    }*/
