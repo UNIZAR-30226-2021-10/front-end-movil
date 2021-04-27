@@ -1,33 +1,21 @@
 package eina.unizar.front_end_movil;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +24,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -45,11 +32,11 @@ import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Vector;
 
-import Avatar.DrawAVMethods;
 import Avatar.ItemAvatar;
+import Avatar.MiddleWareAV;
 import SessionManagement.GestorSesion;
 import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;
@@ -62,15 +49,13 @@ public class CambiarAvatar extends AppCompatActivity {
     private static final int OPTION_OK = 0;
     private static final int OPTION_ATRAS = 1;
 
-    private final static String COLOR_NARANJA =  "#FFA141";
-
     //Retrofit y gestor de Sesion
     private RetrofitInterface retrofitInterface;
     private GestorSesion gestorSesion;
 
     //Listas y vectores que contienen los items del usuario y los items que lleva puesto
     private ArrayList<ItemAvatar> itemsUsuario;
-    //TODO: Crear vector para los items equipados del usuario que posteriormente se renderizaran en el Canvas
+    //Vector para los items equipados del usuario que posteriormente se renderizaran en el Canvas
     private Bitmap []itemsUsuarioEquipados = new Bitmap[4];
 
     //RecyclerView y recyclerviewAdapter(AvatarAdapter) para hacer de puente entre listaItem y los items de la BD y el layOutManager para asignar
@@ -90,11 +75,10 @@ public class CambiarAvatar extends AppCompatActivity {
     //Alto y Ancho del ImageView del Avatar
     protected int ALTURA_AVATAR;
     protected int ANCHO_AVATAR;
-
+    //Variable para guardar el context (equivalente a getAplicationContext())
     protected Context c;
-
+    //ImageView del Avatar
     private  ImageView imagenAvatar;
-
 
     /**
      * Called when the activity is first created.
@@ -123,8 +107,16 @@ public class CambiarAvatar extends AppCompatActivity {
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), PerfilUsuario.class);
-                startActivityForResult(intent, OPTION_OK);
+                //Intent intent = new Intent(v.getContext(), PerfilUsuario.class);
+                //startActivityForResult(intent, OPTION_OK);
+                MiddleWareAV middleWareAV = MiddleWareAV.createMiddleWareAV(c);
+                ArrayList<Integer> arraybooleanos = new ArrayList<>();
+                ArrayList<String> arrayNombre = new ArrayList<>();
+                for(int i=0 ; i < itemsUsuario.size(); i++){
+                    arraybooleanos.add(itemsUsuario.get(i).isEquipped() ? 1 : 0);
+                    arrayNombre.add(itemsUsuario.get(i).getIdItem());
+                }
+                middleWareAV.updateItemsEquipados(arraybooleanos,arrayNombre);
             }
         });
 
@@ -173,7 +165,7 @@ public class CambiarAvatar extends AppCompatActivity {
 
     private void cargarAvatar() {
         String imageUri = gestorSesion.getAvatarSession();
-        Picasso.get().load(imageUri).fit().centerCrop()
+        Picasso.get().load(imageUri).fit()
                 .error(R.drawable.ic_baseline_error_24)
                 .placeholder(R.drawable.animacion_carga)
                 .into(imagenAvatar);
@@ -184,7 +176,7 @@ public class CambiarAvatar extends AppCompatActivity {
      * a la base de datos.
      */
     private void fillData() {
-        // TODO: Por ahora así hasta que decidamos como está la BD
+
         itemsUsuario = new ArrayList<>();
         HashMap<String,String> hashPerfilUsuario = new HashMap<>();
         hashPerfilUsuario.put("email",gestorSesion.getmailSession());
@@ -198,8 +190,10 @@ public class CambiarAvatar extends AppCompatActivity {
                     for (JsonElement json : jsonArray) {
                         JsonObject jsonObject = json.getAsJsonObject();
                         String image = jsonObject.get("Imagen").getAsString().replaceAll("http://localhost:3060", "https://trivial-images.herokuapp.com");
+                        String imageLocal = jsonObject.get("Imagen").getAsString().replaceAll("localhost", "192.168.1.34");
                         itemsUsuario.add(new ItemAvatar(jsonObject.get("Nombre").getAsString(),
-                                jsonObject.get("Tipo").getAsString(), image, jsonObject.get("equipado").getAsString().equals("1")));
+                                jsonObject.get("Tipo").getAsString(), imageLocal, jsonObject.get("equipado").getAsString().equals("1"),
+                                jsonObject.get("iditem").getAsString()));
                     }
                     loadItemsEquipped();
                 }
@@ -224,9 +218,10 @@ public class CambiarAvatar extends AppCompatActivity {
             listaItem.setHasFixedSize(true);
             mListManager = new LinearLayoutManager(this);
             listAdapter = new AvatarAdapter(itemsUsuario);
-            //Si el usuario no tiene ningún item mostrarle que no tienen ningún item.
+            //Si el usuario no tiene ningún item mostrarle que no tienen ningún item. No debería entrar nunca ya que siempre tendrá la skin naranja, pero si se producen fallos en la base de datos
+            // prevendrá bugs.
             if( listAdapter.getItemCount() == 0){
-                Toast.makeText(this,"Todavia no tienes items",Toast.LENGTH_LONG).show();
+                Toast.makeText(this,"Todavia no tienes ningun item",Toast.LENGTH_LONG).show();
                 return;
             }
             listaItem.setLayoutManager(mListManager);
@@ -323,9 +318,6 @@ public class CambiarAvatar extends AppCompatActivity {
 
 
 
-        }
-        public void spy(){
-            System.out.println(itemsUsuarioEquipados.length);
         }
 
         public void onUpdateCanvas() {

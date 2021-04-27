@@ -11,11 +11,11 @@ public class APIUtils {
         private void ApiUtils() {}
 
         public static RetrofitInterface getAPIService() {
-            return ClienteRetrofit.getClient(BASE_URL).create(RetrofitInterface.class);
+            return ClienteRetrofit.getClient(URL_LOCAL).create(RetrofitInterface.class);
         }
 
         public static RetrofitInterface getAPIServiceImages() {
-                return ClienteRetrofit.getClient(URL_IMAGENES).create(RetrofitInterface.class);
+                return ClienteRetrofit.getClient(URL_LOCAL).create(RetrofitInterface.class);
         }
 
 
