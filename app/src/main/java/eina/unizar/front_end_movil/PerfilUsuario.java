@@ -9,11 +9,16 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -29,6 +34,7 @@ public class PerfilUsuario extends AppCompatActivity {
     private ListView listaObjetos;
     private String[] nombres = {"Traje", "Médico", "Paragüas", "Estetoscopio", "Maletín",
             "Vestido", "Corbata", "Gafas", "Balon", "Sombrero"};
+
 
     private GestorSesion gestorSesion;
 
@@ -58,6 +64,16 @@ public class PerfilUsuario extends AppCompatActivity {
         points.setText(gestorSesion.getpointsSession());
 
 
+        ImageView perfilButton = (ImageView) findViewById(R.id.perfil_button);
+        String imageUri = gestorSesion.getAvatarSession();
+        Picasso.get().load(imageUri).fit()
+                .error(R.drawable.ic_baseline_error_24)
+                .placeholder(R.drawable.animacion_carga)
+                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                .networkPolicy(NetworkPolicy.NO_CACHE)
+                .into(perfilButton);
+
+
         Button ajustesButton = (Button) findViewById((R.id.ajustes));
         ajustesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,8 +83,7 @@ public class PerfilUsuario extends AppCompatActivity {
             }
         });
 
-        // Botón de sign out
-        Button perfilButton = (Button) findViewById(R.id.perfil_button);
+
         perfilButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

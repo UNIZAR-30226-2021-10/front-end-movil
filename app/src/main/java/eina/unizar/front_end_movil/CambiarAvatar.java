@@ -4,13 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,24 +23,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 
 import Avatar.ItemAvatar;
 import Avatar.MiddleWareAV;
 import SessionManagement.GestorSesion;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;
 import retrofit2.Call;
@@ -94,13 +104,14 @@ public class CambiarAvatar extends AppCompatActivity {
         getSupportActionBar().hide();
         //Construimos el gestor de Sesion y el retrofit.
         gestorSesion = new GestorSesion(CambiarAvatar.this);
-        retrofitInterface = APIUtils.getAPIServiceImages();
+        retrofitInterface = APIUtils.getAPIService();
 
         imagenAvatar = (ImageView) findViewById(R.id.imageViewAvatar);
-        //Cargamos el Avatar actual que el usuario tenga.
-        cargarAvatar();
+
         //Llamada al método que inicializa la recyclerView con los items del usuario.
         fillData();
+        //Cargamos el Avatar actual que el usuario tenga.
+        cargarAvatar();
 
 
         Button okButton = (Button) findViewById((R.id.ok));
@@ -117,6 +128,11 @@ public class CambiarAvatar extends AppCompatActivity {
                     arrayNombre.add(itemsUsuario.get(i).getIdItem());
                 }
                 middleWareAV.updateItemsEquipados(arraybooleanos,arrayNombre);
+                BitmapDrawable drawable = (BitmapDrawable) imagenAvatar.getDrawable();
+                Bitmap bitmapAVTR = drawable.getBitmap();
+                middleWareAV.saveAvatar(bitmapAVTR);
+                mostrarMensajeCarga();
+
             }
         });
 
@@ -133,42 +149,69 @@ public class CambiarAvatar extends AppCompatActivity {
 
     }
 
+    private void mostrarMensajeCarga() {
+        // SweetAler para mostrar el usuario que está procesando la carga.
+        final SweetAlertDialog pDialog = new SweetAlertDialog(CambiarAvatar.this, SweetAlertDialog.PROGRESS_TYPE);
+        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        pDialog.setCancelable(false);
+        pDialog.setTitleText("Guardando Cambios ...");
+        pDialog.show();
+       new Handler().postDelayed(new Runnable() {
+           @Override
+           public void run() {
+               pDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+               pDialog.setTitleText("Listo");
+               pDialog.setConfirmText("Ok").setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                   @Override
+                   public void onClick(SweetAlertDialog sweetAlertDialog) {
+                       Arrays.fill(itemsUsuarioEquipados, null);
+                       Intent intent = new Intent(c, PerfilUsuario.class);
+                       startActivityForResult(intent, OPTION_OK);
+                   }
+               });
+
+
+           }
+       },2500);
+
+
+    }
+
     private void loadItemsEquipped()  {
 
         for (final ItemAvatar i : itemsUsuario) {
                 if (i.isEquipped()) {
-                    Picasso.get().load(i.getImagen()).into(new Target() {
-                        @Override
-                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                            try {
-                                itemsUsuarioEquipados[traduccion.get(i.getTipo())] = bitmap;
-                            }catch (NullPointerException e){
-                                e.printStackTrace();
-                            }
-                        }
+                    Glide.with(c)
+                            .asBitmap().load(i.getImagen())
+                            .listener(new RequestListener<Bitmap>() {
+                                          @Override
+                                          public boolean onLoadFailed(@Nullable GlideException e, Object model, com.bumptech.glide.request.target.Target<Bitmap> target, boolean isFirstResource) {
+                                              return false;
+                                          }
 
-                        @Override
-                        public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                            e.printStackTrace();
-                        }
-
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                        }
-                    });
-
+                                          @Override
+                                          public boolean onResourceReady(Bitmap resource, Object model, com.bumptech.glide.request.target.Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                                              itemsUsuarioEquipados[traduccion.get(i.getTipo())] = resource;
+                                              return false;
+                                          }
+                                      }
+                            ).submit();
                 }
             }
     }
 
-
+    /**
+     * Función que carga en el imageview la imagen que tenga el usuario.
+     */
     private void cargarAvatar() {
-        String imageUri = gestorSesion.getAvatarSession();
+      String imageUri = gestorSesion.getAvatarSession();
         Picasso.get().load(imageUri).fit()
                 .error(R.drawable.ic_baseline_error_24)
                 .placeholder(R.drawable.animacion_carga)
+                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                .networkPolicy(NetworkPolicy.NO_CACHE)
                 .into(imagenAvatar);
+
     }
 
     /**
@@ -189,17 +232,21 @@ public class CambiarAvatar extends AppCompatActivity {
                     JsonArray jsonArray = response.body().getAsJsonArray();
                     for (JsonElement json : jsonArray) {
                         JsonObject jsonObject = json.getAsJsonObject();
+                        //Si se está usando la API en la nube pasarle image
                         String image = jsonObject.get("Imagen").getAsString().replaceAll("http://localhost:3060", "https://trivial-images.herokuapp.com");
+                        //Si se está usando la API en local pasarle imagelocal
                         String imageLocal = jsonObject.get("Imagen").getAsString().replaceAll("localhost", "192.168.1.34");
                         itemsUsuario.add(new ItemAvatar(jsonObject.get("Nombre").getAsString(),
-                                jsonObject.get("Tipo").getAsString(), imageLocal, jsonObject.get("equipado").getAsString().equals("1"),
+                                jsonObject.get("Tipo").getAsString(), image, jsonObject.get("equipado").getAsString().equals("1"),
                                 jsonObject.get("iditem").getAsString()));
                     }
                     loadItemsEquipped();
+                    for(int i=0;i<itemsUsuarioEquipados.length;i++){
+                        System.out.println(itemsUsuarioEquipados[i]);
+                    }
                 }
 
                 cargarRecyclerView();
-
             }
 
             @Override
@@ -290,6 +337,7 @@ public class CambiarAvatar extends AppCompatActivity {
             imagenAvatar.setImageBitmap(bmOverlay);
         }
 
+
         public void onUpdateItem(String urlSrc, final String tipo, final Boolean equipped) {
 
              Picasso.get().load(urlSrc).into(new Target() {
@@ -301,7 +349,7 @@ public class CambiarAvatar extends AppCompatActivity {
                       }else{
                           itemsUsuarioEquipados[traduccion.get(tipo)] = null;
                       }
-                      System.out.println(Arrays.toString(itemsUsuarioEquipados));
+                      //System.out.println(Arrays.toString(itemsUsuarioEquipados));
                       onUpdateCanvas();
                   }
 
@@ -404,7 +452,7 @@ public class CambiarAvatar extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull AvatarViewHolder holder, int position) {
             ItemAvatar itemAvatar = mList.get(position);
-            Picasso.get().load(itemAvatar.getImagen()).into(holder.imageView);
+            Picasso.get().load(itemAvatar.getImagen()).placeholder(R.drawable.animacion_carga).into(holder.imageView);
             holder.TextNombre.setText(itemAvatar.getNombre());
             holder.TextTipo.setText(itemAvatar.getTipo());
             if(itemAvatar.isEquipped()){
@@ -422,66 +470,4 @@ public class CambiarAvatar extends AppCompatActivity {
         }
     }
 
-
-
-
 }
-
-
-/*listaObjetos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String clickedItem = (String)parent.getItemAtPosition(position);
-
-                Toast.makeText(CambiarAvatar.this,clickedItem, Toast.LENGTH_SHORT).show();
-                if(clickedItem.equals(nombres[0])){ //quitar traje -> debe crear avatar con traje y color
-                    //Obtenemos el bitmap del imageview (el que tendrá el usuario)
-                    BitmapDrawable bitmapOriginal = (BitmapDrawable) imagenAvatar.getDrawable();
-                    Bitmap bitmapAvatarStandar = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.color_naranja);
-                    Bitmap bitmapTraje = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.disfraz_traje);
-
-                    DrawingAvatar drawingAvatar = new DrawingAvatar(c);
-                    drawingAvatar.equiparItem(bitmapAvatarStandar,bitmapTraje,null);
-
-
-                }else if(clickedItem.equals(nombres[1])){ //poner traje
-                    Bitmap bitmapAvatarStandar = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.color_naranja);
-                    Bitmap bitmapTraje = BitmapFactory.decodeResource(getBaseContext().getResources(),R.mipmap.disfraz_traje);
-
-                    DrawingAvatar drawingAvatar = new DrawingAvatar(getBaseContext());
-                    drawingAvatar.quitarItem(bitmapAvatarStandar,bitmapTraje);
-
-                }
-            }
-        });*/
-
-/* public Bitmap replaceColor(Bitmap src,int fromColor, int targetColor) {
-        if(src == null) {
-            return null;
-        }
-        // Source image size
-        int width = src.getWidth();
-        int height = src.getHeight();
-        int[] pixels = new int[width * height];
-        //get pixels
-        src.getPixels(pixels, 0, width, 0, 0, width, height);
-
-        for(int x = 0; x < pixels.length; ++x) {
-            //pixels[x] = (pixels[x] == fromColor) ? targetColor : pixels[x];
-            System.out.println("Rojo: " + Color.red(pixels[x]) + " Verde:" + Color.green(pixels[x]) + " Azul:" + Color.blue(pixels[x]));
-            if (checkforSimilarColors(Color.parseColor(COLOR_NARANJA),pixels[x]) < 120){
-                pixels[x] = Color.argb(255,99,216,39);
-            }
-
-        }
-        // create result bitmap output
-        Bitmap result = Bitmap.createBitmap(width, height, src.getConfig());
-        //set pixels
-        result.setPixels(pixels, 0, width, 0, 0, width, height);
-
-        return result;
-    }*/
-
-   /* private double checkforSimilarColors(int a, int b){
-        return Math.sqrt(Math.pow(Color.red(a) - Color.red(b), 2) + Math.pow(Color.blue(a) - Color.blue(b), 2) + Math.pow(Color.green(a) - Color.green(b), 2));
-    }*/

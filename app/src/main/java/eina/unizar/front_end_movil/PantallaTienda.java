@@ -112,7 +112,7 @@ public class PantallaTienda extends AppCompatActivity {
         MONEDAS_USUARIO = gestorSesion.getKEY_SESSION_COINS();
         numMonedas.setText(MONEDAS_USUARIO);
 
-        retrofitInterface = APIUtils.getAPIServiceImages();
+        retrofitInterface = APIUtils.getAPIService();
 
         // Drive = "https://drive.google.com/file/d/1yBy5abUvTuvAMk5aeKDnlljuWMcBG0Ur/view?usp=sharing"
         // Imagen prueba = "http://192.168.0.26:3060/tienda/color_amarillo.png"

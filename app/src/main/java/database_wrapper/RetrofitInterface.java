@@ -69,5 +69,8 @@ public interface RetrofitInterface {
     Call<Void> updateItemsFromUser(@Field("email") String email, @Field("equipados")ArrayList<Integer> equipados
                                     , @Field("nombre") ArrayList<String> nombres);
 
+    @POST("/UpdateAvatarUsuario")
+    Call<JsonObject> updateAvatarFromUser(@Body HashMap<String,String> map);
+
 
 }
