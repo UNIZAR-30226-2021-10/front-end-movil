@@ -73,4 +73,6 @@ public interface RetrofitInterface {
     @POST("/PartidaMulti_info")
     Call<JsonObject> obtenerInfo(@Body HashMap<String,String> map);
 
+    @POST("/BuscarPartidaMulti")
+    Call<JsonObject> buscarPartidaCreada(@Body HashMap<String,String> map);
 }
