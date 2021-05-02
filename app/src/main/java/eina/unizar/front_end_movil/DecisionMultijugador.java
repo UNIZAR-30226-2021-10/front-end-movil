@@ -107,12 +107,8 @@ public class DecisionMultijugador extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 codigoInsertado = codigoPartida.getText().toString();
-                msocket.on("unirseMulti", unirseMultijugador);
-                Intent intent = new Intent (v.getContext(), JuegoMultijugador.class);
-                Bundle extras = new Bundle();
-                extras.putString("codigo",codigoInsertado);
-                intent.putExtras(extras);
-                startActivityForResult(intent, OPTION_ACCEDER);
+                handleBuscarPartida();
+                // msocket.on("unirseMulti", unirseMultijugador);
             }
         });
 
@@ -146,6 +142,36 @@ public class DecisionMultijugador extends AppCompatActivity {
         });
 
     }
+
+    private void  handleBuscarPartida(){
+        HashMap<String,String> buscarPartida = new HashMap<>();
+        buscarPartida.put("codigo", codigoInsertado);
+
+        Call<JsonObject> call = retrofitInterface.buscarPartidaCreada(buscarPartida);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() == 200) {
+                    Intent intent = new Intent (DecisionMultijugador.this, JuegoMultijugador.class);
+                    Bundle extras = new Bundle();
+                    extras.putString("codigo",codigoInsertado);
+                    intent.putExtras(extras);
+                    startActivityForResult(intent, OPTION_ACCEDER);
+                    System.out.println("TODO OK");
+                } else{
+                    Toast.makeText(DecisionMultijugador.this, "La partida introducida no existe", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(DecisionMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
 }
 
 
