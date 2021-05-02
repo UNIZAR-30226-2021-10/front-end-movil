@@ -23,6 +23,7 @@ import java.util.Random;
 
 import SessionManagement.GestorSesion;
 import SessionManagement.Question;
+import SessionManagement.User;
 import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;
 import retrofit2.Call;
@@ -111,9 +112,12 @@ public class JuegoMultijugador extends AppCompatActivity{
         }
 
         Bundle extras = getIntent().getExtras();
-        NUM_RONDAS = extras.getInt("rondas");
-        NUM_JUGADORES = extras.getInt("jugadores");
+        //NUM_RONDAS = extras.getInt("rondas");
+        //NUM_JUGADORES = extras.getInt("jugadores");
         codigo = extras.getString("codigo");
+
+        //llamar a la bd para conseguir el numRondas y numJugadores
+        handleObtenerInfo();
 
         pregunta = (TextView)findViewById(R.id.pregunta);
         resp1 = (TextView)findViewById(R.id.respuesta1);
@@ -171,7 +175,6 @@ public class JuegoMultijugador extends AppCompatActivity{
         imagenDados = (ImageButton) findViewById(R.id.dado);
         imagenDados.setClickable(false);
 
-        asignarJugadores();
 
         // boton de atrás
         Button atrasButton = (Button) findViewById(R.id.atras);
@@ -261,6 +264,37 @@ public class JuegoMultijugador extends AppCompatActivity{
         }
     }
 
+    private void  handleObtenerInfo(){
+        HashMap<String,String> obtener = new HashMap<>();
+        obtener.put("codigo", codigo);
+
+        Call<JsonObject> call = retrofitInterface.obtenerInfo(obtener);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() == 200) {
+                    JsonObject jsonObject = response.body().getAsJsonObject("idpartida");
+                    NUM_JUGADORES = jsonObject.get("numJugadores").getAsInt();
+                    NUM_RONDAS = jsonObject.get("rondas").getAsInt();
+                    System.out.println(NUM_JUGADORES);
+                    System.out.println(NUM_RONDAS);
+                    System.out.println("TODO OK");
+                    asignarJugadores();
+                } else{
+                    Toast.makeText(JuegoMultijugador.this, "No se ha podido encontrar partida", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(JuegoMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+
     private void  handleFinPartidaMulti(){
         HashMap<String,String> finPartidaMulti = new HashMap<>();
 
@@ -288,6 +322,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         });
 
     }
+
 
     private void  handleFinPartidaMultiJuega() {
         HashMap<String, String> unirsePartida = new HashMap<>();

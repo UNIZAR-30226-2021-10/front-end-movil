@@ -17,12 +17,11 @@ import com.google.gson.JsonObject;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.Socket;
 //import java.net.URI;
 import java.util.HashMap;
-//import io.socket.client.IO;
-//import io.socket.client.Socket;
-//import io.socket.emitter.Emitter;
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 import SessionManagement.GestorSesion;
 import database_wrapper.APIUtils;
@@ -41,7 +40,7 @@ public class DecisionMultijugador extends AppCompatActivity {
 
     EditText codigoPartida;
 
-    String CODIGO_PARTIDA = "ABCD123";
+    //String CODIGO_PARTIDA = "ABCD123";
     String codigoInsertado;
     //int NUM_RONDAS;
     //int NUM_JUGADORES;
@@ -49,6 +48,7 @@ public class DecisionMultijugador extends AppCompatActivity {
     private RetrofitInterface retrofitInterface;
     private GestorSesion gestorSesion;
     private Socket msocket;
+
 
     /**
      * Called when the activity is first created.
@@ -68,24 +68,9 @@ public class DecisionMultijugador extends AppCompatActivity {
 
         codigoPartida = (EditText) findViewById(R.id.code);
 
-
-        /*
-        try {
-            //This address is the way you can connect to localhost with AVD(Android Virtual Device)
-            mSocket = IO.socket("http://10.0.2.2:3000");
-            Log.d("success", mSocket.id());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d("fail", "Failed to connect");
-        }*/
-
-        //mSocket.connect();
-        //mSocket.on("unirseMulti", unirseMultijugador);
-        /*
-        private Emmiter.Listener unirseMultijugador = new Emmiter.Listener(){
+        final Emitter.Listener unirseMultijugador = new Emitter.Listener(){
             @Override
-            public void Call(final Object... args){
+            public void call(final Object... args) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -101,7 +86,20 @@ public class DecisionMultijugador extends AppCompatActivity {
                     }
                 });
             }
-        };*/ 
+        };
+
+        try {
+            //This address is the way you can connect to localhost with AVD(Android Virtual Device)
+            msocket = IO.socket("http://10.0.2.2:3050");
+            Log.d("success", msocket.id());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("fail", "Failed to connect");
+        }
+
+        msocket.connect();
+
 
         // Botón de unirse a una partida ya creada
         Button accederButton = (Button) findViewById(R.id.acceder);
@@ -109,10 +107,10 @@ public class DecisionMultijugador extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 codigoInsertado = codigoPartida.getText().toString();
+                msocket.on("unirseMulti", unirseMultijugador);
                 Intent intent = new Intent (v.getContext(), JuegoMultijugador.class);
                 Bundle extras = new Bundle();
-                extras.putInt("jugadores",4);
-                extras.putInt("rondas",5);
+                extras.putString("codigo",codigoInsertado);
                 intent.putExtras(extras);
                 startActivityForResult(intent, OPTION_ACCEDER);
             }

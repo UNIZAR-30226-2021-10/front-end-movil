@@ -70,4 +70,7 @@ public interface RetrofitInterface {
     @POST("/Ranking")
     Call<JsonArray> getRanking();
 
+    @POST("/PartidaMulti_info")
+    Call<JsonObject> obtenerInfo(@Body HashMap<String,String> map);
+
 }

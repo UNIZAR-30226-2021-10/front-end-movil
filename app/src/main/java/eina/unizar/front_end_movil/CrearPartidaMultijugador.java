@@ -67,13 +67,13 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
 
         numJugadores = (Spinner) findViewById(R.id.numero_jugadores);
         numJugadores.setOnItemSelectedListener(this);
-        jugadores = numJugadores.getSelectedItem().toString();
-        NUM_JUGADORES = Integer.parseInt(jugadores);
+        //jugadores = numJugadores.getSelectedItem().toString();
+       // NUM_JUGADORES = Integer.parseInt(jugadores);
 
         numRondas = (Spinner) findViewById(R.id.numero_rondas);
         numRondas.setOnItemSelectedListener(this);
-        rondas = numRondas.getSelectedItem().toString();
-        NUM_RONDAS = Integer.parseInt(rondas);
+        //rondas = numRondas.getSelectedItem().toString();
+        //NUM_RONDAS = Integer.parseInt(rondas);
 
 
         // Botón de empezar partida multijugador
@@ -117,10 +117,12 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         /* para cuando clica una opción*/
         // TODO: para la BD aquí se cogerá el valor del nº de rondas
-        int numPlayers = Integer.parseInt(numJugadores.getItemAtPosition(numJugadores.getSelectedItemPosition()).toString());
-        extras.putInt("jugadores",numPlayers);
-        int numRounds = Integer.parseInt(numRondas.getItemAtPosition(numRondas.getSelectedItemPosition()).toString());
-        extras.putInt("rondas",numRounds);
+     //   int numPlayers = Integer.parseInt(numJugadores.getItemAtPosition(numJugadores.getSelectedItemPosition()).toString());
+     //   extras.putInt("jugadores",numPlayers);
+     //   int numRounds = Integer.parseInt(numRondas.getItemAtPosition(numRondas.getSelectedItemPosition()).toString());
+     //   extras.putInt("rondas",numRounds);
+        NUM_RONDAS = Integer.parseInt(numRondas.getItemAtPosition(numRondas.getSelectedItemPosition()).toString());
+        NUM_JUGADORES = Integer.parseInt(numJugadores.getItemAtPosition(numJugadores.getSelectedItemPosition()).toString());
     }
 
     @Override
