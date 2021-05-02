@@ -2,6 +2,7 @@ package eina.unizar.front_end_movil;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,7 +14,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.JsonObject;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.Socket;
+//import java.net.URI;
 import java.util.HashMap;
+//import io.socket.client.IO;
+//import io.socket.client.Socket;
+//import io.socket.emitter.Emitter;
 
 import SessionManagement.GestorSesion;
 import database_wrapper.APIUtils;
@@ -21,6 +30,7 @@ import database_wrapper.RetrofitInterface;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
 
 public class DecisionMultijugador extends AppCompatActivity {
 
@@ -38,6 +48,7 @@ public class DecisionMultijugador extends AppCompatActivity {
 
     private RetrofitInterface retrofitInterface;
     private GestorSesion gestorSesion;
+    private Socket msocket;
 
     /**
      * Called when the activity is first created.
@@ -57,13 +68,47 @@ public class DecisionMultijugador extends AppCompatActivity {
 
         codigoPartida = (EditText) findViewById(R.id.code);
 
+
+        /*
+        try {
+            //This address is the way you can connect to localhost with AVD(Android Virtual Device)
+            mSocket = IO.socket("http://10.0.2.2:3000");
+            Log.d("success", mSocket.id());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("fail", "Failed to connect");
+        }*/
+
+        //mSocket.connect();
+        //mSocket.on("unirseMulti", unirseMultijugador);
+        /*
+        private Emmiter.Listener unirseMultijugador = new Emmiter.Listener(){
+            @Override
+            public void Call(final Object... args){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        JSONObject data = (JSONObject) args[0];
+                        String user;
+                        String code;
+                        try{
+                            user = data.getString("user");
+                            code = data.getString("code");
+                        } catch (JSONException e){
+                            return;
+                        }
+                    }
+                });
+            }
+        };*/ 
+
         // Botón de unirse a una partida ya creada
         Button accederButton = (Button) findViewById(R.id.acceder);
         accederButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 codigoInsertado = codigoPartida.getText().toString();
-                handleUnirsePartida();
                 Intent intent = new Intent (v.getContext(), JuegoMultijugador.class);
                 Bundle extras = new Bundle();
                 extras.putInt("jugadores",4);
@@ -102,36 +147,6 @@ public class DecisionMultijugador extends AppCompatActivity {
             }
         });
 
-    }
-
-    private void  handleUnirsePartida() {
-        HashMap<String, String> unirsePartida = new HashMap<>();
-
-        unirsePartida.put("codigo", codigoInsertado);
-        unirsePartida.put("usuario_email", gestorSesion.getSession());
-        unirsePartida.put("puntuacion", Integer.toString(0));
-
-        Call<JsonObject> call = retrofitInterface.UnirseMultijugadorJuega(unirsePartida);
-        call.enqueue(new Callback<JsonObject>() {
-            //Gestionamos la respuesta de la llamada a post
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if (response.code() == 200) {
-                    System.out.println("TODO OK");
-                } else if (response.code() == 450) {
-                    Toast.makeText(DecisionMultijugador.this, "No se ha podido encontrar partida", Toast.LENGTH_LONG).show();
-                } else if (response.code() == 440) {
-                    Toast.makeText(DecisionMultijugador.this, "No se ha podido insertar jugada", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(DecisionMultijugador.this, "No se ha podido insertar partida", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                Toast.makeText(DecisionMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
     }
 }
 
