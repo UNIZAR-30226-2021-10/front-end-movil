@@ -49,7 +49,6 @@ public class JuegoMultijugador extends AppCompatActivity{
     private TextView resp3;
     private TextView resp4;
     private TextView num_rondas;
-    private TextView partida_code;
     private TextView codigo_partida;
     private TextView turno_jugador;
     private TextView usuario1_nombre;
@@ -125,11 +124,10 @@ public class JuegoMultijugador extends AppCompatActivity{
         resp3 = (TextView)findViewById(R.id.respuesta3);
         resp4 = (TextView)findViewById(R.id.respuesta4);
         num_rondas = (TextView)findViewById(R.id.num_rondas);
-        codigo_partida = (TextView)findViewById(R.id.codigo_partida);
+        codigo_partida = (TextView)findViewById(R.id.partida_code);
         turno_jugador = (TextView)findViewById(R.id.turno_jugador);
         categoria = (TextView)findViewById(R.id.categoria);
-        partida_code = (TextView)findViewById(R.id.partida_code);
-        partida_code.setText(String.valueOf(codigo));
+        codigo_partida.setText(String.valueOf(codigo));
 
         usuario1_nombre = (TextView)findViewById(R.id.usuario1_nombre);
         usuario2_nombre = (TextView)findViewById(R.id.usuario2_nombre);
