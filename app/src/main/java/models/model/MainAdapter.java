@@ -37,7 +37,9 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> im
         //holder.foto.setImageBitmap(mainModels.get(position).getFoto());
         Picasso.get().load(mainModels.get(position).getFoto()).into(holder.foto);
         holder.nombre.setText(mainModels.get(position).getNombre());
-        holder.precio.setText(mainModels.get(position).getPrecio().toString());
+        if(mainModels.get(position).getPrecio() != 0){
+            holder.precio.setText(mainModels.get(position).getPrecio().toString());
+        }
     }
 
     @Override

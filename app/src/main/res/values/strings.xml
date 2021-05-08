@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">front_end_movil</string>
+    <string name="equipado">Equipado</string>
+    <string name="Noequipado">No equipado</string>
     <item name="acceder" type="id" />
     <item name="password" type="id" />
     <item name="registro" type="id" />

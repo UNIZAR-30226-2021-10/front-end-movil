@@ -118,15 +118,20 @@ public class MenuPrincipal extends AppCompatActivity {
 
                     JsonObject jsonObject = response.body().getAsJsonObject("email");
                     // String test = jsonObject.get("email").getAsString();
-                    //Creamos un usuario con la información procedente de la base de datos
-                    User usuario =  new User(jsonObject.get("email").getAsString(),jsonObject.get("nickname").getAsString()
-                                            ,jsonObject.get("puntos").getAsString(),jsonObject.get("monedas").getAsString());
+                    if (jsonObject.get("imagen") != null) {
+                        String imagenAvatar = jsonObject.get("imagen").getAsString().replaceAll("http://localhost:3060", "https://trivial-images.herokuapp.com");
+                        //Creamos un usuario con la información procedente de la base de datos
+                        User usuario = new User(jsonObject.get("email").getAsString(), jsonObject.get("nickname").getAsString()
+                                , jsonObject.get("puntos").getAsString(), jsonObject.get("monedas").getAsString()
+                                , imagenAvatar);
 
-                    GestorSesion gestorSesion = new GestorSesion(MenuPrincipal.this);
-                    gestorSesion.saveSession(usuario);
-                    Intent intent = new Intent (MenuPrincipal.this, DecisionJuego.class);
-                    startActivityForResult(intent, OPTION_ACCEDER);
-
+                        GestorSesion gestorSesion = new GestorSesion(MenuPrincipal.this);
+                        gestorSesion.saveSession(usuario);
+                        Intent intent = new Intent(MenuPrincipal.this, DecisionJuego.class);
+                        startActivityForResult(intent, OPTION_ACCEDER);
+                    }else{
+                        Toast.makeText(MenuPrincipal.this,"Ha ocurrido un error inesperado, inténtelo de nuevo más tarde.",Toast.LENGTH_LONG).show();
+                    }
                 }else if(response.code() == 400){
                     Toast.makeText( MenuPrincipal.this, "Contraseña o usuario incorrecto.", Toast.LENGTH_LONG).show();
                 }

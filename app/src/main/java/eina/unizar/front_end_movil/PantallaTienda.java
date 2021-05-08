@@ -94,7 +94,7 @@ public class PantallaTienda extends AppCompatActivity {
         MONEDAS_USUARIO = gestorSesion.getKEY_SESSION_COINS();
         numMonedas.setText(MONEDAS_USUARIO);
 
-        retrofitInterface = APIUtils.getAPIServiceImages();
+        retrofitInterface = APIUtils.getAPIService();
 
         // Drive = "https://drive.google.com/file/d/1yBy5abUvTuvAMk5aeKDnlljuWMcBG0Ur/view?usp=sharing"
         // Imagen prueba = "http://192.168.0.26:3060/tienda/color_amarillo.png"
@@ -267,6 +267,7 @@ public class PantallaTienda extends AppCompatActivity {
             //Gestionamos la respuesta de la llamada a post
             @Override
             public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
+
                 if (response.code() == 200) {
 
                     JsonArray jsonObject = response.body().getAsJsonArray();
@@ -275,7 +276,6 @@ public class PantallaTienda extends AppCompatActivity {
                         JsonObject prueba = j.getAsJsonObject();
                         String imagen = prueba.get("Imagen").getAsString();
                         imagen = imagen.replaceAll("http://localhost:3060", "https://trivial-images.herokuapp.com");
-                        System.err.println(imagen);
                         if(prueba.get("Tipo").getAsString().equals("color")){
                             precioColores.add(prueba.get("Precio").getAsInt());
                             nombresColores.add(prueba.get("Nombre").getAsString());

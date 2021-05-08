@@ -133,9 +133,8 @@ public class RegistroUsuario extends AppCompatActivity {
             //Gestionamos la respuesta de la llamada a post
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-
                 if (response.code() == 200) {
-                    comprarNaranja(); // TODO: PONER PARA QUE INTRODUZCA EN TIENE
+                    comprarNaranja();
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
