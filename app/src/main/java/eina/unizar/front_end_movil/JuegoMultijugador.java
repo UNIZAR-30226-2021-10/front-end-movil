@@ -15,6 +15,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.JsonObject;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,11 +34,18 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import io.socket.client.Ack;
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
+
 public class JuegoMultijugador extends AppCompatActivity{
 
     private static final int OPTION_ATRAS = 0;
     private static final int OPTION_ACABAR = 1;
     private static final int OPTION_CHAT = 2;
+
+    private Socket msocket;
 
     private TextView texto_puntos3;
     private TextView texto_puntos4;
@@ -105,6 +116,7 @@ public class JuegoMultijugador extends AppCompatActivity{
 
         gestorSesion = new GestorSesion(JuegoMultijugador.this);
 
+
         indice = 0;
         for(int i = 0; i< 60; i++){
             preguntasCogidas[i] = 0;
@@ -114,6 +126,30 @@ public class JuegoMultijugador extends AppCompatActivity{
         //NUM_RONDAS = extras.getInt("rondas");
         //NUM_JUGADORES = extras.getInt("jugadores");
         codigo = extras.getString("codigo");
+
+        msocket = IO.socket(URI.create("http://localhost:5000"));
+        msocket.connect();
+        JSONObject aux = new JSONObject();
+        try{
+            aux.put("username", gestorSesion.getSession()); //username
+            aux.put("code", codigo); //code
+            aux.put("firstJoin",1); //firstJoin
+           // aux.put("avatar",); //avatar
+            //aux.put("history",); //history
+
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+
+        Ack ack = new Ack(){
+            @Override
+            public void call(Object... args){
+
+            }
+        };
+
+        msocket.emit("join", aux, ack);
+
 
         //llamar a la bd para conseguir el numRondas y numJugadores
         handleObtenerInfo();

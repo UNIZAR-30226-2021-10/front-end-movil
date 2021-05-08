@@ -10,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.JsonObject;
@@ -18,7 +19,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 //import java.net.URI;
+import java.net.URI;
 import java.util.HashMap;
+
+import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -47,7 +51,7 @@ public class DecisionMultijugador extends AppCompatActivity {
 
     private RetrofitInterface retrofitInterface;
     private GestorSesion gestorSesion;
-    private Socket msocket;
+   // private Socket msocket;
 
 
     /**
@@ -67,38 +71,8 @@ public class DecisionMultijugador extends AppCompatActivity {
         gestorSesion = new GestorSesion(DecisionMultijugador.this);
 
         codigoPartida = (EditText) findViewById(R.id.code);
+        codigoInsertado = codigoPartida.getText().toString();
 
-        final Emitter.Listener unirseMultijugador = new Emitter.Listener(){
-            @Override
-            public void call(final Object... args) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        JSONObject data = (JSONObject) args[0];
-                        String user;
-                        String code;
-                        try{
-                            user = data.getString("user");
-                            code = data.getString("code");
-                        } catch (JSONException e){
-                            return;
-                        }
-                    }
-                });
-            }
-        };
-
-        try {
-            //This address is the way you can connect to localhost with AVD(Android Virtual Device)
-            msocket = IO.socket("http://10.0.2.2:3050");
-            Log.d("success", msocket.id());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d("fail", "Failed to connect");
-        }
-
-        msocket.connect();
 
 
         // Botón de unirse a una partida ya creada
@@ -106,9 +80,7 @@ public class DecisionMultijugador extends AppCompatActivity {
         accederButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                codigoInsertado = codigoPartida.getText().toString();
                 handleBuscarPartida();
-                // msocket.on("unirseMulti", unirseMultijugador);
             }
         });
 
