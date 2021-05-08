@@ -132,7 +132,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         codigo = extras.getString("codigo");
         tipo = extras.getString("tipo");
         type = Integer.parseInt(tipo);
-        /*
+
         msocket = IO.socket(URI.create("http://localhost:5000"));
         msocket.connect();
         JSONObject aux = new JSONObject();
@@ -140,7 +140,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             aux.put("username", gestorSesion.getSession()); //username
             aux.put("code", codigo); //code
             aux.put("firstJoin",firstJoin); //firstJoin
-           // aux.put("avatar",); //avatar
+            aux.put("avatar", gestorSesion.getAvatarSession()); //avatar
             //aux.put("history",); //history
 
         } catch (JSONException e){
@@ -155,13 +155,10 @@ public class JuegoMultijugador extends AppCompatActivity{
         };
 
         msocket.emit("join", aux, ack);
-         */
 
 
         //llamar a la bd para conseguir el numRondas y numJugadores
         handleObtenerInfo();
-        //asigna los jugadores donde corresponde en la pantalla del juego
-
 
         pregunta = (TextView)findViewById(R.id.pregunta);
         resp1 = (TextView)findViewById(R.id.respuesta1);
@@ -317,7 +314,6 @@ public class JuegoMultijugador extends AppCompatActivity{
             usuario1_nombre.setText(gestorSesion.getSession());
             usuario1_puntos.setText("0");
             imagenUsuario1.setImageResource(R.mipmap.imagenusr1);
-            //imagenUsuario1 = gestorSesion.getImage();
             texto_puntos3.setText("");
             texto_puntos4.setText("");
             usuario2_nombre.setText("");
@@ -330,19 +326,19 @@ public class JuegoMultijugador extends AppCompatActivity{
                 if(jugadoresEnSala == 1){ //es el usuario2
                     usuario2_nombre.setText(gestorSesion.getSession());
                     usuario2_puntos.setText("0");
-                    //imagenUsuario2 = gestorSesion.getImage();
+                    imagenUsuario2.setImageResource(R.mipmap.imagenusr1);
                     jugadoresEnSala ++;
                 }
                 else if(jugadoresEnSala == 2){ //es el usuario 3
                     usuario3_nombre.setText(gestorSesion.getSession());
                     usuario3_puntos.setText("0");
-                    //imagenUsuario3 = gestorSesion.getImage();
+                    imagenUsuario3.setImageResource(R.mipmap.imagenusr1);
                     jugadoresEnSala ++;
                 }
                 else if(jugadoresEnSala == 3){ //es el usuario 4
                     usuario4_nombre.setText(gestorSesion.getSession());
                     usuario4_puntos.setText("0");
-                    //imagenUsuario4 = gestorSesion.getImage();
+                    imagenUsuario4.setImageResource(R.mipmap.imagenusr1);
                     jugadoresEnSala ++;
                 }
                 handleUnirseJuega();

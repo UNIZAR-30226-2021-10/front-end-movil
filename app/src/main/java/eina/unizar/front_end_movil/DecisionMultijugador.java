@@ -43,15 +43,10 @@ public class DecisionMultijugador extends AppCompatActivity {
     private static final int OPTION_ATRAS = 2;
 
     EditText codigoPartida;
-
-    //String CODIGO_PARTIDA = "ABCD123";
     String codigoInsertado;
-    //int NUM_RONDAS;
-    //int NUM_JUGADORES;
 
     private RetrofitInterface retrofitInterface;
     private GestorSesion gestorSesion;
-   // private Socket msocket;
 
 
     /**
@@ -71,8 +66,6 @@ public class DecisionMultijugador extends AppCompatActivity {
         gestorSesion = new GestorSesion(DecisionMultijugador.this);
 
         codigoPartida = (EditText) findViewById(R.id.code);
-        codigoInsertado = codigoPartida.getText().toString();
-
 
 
         // Botón de unirse a una partida ya creada
@@ -80,6 +73,7 @@ public class DecisionMultijugador extends AppCompatActivity {
         accederButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                codigoInsertado = codigoPartida.getText().toString();
                 handleBuscarPartida();
             }
         });
@@ -131,9 +125,12 @@ public class DecisionMultijugador extends AppCompatActivity {
                     extras.putString("tipo", String.valueOf(2));
                     intent.putExtras(extras);
                     startActivityForResult(intent, OPTION_ACCEDER);
-                    System.out.println("TODO OK");
-                } else{
+                    System.out.println("TODO OK en obtener partida");
+                } else if(response.code() == 400){
                     Toast.makeText(DecisionMultijugador.this, "La partida introducida no existe", Toast.LENGTH_LONG).show();
+                }
+                else{
+                    Toast.makeText(DecisionMultijugador.this, "La partida no ha sido encontrada", Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -142,6 +139,7 @@ public class DecisionMultijugador extends AppCompatActivity {
                 Toast.makeText(DecisionMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+
 
     }
 
