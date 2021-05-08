@@ -1,14 +1,20 @@
 package database_wrapper;
 
+import android.widget.ArrayAdapter;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Body;
+import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 public interface RetrofitInterface {
@@ -55,8 +61,6 @@ public interface RetrofitInterface {
     @POST("/ObjetoTienda_RestarMonedas")
     Call<JsonObject> updateCoins(@Body HashMap<String,String> map);
 
-    @POST("/PerfilUsuario")
-    Call<JsonArray> getObjectsUser(@Body HashMap<String,String> map);
 
     @POST("CrearMultijugador_Partida")
     Call<JsonObject> crearPartidaMultijugador(@Body HashMap<String,String> map);
@@ -78,5 +82,19 @@ public interface RetrofitInterface {
 
     @POST("/FinalMultijugador_Juega")
     Call<JsonObject> finPartidaMultiJuega(@Body HashMap<String,String> map);
+
+    @FormUrlEncoded
+    @POST("/UpdateItemsUsuario")
+    Call<Void> updateItemsFromUser(@Field("email") String email, @Field("equipados")ArrayList<Integer> equipados
+            , @Field("nombre") ArrayList<String> nombres);
+
+    @POST("/UpdateAvatarUsuario")
+    Call<JsonObject> updateAvatarFromUser(@Body HashMap<String,String> map);
+
+    @POST("/PerfilUsuario")
+    Call<JsonArray> getUserItems(@Body HashMap<String,String> map);
+
+
+
 
 }

@@ -6,6 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ClienteRetrofit {
 
     private static  Retrofit retrofit = null;
+    private static Retrofit retrofitImages = null;
 
     /**
      * Función que nos devuelve el objeto retrofit en caso de que no haya sido inicializado
@@ -21,4 +22,16 @@ public class ClienteRetrofit {
         }
         return retrofit;
     }
+
+
+    public static Retrofit getClientImages(String baseUrl) {
+        if (retrofitImages==null) {
+            retrofitImages = new Retrofit.Builder()
+                    .baseUrl(baseUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+        return retrofitImages;
+    }
+
 }

@@ -6,13 +6,15 @@ public class User {
     private String username;
     private String points;
     private String coins;
+    private String avatar;
 
 
-    public User(String email, String username, String points, String coins) {
+    public User(String email, String username, String points, String coins, String avatar) {
         this.email = email;
         this.username = username;
         this.points = points;
         this.coins = coins;
+        this.avatar = avatar;
     }
 
 
@@ -46,5 +48,13 @@ public class User {
 
     public void setCoins(String coins) {
         this.coins = coins;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -22,6 +23,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,17 +49,16 @@ public class PerfilUsuario extends AppCompatActivity {
     private static final int OPTION_AJUSTES = 2;
     private static final int OPTION_PERFIL = 3;
 
-    RecyclerView recycler_view;
+    private RecyclerView recycler_view;
 
-    ArrayList<MainModel> mainmodel;
-    MainAdapter mainAdapter;
-    ArrayList<String> imagenesCosas = new ArrayList<>();
-    ArrayList<String> nombreCosas = new ArrayList<>();
-    ArrayList<Integer> precioCosas = new ArrayList<>();
+    private ArrayList<MainModel> mainmodel;
+    private MainAdapter mainAdapter;
+    private ArrayList<String> imagenesCosas = new ArrayList<>();
+    private ArrayList<String> nombreCosas = new ArrayList<>();
 
     private ListView listaObjetos;
-    private String[] nombres = {"Traje", "Médico", "Paragüas", "Estetoscopio", "Maletín",
-            "Vestido", "Corbata", "Gafas", "Balon", "Sombrero"};
+
+
 
     private GestorSesion gestorSesion;
     private RetrofitInterface retrofitInterface;
@@ -63,7 +67,7 @@ public class PerfilUsuario extends AppCompatActivity {
     /**
      * Called when the activity is first created.
      *
-     * @param savedInstanceState
+     * @param savedInstanceState saved instance
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,7 +79,6 @@ public class PerfilUsuario extends AppCompatActivity {
         retrofitInterface = APIUtils.getAPIService();
 
         //listaObjetos = (ListView)findViewById(R.id.list);
-        //fillData();
         recycler_view = findViewById(R.id.recyclerview);
 
         gestorSesion = new GestorSesion(PerfilUsuario.this);
@@ -87,9 +90,13 @@ public class PerfilUsuario extends AppCompatActivity {
         coins.setText(gestorSesion.getKEY_SESSION_COINS());
         TextView points = (TextView) findViewById(R.id.user_points);
         points.setText(gestorSesion.getpointsSession());
-
+        //Cargamos los items del usuario
         obtenerImagenes();
-        //inicializar();
+        //Cargamos la foto del usuario
+        ImageView perfilButton = (ImageView) findViewById(R.id.perfil_button);
+        cargarImagenUsuario(perfilButton);
+
+
 
         Button ajustesButton = (Button) findViewById((R.id.ajustes));
         ajustesButton.setOnClickListener(new View.OnClickListener() {
@@ -100,8 +107,7 @@ public class PerfilUsuario extends AppCompatActivity {
             }
         });
 
-        // Botón de sign out
-        Button perfilButton = (Button) findViewById(R.id.perfil_button);
+
         perfilButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,21 +143,11 @@ public class PerfilUsuario extends AppCompatActivity {
         startActivityForResult(intent, OPTION_CERRAR_SESION);
     }
 
-    /**
-     * Rellena la lista.
-     */
-    private void fillData() {
-        // TODO: Por ahora así hasta que decidamos como está la BD
-        // Cuando hagamos base de datos hay que cambiar esto
-        listaObjetos = (ListView) findViewById(R.id.list);
-        ArrayAdapter<String> adaptador = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nombres);
-        listaObjetos.setAdapter(adaptador);
-    }
 
     public void inicializar(){
         mainmodel = new ArrayList<>();
         for(int i = 0; i < nombreCosas.size(); i++){
-            MainModel model = new MainModel(imagenesCosas.get(i), nombreCosas.get(i), precioCosas.get(i));
+            MainModel model = new MainModel(imagenesCosas.get(i), nombreCosas.get(i), 0);
             mainmodel.add(model);
         }
         LinearLayoutManager layoutManager = new LinearLayoutManager(this,
@@ -167,7 +163,7 @@ public class PerfilUsuario extends AppCompatActivity {
     private void obtenerImagenes() {
         HashMap<String,String> prueba = new HashMap<>();
         prueba.put("email",gestorSesion.getmailSession());
-        Call<JsonArray> call = retrofitInterface.getObjectsUser(prueba);
+        Call<JsonArray> call = retrofitInterface.getUserItems(prueba);
         call.enqueue(new Callback<JsonArray>() {
             //Gestionamos la respuesta de la llamada a post
             @Override
@@ -176,14 +172,12 @@ public class PerfilUsuario extends AppCompatActivity {
 
                     JsonArray jsonObject = response.body().getAsJsonArray();
                     for(JsonElement j : jsonObject){
-                        //System.out.println(j);
                         JsonObject prueba = j.getAsJsonObject();
                         String imagen = prueba.get("Imagen").getAsString();
-                        imagen = imagen.replaceAll("localhost", ip);
-                        precioCosas.add(prueba.get("Precio").getAsInt());
+                        String imagenLocal = imagen.replaceAll("localhost", ip);
+                        String imagenNube = imagen.replaceAll("http://localhost:3060", "https://trivial-images.herokuapp.com");
                         nombreCosas.add(prueba.get("Nombre").getAsString());
-                        imagenesCosas.add(imagen);
-                        //System.out.println(prueba);
+                        imagenesCosas.add(imagenNube);
                     }
                     inicializar();
                 } else{
@@ -197,6 +191,16 @@ public class PerfilUsuario extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void cargarImagenUsuario(ImageView perfilButton){
+        String imageUri = gestorSesion.getAvatarSession();
+        Picasso.get().load(imageUri).fit()
+                .error(R.drawable.ic_baseline_error_24)
+                .placeholder(R.drawable.animacion_carga)
+                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                .networkPolicy(NetworkPolicy.NO_CACHE)
+                .into(perfilButton);
     }
 }
 
