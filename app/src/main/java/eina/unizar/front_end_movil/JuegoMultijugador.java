@@ -385,8 +385,10 @@ public class JuegoMultijugador extends AppCompatActivity{
         HashMap<String,String> unirseJuega = new HashMap<>();
 
         unirseJuega.put("codigo",codigo);
-        unirseJuega.put("usuario_email", gestorSesion.getSession());
-        unirseJuega.put("puntuacion",String.valueOf(0));
+        System.out.println(gestorSesion.getmailSession());
+        System.out.println(String.valueOf(0));
+        unirseJuega.put("email", gestorSesion.getmailSession());
+        unirseJuega.put("puntos",String.valueOf(0));
 
 
         Call<JsonObject> call = retrofitInterface.UnirseMultijugadorJuega(unirseJuega);

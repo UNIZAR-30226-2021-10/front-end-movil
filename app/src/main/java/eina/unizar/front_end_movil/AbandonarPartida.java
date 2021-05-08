@@ -71,7 +71,7 @@ public class AbandonarPartida extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 handleUsuario0Puntos();
-                //falta anyadir: si solo quedo yo en la sala tengo que eliminarla
+                //TODO: falta anyadir: si solo quedo yo en la sala tengo que eliminarla
                 Intent intent = new Intent(v.getContext(), DecisionJuego.class);
                 startActivityForResult(intent, OPTION_ABANDONAR);
             }
