@@ -141,7 +141,6 @@ public class JuegoMultijugador extends AppCompatActivity{
             aux.put("code", codigo); //code
             aux.put("firstJoin",firstJoin); //firstJoin
             aux.put("avatar", gestorSesion.getAvatarSession()); //avatar
-            //aux.put("history",); //history
 
         } catch (JSONException e){
             e.printStackTrace();
