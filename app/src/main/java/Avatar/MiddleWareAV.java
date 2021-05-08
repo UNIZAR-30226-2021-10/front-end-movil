@@ -63,7 +63,7 @@ public final class MiddleWareAV {
     public void saveAvatar(Bitmap Imagen){
         //Convertimos el bitmap en un array de bytes y luego la codificamos en Base64
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Imagen.compress(Bitmap.CompressFormat.PNG, 100, baos); //bitmap is required image which have to send  in Bitmap form
+        Imagen.compress(Bitmap.CompressFormat.PNG, 100, baos); //comprimimos el ByteArray en formato png
         String encodedImage = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
         //Creamos el hashmap clave valor.
         HashMap<String,String> hashMap = new HashMap<>();

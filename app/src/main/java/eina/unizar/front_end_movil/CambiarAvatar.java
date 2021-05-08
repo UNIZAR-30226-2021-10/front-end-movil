@@ -118,8 +118,6 @@ public class CambiarAvatar extends AppCompatActivity {
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(v.getContext(), PerfilUsuario.class);
-                //startActivityForResult(intent, OPTION_OK);
                 MiddleWareAV middleWareAV = MiddleWareAV.createMiddleWareAV(c);
                 ArrayList<Integer> arraybooleanos = new ArrayList<>();
                 ArrayList<String> arrayNombre = new ArrayList<>();
@@ -154,7 +152,7 @@ public class CambiarAvatar extends AppCompatActivity {
         final SweetAlertDialog pDialog = new SweetAlertDialog(CambiarAvatar.this, SweetAlertDialog.PROGRESS_TYPE);
         pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
         pDialog.setCancelable(false);
-        pDialog.setTitleText("Guardando Cambios ...");
+        pDialog.setTitleText("Guardando Cambios...");
         pDialog.show();
        new Handler().postDelayed(new Runnable() {
            @Override
@@ -241,9 +239,7 @@ public class CambiarAvatar extends AppCompatActivity {
                                 jsonObject.get("iditem").getAsString()));
                     }
                     loadItemsEquipped();
-                    for(int i=0;i<itemsUsuarioEquipados.length;i++){
-                        System.out.println(itemsUsuarioEquipados[i]);
-                    }
+
                 }
 
                 cargarRecyclerView();

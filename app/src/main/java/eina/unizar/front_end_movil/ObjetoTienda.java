@@ -50,7 +50,7 @@ public class ObjetoTienda extends AppCompatActivity {
         getSupportActionBar().hide();
 
         gestorSesion = new GestorSesion(ObjetoTienda.this);
-        retrofitInterface = APIUtils.getAPIServiceImages();
+        retrofitInterface = APIUtils.getAPIService();
 
         Bundle extras = getIntent().getExtras();
         String imagen = extras.getString("Imagen");
