@@ -85,6 +85,8 @@ public class JuegoMultijugador extends AppCompatActivity{
     int indice;
     String codigo;
     String ganador;
+    String tipo;
+    int type;
 
     private int NUM_RONDAS;
     private int NUM_JUGADORES;
@@ -95,9 +97,11 @@ public class JuegoMultijugador extends AppCompatActivity{
     int numero_puntos_p4 = 0;
     int teToca = 0;
     int puntos_ganador;
+    int jugadoresEnSala;
 
     private RetrofitInterface retrofitInterface;
     private GestorSesion gestorSesion;
+    private boolean firstJoin = true;
 
     /**
      * Called when the activity is first created.
@@ -126,14 +130,16 @@ public class JuegoMultijugador extends AppCompatActivity{
         //NUM_RONDAS = extras.getInt("rondas");
         //NUM_JUGADORES = extras.getInt("jugadores");
         codigo = extras.getString("codigo");
-
+        tipo = extras.getString("tipo");
+        type = Integer.parseInt(tipo);
+        /*
         msocket = IO.socket(URI.create("http://localhost:5000"));
         msocket.connect();
         JSONObject aux = new JSONObject();
         try{
             aux.put("username", gestorSesion.getSession()); //username
             aux.put("code", codigo); //code
-            aux.put("firstJoin",1); //firstJoin
+            aux.put("firstJoin",firstJoin); //firstJoin
            // aux.put("avatar",); //avatar
             //aux.put("history",); //history
 
@@ -149,10 +155,13 @@ public class JuegoMultijugador extends AppCompatActivity{
         };
 
         msocket.emit("join", aux, ack);
+         */
 
 
         //llamar a la bd para conseguir el numRondas y numJugadores
         handleObtenerInfo();
+        //asigna los jugadores donde corresponde en la pantalla del juego
+
 
         pregunta = (TextView)findViewById(R.id.pregunta);
         resp1 = (TextView)findViewById(R.id.respuesta1);
@@ -215,8 +224,13 @@ public class JuegoMultijugador extends AppCompatActivity{
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Bundle extras = new Bundle();
+                extras.putString("jugadoresEnSala",String.valueOf(jugadoresEnSala));
+                extras.putString("codigo", codigo);
                 Intent intent = new Intent(v.getContext(), AbandonarPartida.class);
+                intent.putExtras(extras);
                 startActivityForResult(intent, OPTION_ATRAS);
+                System.out.println("TODO OK");
             }
         });
 
@@ -232,7 +246,7 @@ public class JuegoMultijugador extends AppCompatActivity{
 
 
     }
-
+    /*
     public void asignarJugadores(){
         // TODO: CUANDO SE VAYAN UNIENDO LOS JUGADORES.... ir poniendo sus datos
         if(NUM_JUGADORES == 4){
@@ -263,7 +277,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         }
         usuario1_nombre.setText(gestorSesion.getSession());
         usuario1_puntos.setText("0");
-    }
+    }*/
 
     public String quienEsGanador() {
         if (numero_puntos_p1 > numero_puntos_p2 && numero_puntos_p1 > numero_puntos_p3 && numero_puntos_p1 > numero_puntos_p4) {
@@ -291,12 +305,51 @@ public class JuegoMultijugador extends AppCompatActivity{
             String ganador = quienEsGanador();
             extra.putString("ganador", ganador);
             handleFinPartidaMulti();
-            handleFinPartidaMultiJuega();
+            //handleFinPartidaMultiJuega();
             Intent intent = new Intent(this, FinPartidaMulti.class);
             intent.putExtras(extra);
             startActivityForResult(intent, OPTION_ACABAR);
         }
     }
+
+    public void asignarJugadores(int tipo){
+        if (tipo == 1) { //ha creado la partida
+            usuario1_nombre.setText(gestorSesion.getSession());
+            usuario1_puntos.setText("0");
+            imagenUsuario1.setImageResource(R.mipmap.imagenusr1);
+            //imagenUsuario1 = gestorSesion.getImage();
+            texto_puntos3.setText("");
+            texto_puntos4.setText("");
+            usuario2_nombre.setText("");
+            usuario2_puntos.setText("");
+            jugadoresEnSala = 1;
+            handleUnirseJuega();
+        }
+        else{ //se ha unido a la partida
+            if(jugadoresEnSala < NUM_JUGADORES){
+                if(jugadoresEnSala == 1){ //es el usuario2
+                    usuario2_nombre.setText(gestorSesion.getSession());
+                    usuario2_puntos.setText("0");
+                    //imagenUsuario2 = gestorSesion.getImage();
+                    jugadoresEnSala ++;
+                }
+                else if(jugadoresEnSala == 2){ //es el usuario 3
+                    usuario3_nombre.setText(gestorSesion.getSession());
+                    usuario3_puntos.setText("0");
+                    //imagenUsuario3 = gestorSesion.getImage();
+                    jugadoresEnSala ++;
+                }
+                else if(jugadoresEnSala == 3){ //es el usuario 4
+                    usuario4_nombre.setText(gestorSesion.getSession());
+                    usuario4_puntos.setText("0");
+                    //imagenUsuario4 = gestorSesion.getImage();
+                    jugadoresEnSala ++;
+                }
+                handleUnirseJuega();
+            }
+        }
+    }
+
 
     private void  handleObtenerInfo(){
         HashMap<String,String> obtener = new HashMap<>();
@@ -311,10 +364,10 @@ public class JuegoMultijugador extends AppCompatActivity{
                     JsonObject jsonObject = response.body().getAsJsonObject("idpartida");
                     NUM_JUGADORES = jsonObject.get("numJugadores").getAsInt();
                     NUM_RONDAS = jsonObject.get("rondas").getAsInt();
-                    System.out.println(NUM_JUGADORES);
-                    System.out.println(NUM_RONDAS);
+                    //System.out.println(NUM_JUGADORES);
+                    //System.out.println(NUM_RONDAS);
                     System.out.println("TODO OK");
-                    asignarJugadores();
+                    asignarJugadores(type);
                 } else{
                     Toast.makeText(JuegoMultijugador.this, "No se ha podido encontrar partida", Toast.LENGTH_LONG).show();
                 }
@@ -327,6 +380,37 @@ public class JuegoMultijugador extends AppCompatActivity{
         });
 
     }
+
+    private void  handleUnirseJuega(){
+        HashMap<String,String> unirseJuega = new HashMap<>();
+
+        unirseJuega.put("codigo",codigo);
+        unirseJuega.put("usuario_email", gestorSesion.getSession());
+        unirseJuega.put("puntuacion",String.valueOf(0));
+
+
+        Call<JsonObject> call = retrofitInterface.UnirseMultijugadorJuega(unirseJuega);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() == 200) {
+                    System.out.println("TODO OK");
+                } else if(response.code() == 450){
+                    Toast.makeText(JuegoMultijugador.this, "No se ha podido encontrar partida", Toast.LENGTH_LONG).show();
+                } else{
+                    Toast.makeText(JuegoMultijugador.this, "No se ha podido insertar partida", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(JuegoMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
 
 
     private void  handleFinPartidaMulti(){
@@ -357,15 +441,15 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     }
 
-
+    /*
     private void  handleFinPartidaMultiJuega() {
-        HashMap<String, String> unirsePartida = new HashMap<>();
+        HashMap<String, String> finMultiJuega = new HashMap<>();
 
-        //unirsePartida.put("codigo", codigoInsertado);
-        unirsePartida.put("usuario_email", ganador);
-        unirsePartida.put("puntuacion", Integer.toString(puntos_ganador));
+        finMultiJuega.put("codigo", codigo);
+        finMultiJuega.put("usuario_email", ganador);
+        finMultiJuega.put("puntuacion", Integer.toString(puntos_ganador));
 
-        Call<JsonObject> call = retrofitInterface.UnirseMultijugadorJuega(unirsePartida);
+        Call<JsonObject> call = retrofitInterface.finPartidaMultiJuega(finMultiJuega);
         call.enqueue(new Callback<JsonObject>() {
             //Gestionamos la respuesta de la llamada a post
             @Override
@@ -386,7 +470,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                 Toast.makeText(JuegoMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-    }
+    }*/
 
     void activar(){
         pregunta.setClickable(true);

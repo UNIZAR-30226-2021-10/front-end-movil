@@ -86,6 +86,7 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
                 codigo = Integer.toString(code);
                 handleRegistrarPartida();
                 extras.putString("codigo", codigo);
+                extras.putString("tipo", String.valueOf(1));
                 Intent intent = new Intent (v.getContext(), JuegoMultijugador.class);
                 intent.putExtras(extras);
                 startActivityForResult(intent, OPTION_CREAR);

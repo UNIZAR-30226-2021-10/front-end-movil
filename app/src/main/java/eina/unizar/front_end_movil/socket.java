@@ -7,17 +7,20 @@ import java.net.URI;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
-/*
+import android.util.Log;
+
 public class socket {
+    /*
+}
     private Socket socket;
     public void iniciarSocket(String username, int code, int firstJoin, String avatar){
         socket = IO.socket(URI.create("localhost:5000"));
-        socket.emit("join", username, code, firstJoin, avatar, (error) =>{
+        /*socket.emit("join", username, code, firstJoin, avatar, (error) =>{
             if(error){
                 alert(error);
             }
         };
-        console.log("Se ha unido el usuario");
+        Log.d("Se ha unido el usuario", "Se ha unido el usuario");
     }
 
     public void disconnectSocket(){
@@ -28,14 +31,14 @@ public class socket {
     private Emitter.Listener message = new Emitter.Listener(){
         @Override
         public void call(final Object... args){
-           /* runOnUiThread(new Runnable(){
+            runOnUiThread(new Runnable(){
                 @Override 
                 public void run(){
                     JSONObject datos = (JSONObject) args[0];
                     
                 }
             }
-        };
+        }
     };
 
     private Emitter.Listener jugador = new Emitter.Listener() {
@@ -43,7 +46,8 @@ public class socket {
         public void call(Object... args) {
 
         }
-    }
+    };
+
 
     public void actualizarMensajes(String messages, String jugadores, falta algo ){
         socket.on("message", message);
@@ -56,8 +60,9 @@ public class socket {
 
     public void enviarMensaje (Emitter.Listener message) {
         socket.emit("sendMessage", message);
-        System.out.println("He enviado mensaje");
-        System.out.println(message);
-    }
-*/
+        String d = "He enviado el mensaje";
+        Log.d("He enviado el mensaje", d);
+        Log.d("message", message.toString());
+    }*/
+
 }
