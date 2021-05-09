@@ -16,6 +16,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -129,7 +132,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                         e.printStackTrace();
                     }
                     if(mensaje.equals("Se ha unido " + nickname)) {
-                        Jugadores jugador = new Jugadores(nickname, 0);
+                        Jugadores jugador = new Jugadores(nickname, 0, avatar);
                         players.add(jugador);
                         asignarJugadores();
                     }
@@ -175,9 +178,10 @@ public class JuegoMultijugador extends AppCompatActivity{
 
         unirConXML();
 
-        handleUnirseJuega();
         creadorPartida();
-
+        if(type == 1) {
+            handleUnirseJuega();
+        }
 
         {
             try {
@@ -281,6 +285,15 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     }
 
+    public void cargarImagenUsuario(String url, ImageView perfilButton){
+        Picasso.get().load(url).fit()
+                .error(R.drawable.ic_baseline_error_24)
+                .placeholder(R.drawable.animacion_carga)
+                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                .networkPolicy(NetworkPolicy.NO_CACHE)
+                .into(perfilButton);
+    }
+
     public void unirConXML(){
         pregunta = (TextView)findViewById(R.id.pregunta);
         resp1 = (TextView)findViewById(R.id.respuesta1);
@@ -357,8 +370,8 @@ public class JuegoMultijugador extends AppCompatActivity{
         if (type == 1) { //ha creado la partida
             usuario1_nombre.setText(gestorSesion.getSession());
             usuario1_puntos.setText("0");
-            imagenUsuario1.setImageResource(R.mipmap.imagenusr1);
-            Jugadores jugador = new Jugadores(gestorSesion.getSession(), 0);
+            cargarImagenUsuario(gestorSesion.getAvatarSession(), imagenUsuario1);
+            Jugadores jugador = new Jugadores(gestorSesion.getSession(), 0, gestorSesion.getAvatarSession());
             players.add(jugador);
         }
     }
@@ -368,24 +381,24 @@ public class JuegoMultijugador extends AppCompatActivity{
             if(i == 0){
                 usuario1_nombre.setText(players.get(i).getUsername());
                 usuario1_puntos.setText(String.valueOf(players.get(i).getPuntos()));
-                imagenUsuario1.setImageResource(R.mipmap.imagenusr1);
+                cargarImagenUsuario(players.get(i).getImagen(), imagenUsuario1);
             }
             else if(i == 1){
                 usuario2_nombre.setText(players.get(i).getUsername());
                 usuario2_puntos.setText(String.valueOf(players.get(i).getPuntos()));
-                imagenUsuario2.setImageResource(R.mipmap.imagenusr1);
+                cargarImagenUsuario(players.get(i).getImagen(), imagenUsuario2);
                 texto_puntos2.setText("puntos");
             }
             else if(i == 2){
                 usuario3_nombre.setText(players.get(i).getUsername());
                 usuario3_puntos.setText(String.valueOf(players.get(i).getPuntos()));
-                imagenUsuario3.setImageResource(R.mipmap.imagenusr1);
+                cargarImagenUsuario(players.get(i).getImagen(), imagenUsuario3);
                 texto_puntos3.setText("puntos");
             }
             else if(i == 3){
                 usuario4_nombre.setText(players.get(i).getUsername());
                 usuario4_puntos.setText(String.valueOf(players.get(i).getPuntos()));
-                imagenUsuario4.setImageResource(R.mipmap.imagenusr1);
+                cargarImagenUsuario(players.get(i).getImagen(), imagenUsuario4);
                 texto_puntos4.setText("puntos");
             }
         }
@@ -425,7 +438,7 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     }
 
-    private void  handleObtenerJugadores(){
+    private void handleObtenerJugadores(){
         System.out.println("Este es el handleObtenerJugadores");
         System.out.println(ID_PARTIDA);
 
@@ -441,8 +454,8 @@ public class JuegoMultijugador extends AppCompatActivity{
                         JsonObject prueba = j.getAsJsonObject();
                         String email = prueba.get("email").getAsString();
                         String nickname = prueba.get("nickname").getAsString();
-                        //String image = prueba.get("imagen").getAsString(); coger el avatar
-                        Jugadores jugador2 = new Jugadores(nickname,0);
+                        String image = prueba.get("imagen").getAsString(); //coger el avatar
+                        Jugadores jugador2 = new Jugadores(nickname,0, image);
                         players.add(jugador2);
                     }
                     System.out.println("TODO OK obtener jugadores");
@@ -463,7 +476,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     }
 
 
-    private void  handleUnirseJuega(){
+    private void handleUnirseJuega(){
         HashMap<String,String> unirseJuega = new HashMap<>();
 
         unirseJuega.put("codigo",codigo);

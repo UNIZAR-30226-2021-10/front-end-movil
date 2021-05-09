@@ -119,12 +119,7 @@ public class DecisionMultijugador extends AppCompatActivity {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    Intent intent = new Intent (DecisionMultijugador.this, JuegoMultijugador.class);
-                    Bundle extras = new Bundle();
-                    extras.putString("codigo",codigoInsertado);
-                    extras.putString("tipo", String.valueOf(2)); //cambiar a valor 2
-                    intent.putExtras(extras);
-                    startActivityForResult(intent, OPTION_ACCEDER);
+                    handleUnirseJuega();
                     System.out.println("TODO OK en obtener partida");
                 } else if(response.code() == 400){
                     Toast.makeText(DecisionMultijugador.this, "La partida introducida no existe", Toast.LENGTH_LONG).show();
@@ -140,6 +135,44 @@ public class DecisionMultijugador extends AppCompatActivity {
             }
         });
 
+
+    }
+
+    private void handleUnirseJuega(){
+        HashMap<String,String> unirseJuega = new HashMap<>();
+
+        unirseJuega.put("codigo",codigoInsertado);
+        System.out.println(gestorSesion.getmailSession());
+        System.out.println(String.valueOf(0));
+        unirseJuega.put("email", gestorSesion.getmailSession());
+        unirseJuega.put("puntos",String.valueOf(0));
+
+
+        Call<JsonObject> call = retrofitInterface.UnirseMultijugadorJuega(unirseJuega);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() == 200) {
+                    Intent intent = new Intent (DecisionMultijugador.this, JuegoMultijugador.class);
+                    Bundle extras = new Bundle();
+                    extras.putString("codigo",codigoInsertado);
+                    extras.putString("tipo", String.valueOf(2)); //cambiar a valor 2
+                    intent.putExtras(extras);
+                    startActivityForResult(intent, OPTION_ACCEDER);
+                    System.out.println("TODO OK");
+                } else if(response.code() == 450){
+                    Toast.makeText(DecisionMultijugador.this, "No se ha podido unir a la partida", Toast.LENGTH_LONG).show();
+                } else{
+                    Toast.makeText(DecisionMultijugador.this, "No se ha podido insertar partida", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(DecisionMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
 
