@@ -97,7 +97,8 @@ public interface RetrofitInterface {
     @POST("/PerfilUsuario")
     Call<JsonArray> getUserItems(@Body HashMap<String,String> map);
 
-
+    @GET("/Multijugador_PartidaJugadoresUsuario")
+    Call<JsonArray> obtenerJugadores(@Query("idpartida") String idpartida);
 
 
 }

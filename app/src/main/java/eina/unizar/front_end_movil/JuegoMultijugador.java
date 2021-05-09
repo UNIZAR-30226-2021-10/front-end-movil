@@ -13,12 +13,15 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -83,9 +86,12 @@ public class JuegoMultijugador extends AppCompatActivity{
     String ganador;
     String tipo;
     int type;
+    ArrayList<Jugadores> players = new ArrayList<Jugadores>();
 
     private int NUM_RONDAS;
     private int NUM_JUGADORES;
+    private int ID_PARTIDA;
+    private String EMAIL;
     int numero_ronda = 0;
     int numero_puntos_p1 = 0;
     int numero_puntos_p2 = 0;
@@ -144,11 +150,15 @@ public class JuegoMultijugador extends AppCompatActivity{
 
         unirConXML();
 
+        handleUnirseJuega();
+        creadorPartida();
+
+
         {
             try {
                 IO.Options options = new IO.Options();
                 options.transports = new String[]{WebSocket.NAME};
-                msocket = IO.socket("http://192.168.0.26:5000/", options);
+                msocket = IO.socket("http://192.168.1.162:5000/", options);
                 System.out.println("SOS");
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
@@ -176,7 +186,7 @@ public class JuegoMultijugador extends AppCompatActivity{
 
         msocket.connect();
 
-        /*JSONObject aux = new JSONObject();
+        JSONObject aux = new JSONObject();
         try{
             aux.put("username", gestorSesion.getSession()); //username
             aux.put("code", codigo); //code
@@ -193,7 +203,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                 //JSONObject response = (JSONObject) args[0];
                 //System.out.println(response);
             }
-        });*/
+        });
 
         //llamar a la bd para conseguir el numRondas y numJugadores
         handleObtenerInfo();
@@ -319,44 +329,45 @@ public class JuegoMultijugador extends AppCompatActivity{
         }
     }
 
-    public void asignarJugadores(int tipo){
-        if (tipo == 1) { //ha creado la partida
+    public void creadorPartida(){
+        if (type == 1) { //ha creado la partida
             usuario1_nombre.setText(gestorSesion.getSession());
             usuario1_puntos.setText("0");
             imagenUsuario1.setImageResource(R.mipmap.imagenusr1);
-            usuario2_nombre.setText("");
-            usuario2_puntos.setText("");
-            jugadoresEnSala = 1;
-            handleUnirseJuega();
-        }
-        else{ //se ha unido a la partida
-            if(jugadoresEnSala < NUM_JUGADORES){
-                if(jugadoresEnSala == 1){ //es el usuario2
-                    usuario2_nombre.setText(gestorSesion.getSession());
-                    usuario2_puntos.setText("0");
-                    texto_puntos2.setText("puntos");
-                    imagenUsuario2.setImageResource(R.mipmap.imagenusr1);
-                    jugadoresEnSala ++;
-                }
-                else if(jugadoresEnSala == 2){ //es el usuario 3
-                    usuario3_nombre.setText(gestorSesion.getSession());
-                    usuario3_puntos.setText("0");
-                    texto_puntos3.setText("puntos");
-                    imagenUsuario3.setImageResource(R.mipmap.imagenusr1);
-                    jugadoresEnSala ++;
-                }
-                else if(jugadoresEnSala == 3){ //es el usuario 4
-                    usuario4_nombre.setText(gestorSesion.getSession());
-                    usuario4_puntos.setText("0");
-                    texto_puntos4.setText("");
-                    imagenUsuario4.setImageResource(R.mipmap.imagenusr1);
-                    jugadoresEnSala ++;
-                }
-                handleUnirseJuega();
-            }
+            Jugadores jugador = new Jugadores(gestorSesion.getSession(), 0);
+            players.add(jugador);
         }
     }
 
+    public void asignarJugadores(){
+        if(type != 1){ //se une a la partida
+            for(int i = 0; i < players.size(); i++){
+                if(i == 0){
+                    usuario1_nombre.setText(players.get(i).getUsername());
+                    usuario1_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+                    imagenUsuario1.setImageResource(R.mipmap.imagenusr1);
+                }
+                else if(i == 1){
+                    usuario2_nombre.setText(players.get(i).getUsername());
+                    usuario2_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+                    imagenUsuario2.setImageResource(R.mipmap.imagenusr1);
+                    texto_puntos2.setText("puntos");
+                }
+                else if(i == 2){
+                    usuario3_nombre.setText(players.get(i).getUsername());
+                    usuario3_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+                    imagenUsuario3.setImageResource(R.mipmap.imagenusr1);
+                    texto_puntos3.setText("puntos");
+                }
+                else if(i == 3){
+                    usuario4_nombre.setText(players.get(i).getUsername());
+                    usuario4_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+                    imagenUsuario4.setImageResource(R.mipmap.imagenusr1);
+                    texto_puntos4.setText("puntos");
+                }
+            }
+        }
+    }
 
     private void  handleObtenerInfo(){
         HashMap<String,String> obtener = new HashMap<>();
@@ -369,14 +380,18 @@ public class JuegoMultijugador extends AppCompatActivity{
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
                     JsonObject jsonObject = response.body().getAsJsonObject("idpartida");
+                    ID_PARTIDA = jsonObject.get("idpartida").getAsInt();
                     NUM_JUGADORES = jsonObject.get("numJugadores").getAsInt();
                     NUM_RONDAS = jsonObject.get("rondas").getAsInt();
-                    //System.out.println(NUM_JUGADORES);
-                    //System.out.println(NUM_RONDAS);
                     System.out.println("TODO OK");
-                    asignarJugadores(type);
+                    System.out.println("Este es el handleObtenerInfo");
+                    System.out.println(ID_PARTIDA);
+                    //obtener jugadores de la partida
+                    if(type != 1){
+                        handleObtenerJugadores();
+                    }
                 } else{
-                    Toast.makeText(JuegoMultijugador.this, "No se ha podido encontrar partida", Toast.LENGTH_LONG).show();
+                    Toast.makeText(JuegoMultijugador.this, "No se ha podido obtener informacion", Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -387,6 +402,42 @@ public class JuegoMultijugador extends AppCompatActivity{
         });
 
     }
+
+    private void  handleObtenerJugadores(){
+        System.out.println("Este es el handleObtenerJugadores");
+        System.out.println(ID_PARTIDA);
+
+        Call<JsonArray> call = retrofitInterface.obtenerJugadores(String.valueOf(ID_PARTIDA));
+        call.enqueue(new Callback<JsonArray>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
+                if (response.code() == 200) {
+                    JsonArray jsonObject = response.body().getAsJsonArray();
+                    for(JsonElement j : jsonObject){
+                        //System.out.println(j);
+                        JsonObject prueba = j.getAsJsonObject();
+                        String email = prueba.get("email").getAsString();
+                        String nickname = prueba.get("nickname").getAsString();
+                        //String image = prueba.get("imagen").getAsString(); coger el avatar
+                        Jugadores jugador2 = new Jugadores(nickname,0);
+                        players.add(jugador2);
+                    }
+                    System.out.println("TODO OK obtener jugadores");
+                    asignarJugadores();
+                } else{
+                    Toast.makeText(JuegoMultijugador.this, "No se han podido obtener jugadores", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonArray> call, Throwable t) {
+                Toast.makeText(JuegoMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
 
     private void  handleUnirseJuega(){
         HashMap<String,String> unirseJuega = new HashMap<>();
@@ -406,7 +457,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                 if (response.code() == 200) {
                     System.out.println("TODO OK");
                 } else if(response.code() == 450){
-                    Toast.makeText(JuegoMultijugador.this, "No se ha podido encontrar partida", Toast.LENGTH_LONG).show();
+                    Toast.makeText(JuegoMultijugador.this, "No se ha podido unir a la partida", Toast.LENGTH_LONG).show();
                 } else{
                     Toast.makeText(JuegoMultijugador.this, "No se ha podido insertar partida", Toast.LENGTH_LONG).show();
                 }
@@ -436,7 +487,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                 if (response.code() == 200) {
                     System.out.println("TODO OK");
                 } else if(response.code() == 450){
-                    Toast.makeText(JuegoMultijugador.this, "No se ha podido encontrar partida", Toast.LENGTH_LONG).show();
+                    Toast.makeText(JuegoMultijugador.this, "No se ha podido finalizar la partida", Toast.LENGTH_LONG).show();
                 } else{
                     Toast.makeText(JuegoMultijugador.this, "No se ha podido insertar partida", Toast.LENGTH_LONG).show();
                 }
