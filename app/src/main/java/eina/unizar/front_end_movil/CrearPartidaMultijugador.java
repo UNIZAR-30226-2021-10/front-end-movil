@@ -42,8 +42,6 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
     Spinner numJugadores;
     Spinner numRondas;
     Bundle extras;
-    String jugadores;
-    String rondas;
     int code;
     String codigo;
 
@@ -63,17 +61,16 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
 
         gestorSesion = new GestorSesion(CrearPartidaMultijugador.this);
 
+        NUM_JUGADORES = 2; // por defecto
+        NUM_RONDAS = 5; // por defecto
+
         extras = new Bundle();
 
         numJugadores = (Spinner) findViewById(R.id.numero_jugadores);
         numJugadores.setOnItemSelectedListener(this);
-        //jugadores = numJugadores.getSelectedItem().toString();
-       // NUM_JUGADORES = Integer.parseInt(jugadores);
 
         numRondas = (Spinner) findViewById(R.id.numero_rondas);
         numRondas.setOnItemSelectedListener(this);
-        //rondas = numRondas.getSelectedItem().toString();
-        //NUM_RONDAS = Integer.parseInt(rondas);
 
 
         // Botón de empezar partida multijugador
@@ -85,11 +82,6 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
                 code = r.nextInt(100000 - 10000 + 1) + 10000;
                 codigo = Integer.toString(code);
                 handleRegistrarPartida();
-                extras.putString("codigo", codigo);
-                extras.putString("tipo", String.valueOf(1));
-                Intent intent = new Intent (v.getContext(), JuegoMultijugador.class);
-                intent.putExtras(extras);
-                startActivityForResult(intent, OPTION_CREAR);
             }
         });
 
@@ -116,12 +108,6 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        /* para cuando clica una opción*/
-        // TODO: para la BD aquí se cogerá el valor del nº de rondas
-     //   int numPlayers = Integer.parseInt(numJugadores.getItemAtPosition(numJugadores.getSelectedItemPosition()).toString());
-     //   extras.putInt("jugadores",numPlayers);
-     //   int numRounds = Integer.parseInt(numRondas.getItemAtPosition(numRondas.getSelectedItemPosition()).toString());
-     //   extras.putInt("rondas",numRounds);
         NUM_RONDAS = Integer.parseInt(numRondas.getItemAtPosition(numRondas.getSelectedItemPosition()).toString());
         NUM_JUGADORES = Integer.parseInt(numJugadores.getItemAtPosition(numJugadores.getSelectedItemPosition()).toString());
     }
@@ -138,6 +124,8 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
         Date date = new Date();
         String fecha = dateFormat.format(date);
 
+        System.out.println("num jugadores: " + NUM_JUGADORES + " rondas: " + NUM_RONDAS);
+
         nuevaPartida.put("fecha",fecha);
         nuevaPartida.put("numJugadores", Integer.toString(NUM_JUGADORES));
         nuevaPartida.put("rondas", Integer.toString(NUM_RONDAS));
@@ -151,6 +139,11 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
                     System.out.println("TODO OK");
+                    extras.putString("codigo", codigo);
+                    extras.putString("tipo", String.valueOf(1));
+                    Intent intent = new Intent (CrearPartidaMultijugador.this, JuegoMultijugador.class);
+                    intent.putExtras(extras);
+                    startActivityForResult(intent, OPTION_CREAR);
                 } else{
                     Toast.makeText(CrearPartidaMultijugador.this, "No se ha podido insertar partida", Toast.LENGTH_LONG).show();
                 }
