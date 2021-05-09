@@ -115,6 +115,28 @@ public class JuegoMultijugador extends AppCompatActivity{
                 @Override
                 public void run(){
                     JSONObject datos = (JSONObject) args[0];
+                    System.out.println(datos);
+                    String nickname = "";
+                    String avatar = "";
+                    String mensaje = "";
+                    try {
+                        nickname = datos.getString("nombreUsr");
+                        avatar = datos.getString("avatarUsr");
+                        mensaje = datos.getString("text");
+                        System.out.println("NICKNAME EN EMITTER: " + nickname);
+                        System.out.println("AVATAR EN EMITTER: " + avatar);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    if(mensaje.equals("Se ha unido " + nickname)) {
+                        Jugadores jugador = new Jugadores(nickname, 0);
+                        players.add(jugador);
+                        asignarJugadores();
+                    }
+                    for (Object obj : args) {
+                        Log.d(TAG," NOT Errors :: " + obj);
+                    }
+
                 }
             });
         }
@@ -161,7 +183,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             try {
                 IO.Options options = new IO.Options();
                 options.transports = new String[]{WebSocket.NAME};
-                msocket = IO.socket(ipMarta, options);
+                msocket = IO.socket(ipAndrea, options);
                 System.out.println("SOS");
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
@@ -257,7 +279,6 @@ public class JuegoMultijugador extends AppCompatActivity{
             }
         });
 
-
     }
 
     public void unirConXML(){
@@ -343,31 +364,29 @@ public class JuegoMultijugador extends AppCompatActivity{
     }
 
     public void asignarJugadores(){
-        if(type != 1){ //se une a la partida
-            for(int i = 0; i < players.size(); i++){
-                if(i == 0){
-                    usuario1_nombre.setText(players.get(i).getUsername());
-                    usuario1_puntos.setText(String.valueOf(players.get(i).getPuntos()));
-                    imagenUsuario1.setImageResource(R.mipmap.imagenusr1);
-                }
-                else if(i == 1){
-                    usuario2_nombre.setText(players.get(i).getUsername());
-                    usuario2_puntos.setText(String.valueOf(players.get(i).getPuntos()));
-                    imagenUsuario2.setImageResource(R.mipmap.imagenusr1);
-                    texto_puntos2.setText("puntos");
-                }
-                else if(i == 2){
-                    usuario3_nombre.setText(players.get(i).getUsername());
-                    usuario3_puntos.setText(String.valueOf(players.get(i).getPuntos()));
-                    imagenUsuario3.setImageResource(R.mipmap.imagenusr1);
-                    texto_puntos3.setText("puntos");
-                }
-                else if(i == 3){
-                    usuario4_nombre.setText(players.get(i).getUsername());
-                    usuario4_puntos.setText(String.valueOf(players.get(i).getPuntos()));
-                    imagenUsuario4.setImageResource(R.mipmap.imagenusr1);
-                    texto_puntos4.setText("puntos");
-                }
+        for(int i = 0; i < players.size(); i++){
+            if(i == 0){
+                usuario1_nombre.setText(players.get(i).getUsername());
+                usuario1_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+                imagenUsuario1.setImageResource(R.mipmap.imagenusr1);
+            }
+            else if(i == 1){
+                usuario2_nombre.setText(players.get(i).getUsername());
+                usuario2_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+                imagenUsuario2.setImageResource(R.mipmap.imagenusr1);
+                texto_puntos2.setText("puntos");
+            }
+            else if(i == 2){
+                usuario3_nombre.setText(players.get(i).getUsername());
+                usuario3_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+                imagenUsuario3.setImageResource(R.mipmap.imagenusr1);
+                texto_puntos3.setText("puntos");
+            }
+            else if(i == 3){
+                usuario4_nombre.setText(players.get(i).getUsername());
+                usuario4_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+                imagenUsuario4.setImageResource(R.mipmap.imagenusr1);
+                texto_puntos4.setText("puntos");
             }
         }
     }
@@ -427,7 +446,9 @@ public class JuegoMultijugador extends AppCompatActivity{
                         players.add(jugador2);
                     }
                     System.out.println("TODO OK obtener jugadores");
-                    asignarJugadores();
+                    if(type != 1) {
+                        asignarJugadores();
+                    }
                 } else{
                     Toast.makeText(JuegoMultijugador.this, "No se han podido obtener jugadores", Toast.LENGTH_LONG).show();
                 }
