@@ -40,6 +40,9 @@ import retrofit2.Response;
 
 public class JuegoMultijugador extends AppCompatActivity{
 
+    private static final String ipMarta = "http://192.168.1.162:5000/";
+    private static final String ipAndrea = "http://192.168.0.26:5000/";
+
     private static final String TAG = "JuegoMultijugador";
     private static final int OPTION_ATRAS = 0;
     private static final int OPTION_ACABAR = 1;
@@ -158,7 +161,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             try {
                 IO.Options options = new IO.Options();
                 options.transports = new String[]{WebSocket.NAME};
-                msocket = IO.socket("http://192.168.1.162:5000/", options);
+                msocket = IO.socket(ipMarta, options);
                 System.out.println("SOS");
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
