@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -19,10 +20,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 
 import SessionManagement.GestorSesion;
@@ -30,6 +35,8 @@ import SessionManagement.Question;
 import SessionManagement.User;
 import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;
+import io.socket.client.Manager;
+import io.socket.engineio.client.Transport;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -41,12 +48,22 @@ import io.socket.emitter.Emitter;
 
 public class JuegoMultijugador extends AppCompatActivity{
 
+    private static final String TAG = "JuegoMultijugador";
     private static final int OPTION_ATRAS = 0;
     private static final int OPTION_ACABAR = 1;
     private static final int OPTION_CHAT = 2;
 
     private Socket msocket;
+    {
+        try {
+            msocket = IO.socket("http://10.0.2.2:5000");
+            System.out.println("SOS");
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    private TextView texto_puntos2;
     private TextView texto_puntos3;
     private TextView texto_puntos4;
     private ImageView imagenUsuario1;
@@ -79,7 +96,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     private Button siguiente;
 
     String[] categorias = {"Art and Literature", "Geography", "History", "Film and TV", "Science", "Sport and Leisure"};
-    String[] coloresCategorías = {"#703C02", "#0398FA", "#FFDA00", "#FC57FF", "#17B009", "#FF8D00"};
+    String[] coloresCategorias = {"#703C02", "#0398FA", "#FFDA00", "#FC57FF", "#17B009", "#FF8D00"};
     int[] puntosCat = {20, 30, 25, 15, 5, 10};
     int[] preguntasCogidas = new int[60]; // pueden llegar a ser 60 preguntas
     int indice;
@@ -103,6 +120,40 @@ public class JuegoMultijugador extends AppCompatActivity{
     private GestorSesion gestorSesion;
     private boolean firstJoin = true;
 
+    private Emitter.Listener message = new Emitter.Listener(){
+        @Override
+        public void call(final Object... args){
+            runOnUiThread(new Runnable(){
+                @Override
+                public void run(){
+                    JSONObject datos = (JSONObject) args[0];
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onConnect = new Emitter.Listener(){
+        @Override
+        public void call(final Object... args){
+            runOnUiThread(new Runnable(){
+                @Override
+                public void run(){
+                    System.out.println("SOS x2");
+                }
+            });
+        }
+    };
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        msocket.disconnect();
+        msocket.emit("disconnection");
+        msocket.off();
+        //mSocket.off("message", onNewMessage);
+    }
+
     /**
      * Called when the activity is first created.
      *
@@ -117,9 +168,7 @@ public class JuegoMultijugador extends AppCompatActivity{
 
         //Construirmos el objeto retrofit
         retrofitInterface = APIUtils.getAPIService();
-
         gestorSesion = new GestorSesion(JuegoMultijugador.this);
-
 
         indice = 0;
         for(int i = 0; i< 60; i++){
@@ -127,13 +176,22 @@ public class JuegoMultijugador extends AppCompatActivity{
         }
 
         Bundle extras = getIntent().getExtras();
-        //NUM_RONDAS = extras.getInt("rondas");
-        //NUM_JUGADORES = extras.getInt("jugadores");
         codigo = extras.getString("codigo");
         tipo = extras.getString("tipo");
         type = Integer.parseInt(tipo);
 
-        msocket = IO.socket(URI.create("http://localhost:5000"));
+
+        //msocket = IO.socket(URI.create("http://localhost:5000"));
+        msocket.on("message",message);
+        msocket.on(Socket.EVENT_CONNECT, onConnect);
+        msocket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                for (Object obj : args) {
+                    Log.d(TAG,"Errors :: " + obj);
+                }
+            }
+        });
         msocket.connect();
         JSONObject aux = new JSONObject();
         try{
@@ -149,7 +207,8 @@ public class JuegoMultijugador extends AppCompatActivity{
         Ack ack = new Ack(){
             @Override
             public void call(Object... args){
-
+                //JSONObject response = (JSONObject) args[0];
+                //System.out.println(response);
             }
         };
 
@@ -183,6 +242,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         imagenUsuario3 = (ImageView) findViewById(R.id.usuario3_imagen);
         imagenUsuario4 = (ImageView) findViewById(R.id.usuario4_imagen);
 
+        texto_puntos2 = (TextView)findViewById(R.id.text_puntos2);
         texto_puntos3 = (TextView)findViewById(R.id.text_puntos3);
         texto_puntos4 = (TextView)findViewById(R.id.text_puntos4);
 
@@ -214,7 +274,6 @@ public class JuegoMultijugador extends AppCompatActivity{
         imagenDados = (ImageButton) findViewById(R.id.dado);
         imagenDados.setClickable(false);
 
-
         // boton de atrás
         Button atrasButton = (Button) findViewById(R.id.atras);
         atrasButton.setOnClickListener(new View.OnClickListener() {
@@ -242,38 +301,6 @@ public class JuegoMultijugador extends AppCompatActivity{
 
 
     }
-    /*
-    public void asignarJugadores(){
-        // TODO: CUANDO SE VAYAN UNIENDO LOS JUGADORES.... ir poniendo sus datos
-        if(NUM_JUGADORES == 4){
-            usuario4_nombre.setText("usuario4");
-            usuario4_puntos.setText("0");
-            usuario3_nombre.setText("usuario3");
-            usuario3_puntos.setText("0");
-            usuario2_nombre.setText("usuario2");
-            usuario2_puntos.setText("0");
-            imagenUsuario4.setImageResource(R.mipmap.imagenusr3);
-            imagenUsuario3.setImageResource(R.mipmap.imagenusr1);
-            // TODO faltarian las imagenes de los demas
-        }
-        if(NUM_JUGADORES == 3){
-            usuario3_nombre.setText("usuario3");
-            usuario3_puntos.setText("0");
-            usuario2_nombre.setText("usuario2");
-            usuario2_puntos.setText("0");
-            texto_puntos4.setText("");
-            imagenUsuario3.setImageResource(R.mipmap.imagenusr1);
-            // TODO faltarian las imagenes de los demas
-        }
-        if(NUM_JUGADORES == 2){
-            texto_puntos3.setText("");
-            texto_puntos4.setText("");
-            usuario2_nombre.setText("usuario2");
-            usuario2_puntos.setText("0");
-        }
-        usuario1_nombre.setText(gestorSesion.getSession());
-        usuario1_puntos.setText("0");
-    }*/
 
     public String quienEsGanador() {
         if (numero_puntos_p1 > numero_puntos_p2 && numero_puntos_p1 > numero_puntos_p3 && numero_puntos_p1 > numero_puntos_p4) {
@@ -313,6 +340,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             usuario1_nombre.setText(gestorSesion.getSession());
             usuario1_puntos.setText("0");
             imagenUsuario1.setImageResource(R.mipmap.imagenusr1);
+            texto_puntos2.setText("");
             texto_puntos3.setText("");
             texto_puntos4.setText("");
             usuario2_nombre.setText("");
@@ -528,7 +556,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         }
         obtenerPregunta(random);
         categoria.setText(categorias[random-1]);
-        categoria.setTextColor((Color.parseColor(coloresCategorías[random-1])));
+        categoria.setTextColor((Color.parseColor(coloresCategorias[random-1])));
         // text view de rondas --> para poner por qué ronda vas
         numero_ronda++;
         num_rondas.setText(String.valueOf(numero_ronda));

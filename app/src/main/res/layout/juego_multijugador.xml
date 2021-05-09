@@ -361,6 +361,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/text_puntos2"
         android:layout_width="34dp"
         android:layout_height="13dp"
         android:layout_marginStart="362dp"
