@@ -113,7 +113,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     private GestorSesion gestorSesion;
     private boolean firstJoin = true;
 
-    private Emitter.Listener message = new Emitter.Listener(){
+    private Emitter.Listener nuevoJugador = new Emitter.Listener(){
         @Override
         public void call(final Object... args){
             runOnUiThread(new Runnable(){
@@ -123,23 +123,21 @@ public class JuegoMultijugador extends AppCompatActivity{
                     System.out.println(datos);
                     String nickname = "";
                     String avatar = "";
-                    String mensaje = "";
                     try {
-                        nickname = datos.getString("nombreUsr");
-                        avatar = datos.getString("avatarUsr");
-                        mensaje = datos.getString("text");
+                        nickname = datos.getString("username");
+                        avatar = datos.getString("avatar");
                         System.out.println("NICKNAME EN EMITTER: " + nickname);
                         System.out.println("AVATAR EN EMITTER: " + avatar);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    if(mensaje.equals("Se ha unido " + nickname)) {
-                        Jugadores jugador = new Jugadores(nickname, 0, avatar);
-                        players.add(jugador);
-                        asignarJugadores();
-                    }
-                    for (Object obj : args) {
-                        Log.d(TAG," NOT Errors :: " + obj);
+
+                    Jugadores jugador = new Jugadores(nickname, 0, avatar);
+                    players.add(jugador);
+                    asignarJugadores();
+                    System.out.println("Estos son los jugadores de" + gestorSesion.getSession());
+                    for(int i = 0; i < players.size(); i++){
+                        System.out.println(players.get(i).getUsername());
                     }
 
                 }
@@ -227,7 +225,8 @@ public class JuegoMultijugador extends AppCompatActivity{
             }
         }
 
-        msocket.on("message",message)
+        msocket//.on("message",message)
+                .on("newPlayer", nuevoJugador)
                 .on("recibirTurno", nuevoTurno)
                 .on(Socket.EVENT_CONNECT, new Emitter.Listener() {
                     @Override
@@ -527,13 +526,13 @@ public class JuegoMultijugador extends AppCompatActivity{
                 if (response.code() == 200) {
                     JsonArray jsonObject = response.body().getAsJsonArray();
                     for(JsonElement j : jsonObject){
-                        //System.out.println(j);
                         JsonObject prueba = j.getAsJsonObject();
                         String email = prueba.get("email").getAsString();
                         String nickname = prueba.get("nickname").getAsString();
                         String image = prueba.get("imagen").getAsString(); //coger el avatar
                         Jugadores jugador2 = new Jugadores(nickname,0, image);
                         players.add(jugador2);
+                        System.out.println("JUGADOR AÑADIDO DESDE JOIN " + jugador2.getUsername());
                     }
                     System.out.println("TODO OK obtener jugadores");
                     if(type != 1) {
