@@ -20,12 +20,14 @@ import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import SessionManagement.GestorSesion;
@@ -98,12 +100,12 @@ public class JuegoMultijugador extends AppCompatActivity{
     private int NUM_JUGADORES;
     private int ID_PARTIDA;
     private String EMAIL;
-    int numero_ronda = 0;
+    int numero_ronda = 1;
     int numero_puntos_p1 = 0;
     int numero_puntos_p2 = 0;
     int numero_puntos_p3 = 0;
     int numero_puntos_p4 = 0;
-    int teToca = 0;
+    int teToca = 1;
     int puntos_ganador;
     int jugadoresEnSala;
 
@@ -144,6 +146,63 @@ public class JuegoMultijugador extends AppCompatActivity{
             });
         }
     };
+
+    //turno actualizado despues de que el jugador pase el turno
+    private Emitter.Listener nuevoTurno = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable(){
+                @Override
+                public void run(){
+                    int turnoActual = (int) args[0];
+                    int rondaActual = (int) args[1];
+                    int puntosActualizar = (int) args[2];
+                    //JSONArray datos = (JSONArray) args[2];
+                    //ArrayList<Jugadores> players2 = (ArrayList<Jugadores>) args[2];
+                    /*
+                    try {
+                       //turnoActual = datos.getInt("nuevoTurno");
+                        //rondaActual = datos.getInt("nuevaRonda");
+                        //JSONArray jsonArray = datos.getJSONArray("jugadores");
+                        for(int i = 0; i < datos.length(); i++) {
+                            JSONObject j = datos.getJSONObject(i);
+                            String nombre = j.getString("username");
+                            int puntos = j.getInt("puntos");
+                            String imagen = j.getString("imagen");
+                            Jugadores j1 = new Jugadores(nombre, puntos, imagen);
+                            players2.add(j1);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }*/
+                    teToca = turnoActual;
+                    numero_ronda = rondaActual;
+                    System.out.println("Estos son los puntos que me llegan: ");
+                    System.out.println(puntosActualizar);
+                    players.get(teToca-1).setPuntos(puntosActualizar);
+                    asignarJugadores();
+                    //players.get(teToca-1).getUsername();
+                    //es mi turno de jugar
+                    if(players.get(teToca-1).getUsername().equals(gestorSesion.getSession())){
+                        siguiente.setVisibility(View.VISIBLE);
+                        siguiente.setClickable(true);
+                        rollDice();
+                    }
+                    num_rondas.setText(String.valueOf(numero_ronda));
+                    turno_jugador.setText(players.get(teToca - 1).getUsername());
+                    //usuario1_puntos.setText(String.valueOf(players.get(0).getPuntos()));
+                    //usuario2_puntos.setText(String.valueOf(players.get(1).getPuntos()));
+                    /*if(NUM_JUGADORES >= 3){
+                        usuario3_puntos.setText(String.valueOf(players.get(2).getPuntos()));
+                    }
+                    if(NUM_JUGADORES >= 4){
+                        usuario4_puntos.setText(String.valueOf(players.get(3).getPuntos()));
+                    }*/
+                }
+            });
+        }
+    };
+
 
     @Override
     public void onDestroy() {
@@ -187,7 +246,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             try {
                 IO.Options options = new IO.Options();
                 options.transports = new String[]{WebSocket.NAME};
-                msocket = IO.socket(ipAndrea, options);
+                msocket = IO.socket(ipMarta, options);
                 System.out.println("SOS");
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
@@ -195,6 +254,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         }
 
         msocket.on("message",message)
+                .on("recibirTurno", nuevoTurno)
                 .on(Socket.EVENT_CONNECT, new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
@@ -212,6 +272,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                         }
                     }
                 });
+
 
         msocket.connect();
 
@@ -237,22 +298,56 @@ public class JuegoMultijugador extends AppCompatActivity{
         //llamar a la bd para conseguir el numRondas y numJugadores
         handleObtenerInfo();
 
-        empezar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetear();
-                rollDice();
-                empezar.setVisibility(View.GONE);
-                empezar.setClickable(true);
-                siguiente.setVisibility(View.VISIBLE);
-            }
-        }); // para quitar el botón
+        if(type == 1){
+            empezar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(players.size() == NUM_JUGADORES){
+                        resetear();
+                        rollDice();
+                        empezar.setVisibility(View.GONE);
+                        empezar.setClickable(true);
+                        siguiente.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        Toast.makeText(JuegoMultijugador.this, "Faltan jugadores por unirse a la partida", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }); // para quitar el botón
+        }
+        else{
+            empezar.setVisibility(View.GONE);
+            empezar.setClickable(false);
+        }
+
 
         siguiente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 resetear();
-                rollDice();
+                desactivar();
+                //int indice = teToca - 1;
+                siguiente.setVisibility(View.GONE);
+                siguiente.setClickable(false);
+                System.out.println("El teToca antes del if es: ");
+                System.out.println(teToca);
+                teToca = teToca + 1;
+                if(teToca == NUM_JUGADORES+1){
+                    teToca = 1;
+                    //indice = 0;
+                }
+                System.out.println("El teToca despues del if es: ");
+                System.out.println(teToca);
+                numero_ronda++;
+                //Aqui he cambiado el parámetro final
+                System.out.println("Los puntos que envio son estos:");
+                System.out.println(players.get(teToca-1).getPuntos());
+                System.out.println("Los puntos del jugador 1, indice 0 son:");
+                System.out.println(players.get(0).getPuntos());
+                System.out.println("Los puntos del jugador 2, indice 1 son:");
+                System.out.println(players.get(1).getPuntos());
+                msocket.emit("pasarTurno", teToca, numero_ronda, players.get(teToca-1).getPuntos());
+                //rollDice();
             }
         });
 
@@ -587,6 +682,7 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     void resetear(){
         activar();
+        categoria.setText("");
         pregunta.setText("");
         resp1.setText("");
         resp2.setText("");
@@ -629,23 +725,6 @@ public class JuegoMultijugador extends AppCompatActivity{
         obtenerPregunta(random);
         categoria.setText(categorias[random-1]);
         categoria.setTextColor((Color.parseColor(coloresCategorias[random-1])));
-        // text view de rondas --> para poner por qué ronda vas
-        numero_ronda++;
-        num_rondas.setText(String.valueOf(numero_ronda));
-        teToca++;
-        if(teToca == NUM_JUGADORES+1){
-            teToca = 1;
-        }
-        turno_jugador.setText(String.valueOf(teToca));
-
-        // asignar puntos respectivos
-        usuario1_puntos.setText(String.valueOf(numero_puntos_p1));
-        usuario2_puntos.setText(String.valueOf(numero_puntos_p2));
-        if(NUM_JUGADORES >= 3){
-            usuario3_puntos.setText(String.valueOf(numero_puntos_p3));
-        } else if(NUM_JUGADORES >= 4){
-            usuario4_puntos.setText(String.valueOf(numero_puntos_p4));
-        }
     }
 
     void ponerPregunta(String enunciado, String correcta, String incorrecta1, String incorrecta2, String incorrecta3, int posicion, int indCategoria){
@@ -698,15 +777,18 @@ public class JuegoMultijugador extends AppCompatActivity{
                 respBien.setBackgroundColor((Color.parseColor("#87e352")));
                 desactivar();
                 if(teToca == 1){
-                    numero_puntos_p1 += puntosCat[cat];
+                    players.get(0).setPuntos(players.get(0).getPuntos() + puntosCat[cat]);
+                    System.out.println("Soy el jugador 1");
+                    System.out.println(players.get(0).getPuntos());
                 } else if(teToca == 2){
-                    numero_puntos_p2 += puntosCat[cat];
+                    players.get(1).setPuntos(players.get(1).getPuntos() + puntosCat[cat]);
+                    System.out.println("Soy el jugador 2");
+                    System.out.println(players.get(1).getPuntos());
                 } else if(teToca == 3){
-                    numero_puntos_p3 += puntosCat[cat];
+                    players.get(2).setPuntos(players.get(2).getPuntos() + puntosCat[cat]);
                 } else {
-                    numero_puntos_p4 += puntosCat[cat];
+                    players.get(3).setPuntos(players.get(3).getPuntos() + puntosCat[cat]);
                 }
-
                 siguiente.setClickable(true);
                 comprobarRondas();
             }
