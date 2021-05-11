@@ -157,24 +157,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                     int turnoActual = (int) args[0];
                     int rondaActual = (int) args[1];
                     int puntosActualizar = (int) args[2];
-                    //JSONArray datos = (JSONArray) args[2];
-                    //ArrayList<Jugadores> players2 = (ArrayList<Jugadores>) args[2];
-                    /*
-                    try {
-                       //turnoActual = datos.getInt("nuevoTurno");
-                        //rondaActual = datos.getInt("nuevaRonda");
-                        //JSONArray jsonArray = datos.getJSONArray("jugadores");
-                        for(int i = 0; i < datos.length(); i++) {
-                            JSONObject j = datos.getJSONObject(i);
-                            String nombre = j.getString("username");
-                            int puntos = j.getInt("puntos");
-                            String imagen = j.getString("imagen");
-                            Jugadores j1 = new Jugadores(nombre, puntos, imagen);
-                            players2.add(j1);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }*/
                     teToca = turnoActual;
                     numero_ronda = rondaActual;
                     System.out.println("Estos son los puntos que me llegan: ");
@@ -190,14 +172,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                     }
                     num_rondas.setText(String.valueOf(numero_ronda));
                     turno_jugador.setText(players.get(teToca - 1).getUsername());
-                    //usuario1_puntos.setText(String.valueOf(players.get(0).getPuntos()));
-                    //usuario2_puntos.setText(String.valueOf(players.get(1).getPuntos()));
-                    /*if(NUM_JUGADORES >= 3){
-                        usuario3_puntos.setText(String.valueOf(players.get(2).getPuntos()));
-                    }
-                    if(NUM_JUGADORES >= 4){
-                        usuario4_puntos.setText(String.valueOf(players.get(3).getPuntos()));
-                    }*/
                 }
             });
         }
@@ -246,7 +220,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             try {
                 IO.Options options = new IO.Options();
                 options.transports = new String[]{WebSocket.NAME};
-                msocket = IO.socket(ipMarta, options);
+                msocket = IO.socket(ipAndrea, options);
                 System.out.println("SOS");
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
@@ -304,6 +278,8 @@ public class JuegoMultijugador extends AppCompatActivity{
                 public void onClick(View v) {
                     if(players.size() == NUM_JUGADORES){
                         resetear();
+                        num_rondas.setText(String.valueOf(numero_ronda));
+                        turno_jugador.setText(players.get(teToca - 1).getUsername());
                         rollDice();
                         empezar.setVisibility(View.GONE);
                         empezar.setClickable(true);
@@ -331,6 +307,9 @@ public class JuegoMultijugador extends AppCompatActivity{
                 siguiente.setClickable(false);
                 System.out.println("El teToca antes del if es: ");
                 System.out.println(teToca);
+                int indice = teToca - 1;
+                System.out.println("El indice antes del if es: ");
+                System.out.println(indice);
                 teToca = teToca + 1;
                 if(teToca == NUM_JUGADORES+1){
                     teToca = 1;
@@ -346,7 +325,10 @@ public class JuegoMultijugador extends AppCompatActivity{
                 System.out.println(players.get(0).getPuntos());
                 System.out.println("Los puntos del jugador 2, indice 1 son:");
                 System.out.println(players.get(1).getPuntos());
-                msocket.emit("pasarTurno", teToca, numero_ronda, players.get(teToca-1).getPuntos());
+                msocket.emit("pasarTurno", teToca, numero_ronda, players.get(indice).getPuntos());
+                num_rondas.setText(String.valueOf(numero_ronda));
+                turno_jugador.setText(players.get(teToca - 1).getUsername());
+                asignarJugadores();
                 //rollDice();
             }
         });
