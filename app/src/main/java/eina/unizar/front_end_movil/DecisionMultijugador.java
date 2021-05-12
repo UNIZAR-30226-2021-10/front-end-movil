@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.json.JSONException;
@@ -44,6 +46,9 @@ public class DecisionMultijugador extends AppCompatActivity {
 
     EditText codigoPartida;
     String codigoInsertado;
+    int jugadoresEnSala;
+    int ID_PARTIDA;
+    int NUM_JUGADORES;
 
     private RetrofitInterface retrofitInterface;
     private GestorSesion gestorSesion;
@@ -75,6 +80,13 @@ public class DecisionMultijugador extends AppCompatActivity {
             public void onClick(View v) {
                 codigoInsertado = codigoPartida.getText().toString();
                 handleBuscarPartida();
+                //falta saber cuantos jugadores hay en la sala para poder entrar
+                if(jugadoresEnSala < NUM_JUGADORES){
+                    handleUnirseJuega();
+                }
+                else{
+                    Toast.makeText(DecisionMultijugador.this, "La partida ya está llena", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -109,6 +121,68 @@ public class DecisionMultijugador extends AppCompatActivity {
 
     }
 
+    private void  handleObtenerInfo(){
+        HashMap<String,String> obtener = new HashMap<>();
+        obtener.put("codigo", codigoInsertado);
+
+        Call<JsonObject> call = retrofitInterface.obtenerInfo(obtener);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() == 200) {
+                    JsonObject jsonObject = response.body().getAsJsonObject("idpartida");
+                    ID_PARTIDA = jsonObject.get("idpartida").getAsInt();
+                    NUM_JUGADORES = jsonObject.get("numJugadores").getAsInt();
+                    System.out.println("TODO OK");
+                    System.out.println("Este es el handleObtenerInfo");
+                    System.out.println(ID_PARTIDA);
+                    handleContarJugadores();
+                } else{
+                    Toast.makeText(DecisionMultijugador.this, "No se ha podido obtener informacion", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(DecisionMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+
+    private void handleContarJugadores(){
+        System.out.println("Este es el handleContarJugadores");
+        System.out.println(ID_PARTIDA);
+
+        Call<JsonArray> call = retrofitInterface.obtenerJugadores(String.valueOf(ID_PARTIDA));
+        call.enqueue(new Callback<JsonArray>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
+                if (response.code() == 200) {
+                    JsonArray jsonObject = response.body().getAsJsonArray();
+                    for(JsonElement j : jsonObject){
+                        JsonObject prueba = j.getAsJsonObject();
+                        String email = prueba.get("email").getAsString();
+                        jugadoresEnSala++;
+                    }
+                    System.out.println("TODO OK contar jugadores");
+                } else{
+                    Toast.makeText(DecisionMultijugador.this, "No se han podido contar jugadores", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonArray> call, Throwable t) {
+                Toast.makeText(DecisionMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+
     private void  handleBuscarPartida(){
         HashMap<String,String> buscarPartida = new HashMap<>();
         buscarPartida.put("codigo", codigoInsertado);
@@ -119,7 +193,8 @@ public class DecisionMultijugador extends AppCompatActivity {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    handleUnirseJuega();
+                    handleObtenerInfo();
+                    //handleUnirseJuega();
                     System.out.println("TODO OK en obtener partida");
                 } else if(response.code() == 400){
                     Toast.makeText(DecisionMultijugador.this, "La partida introducida no existe", Toast.LENGTH_LONG).show();
