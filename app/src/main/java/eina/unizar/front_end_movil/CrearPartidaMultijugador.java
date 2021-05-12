@@ -78,9 +78,10 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
         crearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Random r = new Random();
-                code = r.nextInt(100000 - 10000 + 1) + 10000;
-                codigo = Integer.toString(code);
+                //Random r = new Random();
+                //code = r.nextInt(100000 - 10000 + 1) + 10000;
+                //codigo = Integer.toString(code);
+                generarCodigo();
                 handleRegistrarPartida();
             }
         });
@@ -117,6 +118,13 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
         /* */
     }
 
+    public void generarCodigo(){
+        Random r = new Random();
+        code = r.nextInt(100000 - 10000 + 1) + 10000;
+        codigo = Integer.toString(code);
+        handleBuscarPartida();
+    }
+
     private void  handleRegistrarPartida(){
         HashMap<String,String> nuevaPartida = new HashMap<>();
 
@@ -146,6 +154,29 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
                     startActivityForResult(intent, OPTION_CREAR);
                 } else{
                     Toast.makeText(CrearPartidaMultijugador.this, "No se ha podido insertar partida", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(CrearPartidaMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    private void  handleBuscarPartida(){
+        HashMap<String,String> yaPartida = new HashMap<>();
+
+        yaPartida.put("codigo", String.valueOf(codigo));
+
+        Call<JsonObject> call = retrofitInterface.multiPartidaCode(yaPartida);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() == 200) {
+                    generarCodigo();
                 }
             }
 
