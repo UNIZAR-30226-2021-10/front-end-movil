@@ -1,28 +1,31 @@
 package eina.unizar.front_end_movil;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PantallaChat extends AppCompatActivity{
 
     private static final int OPTION_INSTRUCCIONES = 0;
 
-    private TextView mensajeChat;
-    private ListView listaMensajes;
+    private EditText editText;
+    private MessageAdapter messageAdapter;
+    private ListView messagesView;
     ConstraintLayout pant1;
     ConstraintLayout pant2;
 
@@ -38,39 +41,14 @@ public class PantallaChat extends AppCompatActivity{
         setContentView(R.layout.pantalla_chat);
         getSupportActionBar().hide();
 
-        mensajeChat = (TextView)findViewById(R.id.mensaje_writer);
-        listaMensajes = (ListView) findViewById(R.id.lista_mensajes);
+        editText = (EditText) findViewById(R.id.mensaje_writer);
+
+        messageAdapter = new MessageAdapter(this);
+        messagesView = (ListView) findViewById(R.id.lista_mensajes);
+        messagesView.setAdapter(messageAdapter);
         //pant1 = (ConstraintLayout) findViewById(R.id.constraint);
         //pant2 = (ConstraintLayout) findViewById(R.id.constraint2);
         //pant2.setVisibility(View.GONE);
-
-
-        // Construct the data source
-        ArrayList<Mensaje> arrayOfMessages = new ArrayList<Mensaje>();
-        // Create the adapter to convert the array to views
-        final MyAdapter adapter = new MyAdapter(this, arrayOfMessages);
-        // Attach the adapter to a ListView
-        ListView listView = (ListView) findViewById(R.id.lista_mensajes);
-        listView.setAdapter(adapter);
-
-        // Add item to adapter
-        Mensaje newMessage = new Mensaje("Usuario1", "Hola");
-        adapter.add(newMessage);
-        newMessage = new Mensaje("Usuario3", "¿Preparados?");
-        adapter.add(newMessage);
-
-        // Botón de enviar el mensaje
-        ImageButton enviarButton = (ImageButton) findViewById(R.id.enviar);
-        enviarButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // poner mensaje que haya en el editText
-                String m = mensajeChat.getText().toString();
-                Mensaje newMessage = new Mensaje("Usuario2", m);
-                adapter.add(newMessage);
-                mensajeChat.setText("");
-            }
-        });
 
         // Botón de atrás
         Button atrasButton = (Button) findViewById(R.id.atras);
@@ -94,55 +72,135 @@ public class PantallaChat extends AppCompatActivity{
 
     }
 
-    public class MyAdapter extends ArrayAdapter<Mensaje> {
-        public MyAdapter(Context context, ArrayList<Mensaje> msg) {
-            super(context, 0, msg);
-        }
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            // Get the data item for this position
-            Mensaje m = getItem(position);
-            // Check if an existing view is being reused, otherwise inflate the view
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.mensajes_chat, parent, false);
-            }
-            // Lookup view for data population
-            TextView mUsr = (TextView) convertView.findViewById(R.id.nombre_usuario);
-            TextView mMensaje = (TextView) convertView.findViewById(R.id.mensaje);
-            // Populate the data into the template view using the data object
-            mUsr.setText(m.usuario);
-            mMensaje.setText(m.mensaje);
-            // Return the completed view to render on screen
-            return convertView;
+
+    public void sendMessage(View view) {
+        String m = editText.getText().toString();
+        if (m.length() > 4) {
+            // mandar mensaje
+            final Mensaje message = new Mensaje("andrea", m, true);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    messageAdapter.add(message);
+                    // scroll the ListView to the last added element
+                    messagesView.setSelection(messagesView.getCount() - 1);
+                }
+            });
+            editText.getText().clear();
+        }else{
+            // mandar mensaje
+            final Mensaje message = new Mensaje("lulay", m, false);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    messageAdapter.add(message);
+                    // scroll the ListView to the last added element
+                    messagesView.setSelection(messagesView.getCount() - 1);
+                }
+            });
+            editText.getText().clear();
         }
+    }
+
+    public void receiveMessage() {
+        // para recivir mensaje
     }
 
     public class Mensaje{
         private String usuario;
         private String mensaje;
+        private boolean belongsToCurrentUser; // is this message sent by us?
 
-        public Mensaje(String _usuario, String _mensaje){
-            this.usuario = _usuario;
-            this.mensaje = _mensaje;
+        public Mensaje(String usuario, String mensaje, boolean belongsToCurrentUser) {
+            this.usuario = usuario;
+            this.mensaje = mensaje;
+            this.belongsToCurrentUser = belongsToCurrentUser;
         }
 
-        String getUsuario(){
+        public String getUsuario() {
             return usuario;
         }
 
-        String getMensaje(){
+        public void setUsuario(String usuario) {
+            this.usuario = usuario;
+        }
+
+        public String getMensaje() {
             return mensaje;
         }
 
-        void setUsuario(String _usuario){
-            usuario = _usuario;
+        public void setMensaje(String mensaje) {
+            this.mensaje = mensaje;
         }
 
-        void setMensaje(String _mensaje){
-            mensaje = _mensaje;
+        public boolean isBelongsToCurrentUser() {
+            return belongsToCurrentUser;
         }
     }
+
+    // MessageAdapter.java
+    public class MessageAdapter extends BaseAdapter {
+
+        List<Mensaje> messages = new ArrayList<Mensaje>();
+        Context context;
+
+        public MessageAdapter(Context context) {
+            this.context = context;
+        }
+
+        public void add(Mensaje message) {
+            this.messages.add(message);
+            notifyDataSetChanged(); // to render the list we need to notify
+        }
+
+        @Override
+        public int getCount() {
+            return messages.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return messages.get(i);
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
+
+        // This is the backbone of the class, it handles the creation of single ListView row (chat bubble)
+        @Override
+        public View getView(int i, View convertView, ViewGroup viewGroup) {
+            MessageViewHolder holder = new MessageViewHolder();
+            LayoutInflater messageInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+            Mensaje message = messages.get(i);
+
+            if (message.isBelongsToCurrentUser()) { // this message was sent by us so let's create a basic chat bubble on the right
+                convertView = messageInflater.inflate(R.layout.my_message, null);
+                holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
+                convertView.setTag(holder);
+                holder.messageBody.setText(message.getMensaje());
+            } else { // this message was sent by someone else so let's create an advanced chat bubble on the left
+                convertView = messageInflater.inflate(R.layout.their_message, null);
+                holder.name = (TextView) convertView.findViewById(R.id.name);
+                holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
+                convertView.setTag(holder);
+                holder.name.setText(message.getUsuario());
+                holder.messageBody.setText(message.getMensaje());
+            }
+
+            return convertView;
+        }
+
+    }
+
+    class MessageViewHolder {
+        public TextView name;
+        public TextView messageBody;
+    }
+
+
 }
 
 
