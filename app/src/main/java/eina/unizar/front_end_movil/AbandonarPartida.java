@@ -71,6 +71,9 @@ public class AbandonarPartida extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 handleAbandonarPartida();
+                //if(jugadoresActivos <= 2){
+                  //  handleEliminarPartida();
+                //}
                 //handleUsuario0Puntos();
                 //TODO: falta anyadir: si solo quedo yo en la sala tengo que eliminarla
                 Intent intent = new Intent(v.getContext(), DecisionJuego.class);
@@ -120,6 +123,30 @@ public class AbandonarPartida extends AppCompatActivity {
                     System.out.println("TODO OK, se ha abandonado la partida correctamente");
                 } else{
                     Toast.makeText(AbandonarPartida.this, "No se ha podido eliminar al usuario de juega", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(AbandonarPartida.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    private void  handleEliminarPartida(){
+        HashMap<String,String> deletePartida = new HashMap<>();
+        deletePartida.put("codigo", codigo);
+
+        Call<JsonObject> call = retrofitInterface.eliminarPartida(deletePartida);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() == 200) {
+                    System.out.println("TODO OK, se ha eliminado la partida correctamente");
+                } else{
+                    Toast.makeText(AbandonarPartida.this, "No se ha podido eliminar la partida", Toast.LENGTH_LONG).show();
                 }
             }
 

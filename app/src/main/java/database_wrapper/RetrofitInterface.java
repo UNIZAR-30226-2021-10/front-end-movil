@@ -103,5 +103,7 @@ public interface RetrofitInterface {
     @POST("/AbandonarPartidaMulti")
     Call<JsonObject> salirPartidaJuega(@Body HashMap<String,String> map);
 
+    @POST("/AbandonarPartidaMulti")
+    Call<JsonObject> eliminarPartida(@Body HashMap<String,String> map);
 
 }
