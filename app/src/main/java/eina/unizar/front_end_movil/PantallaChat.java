@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,18 +17,86 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import SessionManagement.GestorSesion;
+import SessionManagement.Jugadores;
+import io.socket.client.Ack;
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
+import io.socket.engineio.client.transports.WebSocket;
 
 public class PantallaChat extends AppCompatActivity{
 
+    private static final String ipMarta = "http://192.168.1.162:5000/";
+    private static final String ipAndrea = "http://192.168.0.26:5000/";
+
     private static final int OPTION_INSTRUCCIONES = 0;
+
+    private Socket msocket;
+    private GestorSesion gestorSesion;
 
     private EditText editText;
     private MessageAdapter messageAdapter;
     private ListView messagesView;
     ConstraintLayout pant1;
     ConstraintLayout pant2;
+
+    // const mensajeUserJoin = {sender: 'admin', avatar: admin, text: "Bienvenido al chat "+ user.username, date: "admin" };
+    private Emitter.Listener newMessage = new Emitter.Listener(){
+        @Override
+        public void call(final Object... args){
+            runOnUiThread(new Runnable(){
+                @Override
+                public void run(){
+                    JSONObject datos = (JSONObject) args[0];
+                    String sender = "";
+                    String texto = "";
+                    try {
+                        sender = datos.getString("sender");
+                        texto = datos.getString("text");
+                        System.out.println("NICKNAME EN EMITTER: " + sender);
+                        System.out.println("AVATAR EN EMITTER: " + texto);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    if(!sender.equals(gestorSesion.getSession())) {
+                        Mensaje m = new Mensaje(sender, texto, false);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                messageAdapter.add(m);
+                                // scroll the ListView to the last added element
+                                messagesView.setSelection(messagesView.getCount() - 1);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    };
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        msocket.disconnect();
+        msocket.emit("disconnection");
+        msocket.off();
+    }
+
 
     /**
      * Called when the activity is first created.
@@ -40,6 +109,7 @@ public class PantallaChat extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pantalla_chat);
         getSupportActionBar().hide();
+        gestorSesion = new GestorSesion(PantallaChat.this);
 
         editText = (EditText) findViewById(R.id.mensaje_writer);
 
@@ -49,6 +119,57 @@ public class PantallaChat extends AppCompatActivity{
         //pant1 = (ConstraintLayout) findViewById(R.id.constraint);
         //pant2 = (ConstraintLayout) findViewById(R.id.constraint2);
         //pant2.setVisibility(View.GONE);
+
+        // conexión con sockets
+        try {
+            IO.Options options = new IO.Options();
+            options.transports = new String[]{WebSocket.NAME};
+            msocket = IO.socket(ipAndrea, options);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+        msocket.on("message",newMessage)
+                .on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        for (Object obj : args) {
+                            System.out.println("POR FIN!!!!!!");
+                            Log.d("chat"," NOT Errors :: " + obj);
+                        }
+                    }
+                })
+                .on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        for (Object obj : args) {
+                            Log.d("chat","Errors :: " + obj);
+                        }
+                    }
+                });
+
+
+        msocket.connect();
+
+        // hacer primer join
+        JSONObject aux = new JSONObject();
+        try{
+            aux.put("username", gestorSesion.getSession()); //username
+            aux.put("code", 12345); //code
+            aux.put("firstJoin",true); //firstJoin
+            aux.put("avatar", gestorSesion.getAvatarSession()); //avatar
+
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+
+        msocket.emit("join", aux, new Ack(){
+            @Override
+            public void call(Object... args){
+                //JSONObject response = (JSONObject) args[0];
+                //System.out.println(response);
+            }
+        });
 
         // Botón de atrás
         Button atrasButton = (Button) findViewById(R.id.atras);
@@ -72,40 +193,45 @@ public class PantallaChat extends AppCompatActivity{
 
     }
 
-
-
     public void sendMessage(View view) {
         String m = editText.getText().toString();
-        if (m.length() > 4) {
+        if (m.length() > 0) {
             // mandar mensaje
-            final Mensaje message = new Mensaje("andrea", m, true);
+            final Mensaje message = new Mensaje(gestorSesion.getSession(), m, true);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     messageAdapter.add(message);
                     // scroll the ListView to the last added element
                     messagesView.setSelection(messagesView.getCount() - 1);
-                }
-            });
-            editText.getText().clear();
-        }else{
-            // mandar mensaje
-            final Mensaje message = new Mensaje("lulay", m, false);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    messageAdapter.add(message);
-                    // scroll the ListView to the last added element
-                    messagesView.setSelection(messagesView.getCount() - 1);
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+                    Date date = new Date();
+                    String fecha = dateFormat.format(date);
+                    // const mensajeUserJoin = {sender: 'admin', avatar: admin, text: "Bienvenido al chat "+ user.username, date: "admin" };
+                    JSONObject aux = new JSONObject();
+                    try{
+                        aux.put("sender", gestorSesion.getSession()); //sender
+                        aux.put("avatar", gestorSesion.getAvatarSession()); //avatar
+                        aux.put("text",m); //texto
+                        aux.put("date", fecha); //fecha
+
+                    } catch (JSONException e){
+                        e.printStackTrace();
+                    }
+
+                    msocket.emit("sendMessage", aux, new Ack(){
+                        @Override
+                        public void call(Object... args){
+                            //JSONObject response = (JSONObject) args[0];
+                            //System.out.println(response);
+                        }
+                    });
                 }
             });
             editText.getText().clear();
         }
     }
 
-    public void receiveMessage() {
-        // para recivir mensaje
-    }
 
     public class Mensaje{
         private String usuario;
