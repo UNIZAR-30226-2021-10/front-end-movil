@@ -70,6 +70,7 @@ public class AbandonarPartida extends AppCompatActivity {
         abandonarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //handleAbandonarPartida();
                 handleUsuario0Puntos();
                 //TODO: falta anyadir: si solo quedo yo en la sala tengo que eliminarla
                 Intent intent = new Intent(v.getContext(), DecisionJuego.class);
@@ -81,7 +82,7 @@ public class AbandonarPartida extends AppCompatActivity {
     private void  handleUsuario0Puntos(){
         HashMap<String,String> user0points = new HashMap<>();
         user0points.put("codigo", codigo);
-        user0points.put("puntuacion", String.valueOf(0));
+        user0points.put("puntuacion", String.valueOf(100));
 
         Call<JsonObject> call = retrofitInterface.finPartidaMultiJuega(user0points);
         call.enqueue(new Callback<JsonObject>() {
@@ -89,11 +90,35 @@ public class AbandonarPartida extends AppCompatActivity {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    System.out.println("TODO OK");
+                    System.out.println("TODO OK al poner 100 puntos");
                 } else if(response.code() == 450){
                     Toast.makeText(AbandonarPartida.this, "No se ha podido encontrar partida", Toast.LENGTH_LONG).show();
                 } else{
                     Toast.makeText(AbandonarPartida.this, "No se ha podido actualizar la partida", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(AbandonarPartida.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    private void  handleAbandonarPartida(){
+        HashMap<String,String> salirDePartida = new HashMap<>();
+        salirDePartida.put("codigo", codigo);
+
+        Call<JsonObject> call = retrofitInterface.salirPartidaJuega(salirDePartida);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() == 200) {
+                    System.out.println("TODO OK");
+                } else{
+                    Toast.makeText(AbandonarPartida.this, "No se ha podido eliminar al usuario de juega", Toast.LENGTH_LONG).show();
                 }
             }
 

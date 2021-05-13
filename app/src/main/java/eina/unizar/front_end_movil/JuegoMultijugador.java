@@ -225,7 +225,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             try {
                 IO.Options options = new IO.Options();
                 options.transports = new String[]{WebSocket.NAME};
-                msocket = IO.socket(ipAndrea, options);
+                msocket = IO.socket(ipMarta, options);
                 System.out.println("SOS");
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
