@@ -134,6 +134,7 @@ public class DecisionMultijugador extends AppCompatActivity {
                     JsonObject jsonObject = response.body().getAsJsonObject("idpartida");
                     ID_PARTIDA = jsonObject.get("idpartida").getAsInt();
                     NUM_JUGADORES = jsonObject.get("numJugadores").getAsInt();
+                    System.out.println(NUM_JUGADORES);
                     System.out.println("TODO OK");
                     System.out.println("Este es el handleObtenerInfo");
                     System.out.println(ID_PARTIDA);
@@ -169,6 +170,7 @@ public class DecisionMultijugador extends AppCompatActivity {
                         jugadoresEnSala++;
                     }
                     System.out.println("TODO OK contar jugadores");
+                    System.out.println(jugadoresEnSala);
                 } else{
                     Toast.makeText(DecisionMultijugador.this, "No se han podido contar jugadores", Toast.LENGTH_LONG).show();
                 }
