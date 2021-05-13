@@ -70,8 +70,8 @@ public class AbandonarPartida extends AppCompatActivity {
         abandonarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //handleAbandonarPartida();
-                handleUsuario0Puntos();
+                handleAbandonarPartida();
+                //handleUsuario0Puntos();
                 //TODO: falta anyadir: si solo quedo yo en la sala tengo que eliminarla
                 Intent intent = new Intent(v.getContext(), DecisionJuego.class);
                 startActivityForResult(intent, OPTION_ABANDONAR);
@@ -109,6 +109,7 @@ public class AbandonarPartida extends AppCompatActivity {
     private void  handleAbandonarPartida(){
         HashMap<String,String> salirDePartida = new HashMap<>();
         salirDePartida.put("codigo", codigo);
+        salirDePartida.put("email", gestorSesion.getmailSession());
 
         Call<JsonObject> call = retrofitInterface.salirPartidaJuega(salirDePartida);
         call.enqueue(new Callback<JsonObject>() {
@@ -116,7 +117,7 @@ public class AbandonarPartida extends AppCompatActivity {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    System.out.println("TODO OK");
+                    System.out.println("TODO OK, se ha abandonado la partida correctamente");
                 } else{
                     Toast.makeText(AbandonarPartida.this, "No se ha podido eliminar al usuario de juega", Toast.LENGTH_LONG).show();
                 }
