@@ -20,17 +20,18 @@ import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 
 import SessionManagement.GestorSesion;
+import SessionManagement.Jugadores;
 import SessionManagement.Question;
 import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;
@@ -131,8 +132,8 @@ public class JuegoMultijugador extends AppCompatActivity{
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
-                    Jugadores jugador = new Jugadores(nickname, 0, avatar);
+                    int entrada = players.get(players.size() - 1).getOrden();
+                    Jugadores jugador = new Jugadores(nickname, 0, avatar, entrada + 1);
                     players.add(jugador);
                     asignarJugadores();
                     System.out.println("Estos son los jugadores de" + gestorSesion.getSession());
@@ -159,8 +160,14 @@ public class JuegoMultijugador extends AppCompatActivity{
                     numero_ronda = rondaActual;
                     System.out.println("Estos son los puntos que me llegan: ");
                     System.out.println(puntosActualizar);
-                    players.get(teToca-1).setPuntos(puntosActualizar);
-                    asignarJugadores();
+                    System.out.println("Este es el TETOCA que me llegan: ");
+                    System.out.println(teToca);
+                    if(teToca == 1){
+                        players.get(teToca-1).setPuntos(puntosActualizar); // el que ha jugado antes de ti
+                    }else {
+                        players.get(teToca - 2).setPuntos(puntosActualizar); // el que ha jugado antes de ti
+                    }
+                    asignarPuntos();
                     //players.get(teToca-1).getUsername();
                     //es mi turno de jugar
                     if(players.get(teToca-1).getUsername().equals(gestorSesion.getSession())){
@@ -218,7 +225,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             try {
                 IO.Options options = new IO.Options();
                 options.transports = new String[]{WebSocket.NAME};
-                msocket = IO.socket(ipMarta, options);
+                msocket = IO.socket(ipAndrea, options);
                 System.out.println("SOS");
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
@@ -319,15 +326,16 @@ public class JuegoMultijugador extends AppCompatActivity{
                 numero_ronda++;
                 //Aqui he cambiado el parámetro final
                 System.out.println("Los puntos que envio son estos:");
-                System.out.println(players.get(teToca-1).getPuntos());
+                System.out.println(players.get(indice).getPuntos());
                 System.out.println("Los puntos del jugador 1, indice 0 son:");
                 System.out.println(players.get(0).getPuntos());
                 System.out.println("Los puntos del jugador 2, indice 1 son:");
                 System.out.println(players.get(1).getPuntos());
                 msocket.emit("pasarTurno", teToca, numero_ronda, players.get(indice).getPuntos());
                 num_rondas.setText(String.valueOf(numero_ronda));
-                turno_jugador.setText(players.get(teToca - 1).getUsername());
-                asignarJugadores();
+                turno_jugador.setText(players.get(teToca - 1).getUsername()); // pone el siguiente jugador
+                asignarPuntos();
+                //asignarJugadores();
                 //rollDice();
             }
         });
@@ -447,8 +455,23 @@ public class JuegoMultijugador extends AppCompatActivity{
             usuario1_nombre.setText(gestorSesion.getSession());
             usuario1_puntos.setText("0");
             cargarImagenUsuario(gestorSesion.getAvatarSession(), imagenUsuario1);
-            Jugadores jugador = new Jugadores(gestorSesion.getSession(), 0, gestorSesion.getAvatarSession());
+            Jugadores jugador = new Jugadores(gestorSesion.getSession(), 0, gestorSesion.getAvatarSession(), 0);
             players.add(jugador);
+        }
+    }
+
+    public void asignarPuntos(){
+        for(int i = 0; i < players.size(); i++) {
+            if(i == 0){
+                usuario1_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+            } else if(i == 1){
+                usuario2_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+            } else if(i == 2){
+                usuario3_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+            }
+            else if(i == 3){
+                usuario4_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+            }
         }
     }
 
@@ -530,9 +553,19 @@ public class JuegoMultijugador extends AppCompatActivity{
                         String email = prueba.get("email").getAsString();
                         String nickname = prueba.get("nickname").getAsString();
                         String image = prueba.get("imagen").getAsString(); //coger el avatar
-                        Jugadores jugador2 = new Jugadores(nickname,0, image);
+                        int entrada = prueba.get("orden_entrada").getAsInt(); //coger el avatar
+                        Jugadores jugador2 = new Jugadores(nickname,0, image, entrada);
                         players.add(jugador2);
                         System.out.println("JUGADOR AÑADIDO DESDE JOIN " + jugador2.getUsername());
+                    }
+                    System.out.println("ANTES SORT");
+                    for(int i = 0; i< players.size(); i++){
+                        System.out.println(players.get(i).getUsername());
+                    }
+                    Collections.sort(players);
+                    System.out.println("DESPUES SORT");
+                    for(int i = 0; i< players.size(); i++){
+                        System.out.println(players.get(i).getUsername());
                     }
                     System.out.println("TODO OK obtener jugadores");
                     if(type != 1) {

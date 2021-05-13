@@ -10,8 +10,11 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import java.util.ArrayList;
 
 public class PantallaChat extends AppCompatActivity{
@@ -20,6 +23,8 @@ public class PantallaChat extends AppCompatActivity{
 
     private TextView mensajeChat;
     private ListView listaMensajes;
+    ConstraintLayout pant1;
+    ConstraintLayout pant2;
 
     /**
      * Called when the activity is first created.
@@ -35,6 +40,10 @@ public class PantallaChat extends AppCompatActivity{
 
         mensajeChat = (TextView)findViewById(R.id.mensaje_writer);
         listaMensajes = (ListView) findViewById(R.id.lista_mensajes);
+        //pant1 = (ConstraintLayout) findViewById(R.id.constraint);
+        //pant2 = (ConstraintLayout) findViewById(R.id.constraint2);
+        //pant2.setVisibility(View.GONE);
+
 
         // Construct the data source
         ArrayList<Mensaje> arrayOfMessages = new ArrayList<Mensaje>();
@@ -51,7 +60,7 @@ public class PantallaChat extends AppCompatActivity{
         adapter.add(newMessage);
 
         // Botón de enviar el mensaje
-        Button enviarButton = (Button) findViewById(R.id.enviar);
+        ImageButton enviarButton = (ImageButton) findViewById(R.id.enviar);
         enviarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,6 +78,8 @@ public class PantallaChat extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 finish();
+                //pant1.setVisibility(View.GONE);
+                //pant2.setVisibility(View.VISIBLE);
             }
         });
 
