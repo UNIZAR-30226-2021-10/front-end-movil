@@ -114,6 +114,34 @@ public class DecisionMultijugador extends AppCompatActivity {
 
     }
 
+    private void  handleBuscarPartida(){
+        HashMap<String,String> buscarPartida = new HashMap<>();
+        buscarPartida.put("codigo", codigoInsertado);
+
+        Call<JsonObject> call = retrofitInterface.buscarPartidaCreada(buscarPartida);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() == 200) {
+                    handleObtenerInfo();
+                    //handleUnirseJuega();
+                    System.out.println("TODO OK en obtener partida");
+                } else if(response.code() == 400){
+                    Toast.makeText(DecisionMultijugador.this, "La partida introducida no existe", Toast.LENGTH_LONG).show();
+                }
+                else{
+                    Toast.makeText(DecisionMultijugador.this, "La partida no ha sido encontrada", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(DecisionMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
     private void  handleObtenerInfo(){
         HashMap<String,String> obtener = new HashMap<>();
         obtener.put("codigo", codigoInsertado);
@@ -181,37 +209,6 @@ public class DecisionMultijugador extends AppCompatActivity {
                 Toast.makeText(DecisionMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-
-    }
-
-
-    private void  handleBuscarPartida(){
-        HashMap<String,String> buscarPartida = new HashMap<>();
-        buscarPartida.put("codigo", codigoInsertado);
-
-        Call<JsonObject> call = retrofitInterface.buscarPartidaCreada(buscarPartida);
-        call.enqueue(new Callback<JsonObject>() {
-            //Gestionamos la respuesta de la llamada a post
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if (response.code() == 200) {
-                    handleObtenerInfo();
-                    //handleUnirseJuega();
-                    System.out.println("TODO OK en obtener partida");
-                } else if(response.code() == 400){
-                    Toast.makeText(DecisionMultijugador.this, "La partida introducida no existe", Toast.LENGTH_LONG).show();
-                }
-                else{
-                    Toast.makeText(DecisionMultijugador.this, "La partida no ha sido encontrada", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                Toast.makeText(DecisionMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-
 
     }
 

@@ -104,15 +104,9 @@ public class JuegoMultijugador extends AppCompatActivity{
     private int NUM_RONDAS;
     private int NUM_JUGADORES;
     private int ID_PARTIDA;
-    private String EMAIL;
     int numero_ronda = 1;
-    int numero_puntos_p1 = 0;
-    int numero_puntos_p2 = 0;
-    int numero_puntos_p3 = 0;
-    int numero_puntos_p4 = 0;
     int teToca = 1;
     int puntos_ganador;
-    int monedas_ganador;
     int jugadoresEnSala;
 
     private RetrofitInterface retrofitInterface;
@@ -174,7 +168,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                         players.get(teToca - 2).setPuntos(puntosActualizar); // el que ha jugado antes de ti
                     }
                     asignarPuntos();
-                    //asignarPuntos();
                     //es mi turno de jugar
                     if(players.get(teToca-1).getUsername().equals(gestorSesion.getSession())){
                         siguiente.setVisibility(View.VISIBLE);
@@ -268,7 +261,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             try {
                 IO.Options options = new IO.Options();
                 options.transports = new String[]{WebSocket.NAME};
-                msocket = IO.socket(ipMarta, options);
+                msocket = IO.socket(ipAndrea, options);
                 System.out.println("SOS");
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);

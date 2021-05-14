@@ -73,7 +73,7 @@ public class PantallaChat extends AppCompatActivity{
                     }
 
                     if(!sender.equals(gestorSesion.getSession())) {
-                        Mensaje m = new Mensaje(sender, texto, false);
+                        Mensaje m = new Mensaje(sender, texto, false, sender.equals("admin"));
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -197,7 +197,7 @@ public class PantallaChat extends AppCompatActivity{
         String m = editText.getText().toString();
         if (m.length() > 0) {
             // mandar mensaje
-            final Mensaje message = new Mensaje(gestorSesion.getSession(), m, true);
+            final Mensaje message = new Mensaje(gestorSesion.getSession(), m, true, false);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -237,11 +237,13 @@ public class PantallaChat extends AppCompatActivity{
         private String usuario;
         private String mensaje;
         private boolean belongsToCurrentUser; // is this message sent by us?
+        private boolean isAdmin; // is this admin
 
-        public Mensaje(String usuario, String mensaje, boolean belongsToCurrentUser) {
+        public Mensaje(String usuario, String mensaje, boolean belongsToCurrentUser, boolean isAdmin) {
             this.usuario = usuario;
             this.mensaje = mensaje;
             this.belongsToCurrentUser = belongsToCurrentUser;
+            this.isAdmin = isAdmin;
         }
 
         public String getUsuario() {
@@ -262,6 +264,10 @@ public class PantallaChat extends AppCompatActivity{
 
         public boolean isBelongsToCurrentUser() {
             return belongsToCurrentUser;
+        }
+
+        public boolean isAdmin() {
+            return isAdmin;
         }
     }
 
@@ -307,12 +313,17 @@ public class PantallaChat extends AppCompatActivity{
                 holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
                 convertView.setTag(holder);
                 holder.messageBody.setText(message.getMensaje());
-            } else { // this message was sent by someone else so let's create an advanced chat bubble on the left
+            } else if(!message.isBelongsToCurrentUser() && !message.isAdmin()){ // this message was sent by someone else so let's create an advanced chat bubble on the left
                 convertView = messageInflater.inflate(R.layout.their_message, null);
                 holder.name = (TextView) convertView.findViewById(R.id.name);
                 holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
                 convertView.setTag(holder);
                 holder.name.setText(message.getUsuario());
+                holder.messageBody.setText(message.getMensaje());
+            } else{
+                convertView = messageInflater.inflate(R.layout.admin_message, null);
+                holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
+                convertView.setTag(holder);
                 holder.messageBody.setText(message.getMensaje());
             }
 
