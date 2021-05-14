@@ -198,6 +198,13 @@ public class JuegoMultijugador extends AppCompatActivity{
                     System.out.println("El ganador que me ha llegado es: ");
                     System.out.println(ganadorPartida);
                     ganador = ganadorPartida;
+                    int puntosGuardar = 0;
+                    for(int i = 0; i < players.size(); i++){
+                        if((players.get(i).getUsername()).equals(gestorSesion.getSession())){
+                            puntosGuardar = players.get(i).getPuntos();
+                        }
+                    }
+                    handleRegistrarPuntos(gestorSesion.getmailSession(), puntosGuardar);
                     /*
                     for(int i = 0; i < players.size(); i++){
                         System.out.println("He entrado al bucle del handle");
@@ -619,6 +626,13 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     public void comprobarRondas(){
         if (numero_ronda == NUM_RONDAS*NUM_JUGADORES) {
+            int puntosGuardar = 0;
+            for(int i = 0; i < players.size(); i++){
+                if((players.get(i).getUsername()).equals(gestorSesion.getSession())){
+                    puntosGuardar = players.get(i).getPuntos();
+                }
+            }
+            handleRegistrarPuntos(gestorSesion.getmailSession(), puntosGuardar);
             Bundle extra = new Bundle();
             String ganador = calcularGanador();
             extra.putString("ganador", ganador);
