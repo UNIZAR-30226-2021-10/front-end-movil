@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import SessionManagement.GestorSesion;
@@ -97,6 +98,8 @@ public class JuegoMultijugador extends AppCompatActivity{
     int type;
     ArrayList<Jugadores> players = new ArrayList<Jugadores>();
     ArrayList<Jugadores> playersOrdenados = new ArrayList<Jugadores>();
+    List<String> emails = new ArrayList<String>();
+    List<String> users = new ArrayList<String>();
 
     private int NUM_RONDAS;
     private int NUM_JUGADORES;
@@ -109,6 +112,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     int numero_puntos_p4 = 0;
     int teToca = 1;
     int puntos_ganador;
+    int monedas_ganador;
     int jugadoresEnSala;
 
     private RetrofitInterface retrofitInterface;
@@ -194,6 +198,19 @@ public class JuegoMultijugador extends AppCompatActivity{
                     System.out.println("El ganador que me ha llegado es: ");
                     System.out.println(ganadorPartida);
                     ganador = ganadorPartida;
+                    /*
+                    for(int i = 0; i < players.size(); i++){
+                        System.out.println("He entrado al bucle del handle");
+                        for(int j = 0; j < players.size(); j++){
+                            if((players.get(i).getUsername()).equals(emails.get(j))){
+                                handleRegistrarPuntos(emails.get(j), players.get(i).getPuntos());
+                            }
+                        }
+                    }*/
+                    //esto es de prueba
+                    /*String prueba1 = "martamoralessabroso14@gmail.com";
+                    int puntuacionsss = 100;
+                    handleRegistrarPuntos(prueba1, puntuacionsss);*/
                     finalizarPartida();
                 }
             });
@@ -474,6 +491,16 @@ public class JuegoMultijugador extends AppCompatActivity{
         if(players.size() == 2){
             user1 = players.get(0).getPuntos();
             user2 = players.get(1).getPuntos();
+            /*
+            for(int i = 0; i < players.size(); i++){
+                for(int j = 0; j < players.size(); j++){
+                    if((players.get(i).getUsername()).equals(emails.get(j))){
+                        System.out.println("Voy a entrar a la funcion registrar puntos");
+                        handleRegistrarPuntos(emails.get(j), players.get(i).getPuntos());
+                    }
+                }
+            }*/
+
         }else if(players.size() == 3){
             user1 = players.get(0).getPuntos();
             user2 = players.get(1).getPuntos();
@@ -596,9 +623,9 @@ public class JuegoMultijugador extends AppCompatActivity{
             String ganador = calcularGanador();
             extra.putString("ganador", ganador);
             handleFinPartidaMulti();
+            //handleFinPartidaMultiJuega();
             //msocket.emit("sendFinPartida",playersOrdenados);
             msocket.emit("sendFinPartida",ganador);
-            //handleFinPartidaMultiJuega();
             Intent intent = new Intent(this, FinPartidaMulti.class);
             intent.putExtras(extra);
             startActivityForResult(intent, OPTION_ACABAR);
@@ -712,8 +739,14 @@ public class JuegoMultijugador extends AppCompatActivity{
                         int entrada = prueba.get("orden_entrada").getAsInt(); //coger el avatar
                         Jugadores jugador2 = new Jugadores(nickname,0, image, entrada);
                         players.add(jugador2);
+                        emails.add(email);
+                        users.add(nickname);
+                        System.out.println("El usuario añadido es:");
+                        System.out.println(email);
                         System.out.println("JUGADOR AÑADIDO DESDE JOIN " + jugador2.getUsername());
                     }
+                    System.out.println("Los usuarios que hay son:");
+                    System.out.println(emails);
                     jugadoresEnSala = players.size();
                     System.out.println("ANTES SORT");
                     for(int i = 0; i< players.size(); i++){
@@ -788,6 +821,10 @@ public class JuegoMultijugador extends AppCompatActivity{
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
+                    //handleRegistrarMonedas();
+                    //if(ganador.equals(gestorSesion.getSession())){
+                      //  handleRegistrarMonedas();
+                   // }
                     System.out.println("TODO OK");
                 } else if(response.code() == 450){
                     Toast.makeText(JuegoMultijugador.this, "No se ha podido finalizar la partida", Toast.LENGTH_LONG).show();
@@ -804,12 +841,46 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     }
 
-    /*
-    private void  handleFinPartidaMultiJuega() {
+    private void  handleRegistrarPuntos(String correo, int puntosJugador){
+        HashMap<String,String> ganarMonedas = new HashMap<>();
+        //monedas_ganador = puntos_ganador/2;
+        ganarMonedas.put("email", correo);
+        //ganarMonedas.put("puntos", String.valueOf(puntos_ganador));
+        ganarMonedas.put("monedas", String.valueOf(0));
+        ganarMonedas.put("puntos", String.valueOf(puntosJugador));
+        //ganarMonedas.put("monedas", String.valueOf(monedas_ganador));
+        System.out.println("Los puntos que tengo que registrar son:");
+        System.out.println(puntosJugador);
+        System.out.println("Las monedas que tengo que registrar son:");
+        System.out.println(0);
+
+        Call<JsonObject> call = retrofitInterface.insertNewData(ganarMonedas);
+        //Call<JsonObject> call = retrofitInterface.guardarMonedas(ganarMonedas);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() == 200) {
+                    System.out.println("TODO OK al registrar las monedas");
+                } else{
+                    Toast.makeText(JuegoMultijugador.this, "No se ha actualizado al ganador", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(JuegoMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+
+    /*private void  handleFinPartidaMultiJuega() {
         HashMap<String, String> finMultiJuega = new HashMap<>();
 
         finMultiJuega.put("codigo", codigo);
-        finMultiJuega.put("usuario_email", ganador);
+        //finMultiJuega.put("usuario_email", ganador);
         finMultiJuega.put("puntuacion", Integer.toString(puntos_ganador));
 
         Call<JsonObject> call = retrofitInterface.finPartidaMultiJuega(finMultiJuega);

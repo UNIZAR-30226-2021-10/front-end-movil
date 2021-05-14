@@ -5,6 +5,7 @@ public class Jugadores implements Comparable<Jugadores>{
     private int puntos;
     private String imagen;
     private int orden;
+    private String email;
 
     public  Jugadores(String username, int puntos, String _imagen, int orden){
         this.username = username;
@@ -44,6 +45,8 @@ public class Jugadores implements Comparable<Jugadores>{
     public void setOrden(int orden) {
         this.orden = orden;
     }
+
+
 
     @Override
     public int compareTo(Jugadores o) {

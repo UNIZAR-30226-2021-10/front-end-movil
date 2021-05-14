@@ -106,4 +106,10 @@ public interface RetrofitInterface {
     @POST("/AbandonarPartidaMulti")
     Call<JsonObject> eliminarPartida(@Body HashMap<String,String> map);
 
+    @POST("/GuardarMonedasGanador")
+    Call<JsonObject> guardarMonedas(@Body HashMap<String,String> map);
+
+    @POST("/obtenerEmail")
+    Call<JsonObject> emailDeUsuario(@Body HashMap<String,String> map);
+
 }
