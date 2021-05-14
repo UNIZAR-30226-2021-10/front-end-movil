@@ -80,13 +80,6 @@ public class DecisionMultijugador extends AppCompatActivity {
             public void onClick(View v) {
                 codigoInsertado = codigoPartida.getText().toString();
                 handleBuscarPartida();
-                //falta saber cuantos jugadores hay en la sala para poder entrar
-                if(jugadoresEnSala < NUM_JUGADORES){
-                    handleUnirseJuega();
-                }
-                else{
-                    Toast.makeText(DecisionMultijugador.this, "La partida ya está llena", Toast.LENGTH_LONG).show();
-                }
             }
         });
 
@@ -171,6 +164,13 @@ public class DecisionMultijugador extends AppCompatActivity {
                     }
                     System.out.println("TODO OK contar jugadores");
                     System.out.println(jugadoresEnSala);
+                    //falta saber cuantos jugadores hay en la sala para poder entrar
+                    if(jugadoresEnSala < NUM_JUGADORES){
+                        handleUnirseJuega();
+                    }
+                    else{
+                        Toast.makeText(DecisionMultijugador.this, "La partida ya está llena", Toast.LENGTH_LONG).show();
+                    }
                 } else{
                     Toast.makeText(DecisionMultijugador.this, "No se han podido contar jugadores", Toast.LENGTH_LONG).show();
                 }
