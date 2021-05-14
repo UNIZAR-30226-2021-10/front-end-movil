@@ -184,6 +184,23 @@ public class JuegoMultijugador extends AppCompatActivity{
         }
     };
 
+    private Emitter.Listener jugadoresOrdenados = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable(){
+                @Override
+                public void run(){
+                    String ganadorPartida = (String) args[0];
+                    System.out.println("El ganador que me ha llegado es: ");
+                    System.out.println(ganadorPartida);
+                    ganador = ganadorPartida;
+                    finalizarPartida();
+                }
+            });
+        }
+    };
+
+
 
     @Override
     public void onDestroy() {
@@ -237,6 +254,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         msocket//.on("message",message)
                 .on("newPlayer", nuevoJugador)
                 .on("recibirTurno", nuevoTurno)
+                .on("finalizarPartida", jugadoresOrdenados)
                 .on(Socket.EVENT_CONNECT, new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
@@ -440,6 +458,14 @@ public class JuegoMultijugador extends AppCompatActivity{
         }
     }*/
 
+    public void finalizarPartida(){
+        Bundle extra = new Bundle();
+        extra.putString("ganador", ganador);
+        Intent intent = new Intent(this, FinPartidaMulti.class);
+        intent.putExtras(extra);
+        startActivityForResult(intent, OPTION_ACABAR);
+    }
+
     public String calcularGanador(){
         int user1 = 0;
         int user2 = 0;
@@ -570,7 +596,8 @@ public class JuegoMultijugador extends AppCompatActivity{
             String ganador = calcularGanador();
             extra.putString("ganador", ganador);
             handleFinPartidaMulti();
-            msocket.emit("sendFinPartida",playersOrdenados);
+            //msocket.emit("sendFinPartida",playersOrdenados);
+            msocket.emit("sendFinPartida",ganador);
             //handleFinPartidaMultiJuega();
             Intent intent = new Intent(this, FinPartidaMulti.class);
             intent.putExtras(extra);
