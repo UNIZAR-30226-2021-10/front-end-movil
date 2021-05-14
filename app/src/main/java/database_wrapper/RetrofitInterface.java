@@ -100,5 +100,10 @@ public interface RetrofitInterface {
     @GET("/Multijugador_PartidaJugadoresUsuario")
     Call<JsonArray> obtenerJugadores(@Query("idpartida") String idpartida);
 
+    @POST("/AbandonarPartidaMulti")
+    Call<JsonObject> salirPartidaJuega(@Body HashMap<String,String> map);
+
+    @POST("/AbandonarPartidaMulti")
+    Call<JsonObject> eliminarPartida(@Body HashMap<String,String> map);
 
 }

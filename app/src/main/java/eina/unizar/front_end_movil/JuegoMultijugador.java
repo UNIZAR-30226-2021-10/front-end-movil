@@ -96,6 +96,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     String tipo;
     int type;
     ArrayList<Jugadores> players = new ArrayList<Jugadores>();
+    ArrayList<Jugadores> playersOrdenados = new ArrayList<Jugadores>();
 
     private int NUM_RONDAS;
     private int NUM_JUGADORES;
@@ -226,7 +227,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             try {
                 IO.Options options = new IO.Options();
                 options.transports = new String[]{WebSocket.NAME};
-                msocket = IO.socket(ipAndrea, options);
+                msocket = IO.socket(ipMarta, options);
                 System.out.println("SOS");
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
@@ -418,7 +419,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         imagenDados = (ImageButton) findViewById(R.id.dado);
         imagenDados.setClickable(false);
     }
-
+    /*
     public String quienEsGanador() {
         if (numero_puntos_p1 > numero_puntos_p2 && numero_puntos_p1 > numero_puntos_p3 && numero_puntos_p1 > numero_puntos_p4) {
             ganador = usuario1_nombre.getText().toString();
@@ -437,14 +438,139 @@ public class JuegoMultijugador extends AppCompatActivity{
             puntos_ganador = numero_puntos_p4;
             return usuario4_nombre.getText().toString();
         }
+    }*/
+
+    public String calcularGanador(){
+        int user1 = 0;
+        int user2 = 0;
+        int user3 = -1;
+        int user4 = -2;
+        if(players.size() == 2){
+            user1 = players.get(0).getPuntos();
+            user2 = players.get(1).getPuntos();
+        }else if(players.size() == 3){
+            user1 = players.get(0).getPuntos();
+            user2 = players.get(1).getPuntos();
+            user3 = players.get(2).getPuntos();
+        }else if(players.size() == 4){
+            user1 = players.get(0).getPuntos();
+            user2 = players.get(1).getPuntos();
+            user3 = players.get(2).getPuntos();
+            user4 = players.get(3).getPuntos();
+        }
+
+        if (user1 > user2 && user1 > user3 && user1 > user4) {
+            ganador = players.get(0).getUsername();
+            puntos_ganador = user1;
+        }else if (user2 > user1 && user2 > user3 && user2 > user4) {
+            ganador = players.get(1).getUsername();
+            puntos_ganador = user2;
+        }else if (user3 > user1 && user3 > user2 && user3 > user4) {
+            ganador = players.get(2).getUsername();
+            puntos_ganador = user3;
+        }else if (user4 > user1 && user4 > user3 && user4 > user2) {
+            ganador = players.get(3).getUsername();
+            puntos_ganador = user4;
+        }
+        return ganador;
+    }
+
+    public void ordenarJugadores(){
+        ArrayList<Jugadores> aux = new ArrayList<Jugadores>();
+        ArrayList<Jugadores> aux2 = new ArrayList<Jugadores>();
+        if(players.size() == 2){
+            if(players.get(0).getPuntos() > players.get(1).getPuntos()){
+                playersOrdenados.add(players.get(0));
+                playersOrdenados.add(players.get(1));
+            }
+            else{
+                playersOrdenados.add(players.get(1));
+                playersOrdenados.add(players.get(2));
+            }
+        }
+        else if(players.size() == 3){
+            if(players.get(0).getPuntos() > players.get(1).getPuntos() && players.get(0).getPuntos() > players.get(2).getPuntos()){
+                playersOrdenados.add(players.get(0));
+                aux.add(players.get(1));
+                aux.add(players.get(2));
+            } else if(players.get(1).getPuntos() > players.get(0).getPuntos() && players.get(1).getPuntos() > players.get(2).getPuntos()){
+                playersOrdenados.add(players.get(1));
+                aux.add(players.get(0));
+                aux.add(players.get(2));
+            } else{
+                playersOrdenados.add(players.get(2));
+                aux.add(players.get(0));
+                aux.add(players.get(1));
+            }
+
+            if(aux.get(0).getPuntos() > aux.get(1).getPuntos() ){
+                playersOrdenados.add(aux.get(0));
+                playersOrdenados.add(aux.get(1));
+            }
+            else{
+                playersOrdenados.add(aux.get(1));
+                playersOrdenados.add(aux.get(0));
+            }
+
+        }
+        else{
+            if(players.get(0).getPuntos() > players.get(1).getPuntos() && players.get(0).getPuntos() > players.get(2).getPuntos() && players.get(0).getPuntos() > players.get(3).getPuntos()){
+                playersOrdenados.add(players.get(0));
+                aux.add(players.get(1));
+                aux.add(players.get(2));
+                aux.add(players.get(3));
+            } else if(players.get(1).getPuntos() > players.get(0).getPuntos() && players.get(1).getPuntos() > players.get(2).getPuntos() && players.get(1).getPuntos() > players.get(3).getPuntos()){
+                playersOrdenados.add(players.get(1));
+                aux.add(players.get(0));
+                aux.add(players.get(2));
+                aux.add(players.get(3));
+            }else if(players.get(2).getPuntos() > players.get(0).getPuntos() && players.get(2).getPuntos() > players.get(1).getPuntos() && players.get(2).getPuntos() > players.get(3).getPuntos()){
+                playersOrdenados.add(players.get(2));
+                aux.add(players.get(0));
+                aux.add(players.get(1));
+                aux.add(players.get(3));
+            }
+            else{
+                playersOrdenados.add(players.get(3));
+                aux.add(players.get(0));
+                aux.add(players.get(1));
+                aux.add(players.get(2));
+            }
+
+            if(aux.get(0).getPuntos() > aux.get(1).getPuntos() && aux.get(0).getPuntos() > aux.get(2).getPuntos()){
+                playersOrdenados.add(aux.get(0));
+                aux2.add(players.get(1));
+                aux2.add(players.get(2));
+            }
+            else if(aux.get(1).getPuntos() > aux.get(0).getPuntos() && aux.get(1).getPuntos() > aux.get(2).getPuntos()){
+                playersOrdenados.add(aux.get(1));
+                aux2.add(players.get(0));
+                aux2.add(players.get(2));
+            }
+            else{
+                playersOrdenados.add(aux.get(2));
+                aux2.add(players.get(0));
+                aux2.add(players.get(1));
+            }
+
+            if(aux2.get(0).getPuntos() > aux2.get(1).getPuntos()){
+                playersOrdenados.add(aux2.get(0));
+                playersOrdenados.add(aux2.get(1));
+            }
+            else{
+                playersOrdenados.add(aux2.get(1));
+                playersOrdenados.add(aux2.get(0));
+            }
+        }
     }
 
     public void comprobarRondas(){
         if (numero_ronda == NUM_RONDAS*NUM_JUGADORES) {
             Bundle extra = new Bundle();
-            String ganador = quienEsGanador();
+            String ganador = calcularGanador();
             extra.putString("ganador", ganador);
             handleFinPartidaMulti();
+            msocket.emit("sendFinPartida",playersOrdenados);
             //handleFinPartidaMultiJuega();
             Intent intent = new Intent(this, FinPartidaMulti.class);
             intent.putExtras(extra);
@@ -459,6 +585,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             cargarImagenUsuario(gestorSesion.getAvatarSession(), imagenUsuario1);
             Jugadores jugador = new Jugadores(gestorSesion.getSession(), 0, gestorSesion.getAvatarSession(), 0);
             players.add(jugador);
+            jugadoresEnSala = players.size();
         }
     }
 
@@ -560,6 +687,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                         players.add(jugador2);
                         System.out.println("JUGADOR AÑADIDO DESDE JOIN " + jugador2.getUsername());
                     }
+                    jugadoresEnSala = players.size();
                     System.out.println("ANTES SORT");
                     for(int i = 0; i< players.size(); i++){
                         System.out.println(players.get(i).getUsername());
