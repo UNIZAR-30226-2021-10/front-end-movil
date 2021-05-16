@@ -102,6 +102,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     ArrayList<Jugadores> playersOrdenados = new ArrayList<Jugadores>();
     List<String> emails = new ArrayList<String>();
     List<String> users = new ArrayList<String>();
+    List<String> abandonados = new ArrayList<String>();
 
     private int NUM_RONDAS;
     private int NUM_JUGADORES;
@@ -237,6 +238,25 @@ public class JuegoMultijugador extends AppCompatActivity{
                     System.out.println("El usuario que ha abandonado la partida es ");
                     System.out.println(userOut);
                     eliminarJugador(userOut);
+                    //tiene que comprobar que hay dos jugadores o mas para poder continuar la partida y sino
+                    abandonados.add("");
+                    int quedan = players.size() - abandonados.size();
+                    if(quedan == 1){
+                        //finalizar la partida para todos y poner al jugador como ganador
+                        msocket.emit("desconexion");
+                        int puntosGuardar = 0;
+                        for(int i = 0; i < players.size(); i++){
+                            if((players.get(i).getUsername()).equals(gestorSesion.getSession())){
+                                puntosGuardar = players.get(i).getPuntos();
+                                ganador = players.get(i).getUsername();
+                            }
+                        }
+                        handleRegistrarPuntos(gestorSesion.getmailSession(), puntosGuardar);
+                        handleFinPartidaMulti();
+                        if(!gestorSesion.getSession().equals(userOut)){
+                            finalizarPartida();
+                        }
+                    }
                 }
             });
         }
@@ -422,11 +442,9 @@ public class JuegoMultijugador extends AppCompatActivity{
                         msocket.emit("disconnection");
                         //tiene que ser eliminado de la tabla juega
                         handleAbandonarPartida();
-                        //hay que eliminar su imagen y sus datos de la pantalla
-                        //Esto va en el emmiter
                         //tiene que continuar la partida con un jugador menos
-                        //tiene que comprobar que hay dos jugadores o mas para poder continuar la partida y sino
-                        //finalizar la partida para todos y poner al jugador como ganador
+
+                        //sino se debe continuar pero sin el jugador
                         Intent intent = new Intent(v.getContext(), DecisionJuego.class);
                         startActivityForResult(intent, OPTION_ATRAS);
                     }
@@ -932,10 +950,6 @@ public class JuegoMultijugador extends AppCompatActivity{
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    //handleRegistrarMonedas();
-                    //if(ganador.equals(gestorSesion.getSession())){
-                      //  handleRegistrarMonedas();
-                   // }
                     System.out.println("TODO OK");
                 } else if(response.code() == 450){
                     Toast.makeText(JuegoMultijugador.this, "No se ha podido finalizar la partida", Toast.LENGTH_LONG).show();
