@@ -856,11 +856,12 @@ public class JuegoMultijugador extends AppCompatActivity{
     }
 
     private void  handleRegistrarPuntos(String correo, int puntosJugador){
+        int monedasInsertar = puntosJugador/2;
         HashMap<String,String> ganarMonedas = new HashMap<>();
         //monedas_ganador = puntos_ganador/2;
         ganarMonedas.put("email", correo);
         //ganarMonedas.put("puntos", String.valueOf(puntos_ganador));
-        ganarMonedas.put("monedas", String.valueOf(0));
+        ganarMonedas.put("monedas", String.valueOf(monedasInsertar));
         ganarMonedas.put("puntos", String.valueOf(puntosJugador));
         //ganarMonedas.put("monedas", String.valueOf(monedas_ganador));
         System.out.println("Los puntos que tengo que registrar son:");
