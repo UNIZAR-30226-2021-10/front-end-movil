@@ -249,11 +249,16 @@ public class JuegoMultijugador extends AppCompatActivity{
                             if((players.get(i).getUsername()).equals(gestorSesion.getSession())){
                                 puntosGuardar = players.get(i).getPuntos();
                                 ganador = players.get(i).getUsername();
+                                System.out.println("El ganador soy yo porque no abandono:");
+                                System.out.println(ganador);
                             }
                         }
+                        //Registra los puntos y monedas del jugador que se queda en la partida
                         handleRegistrarPuntos(gestorSesion.getmailSession(), puntosGuardar);
+                        //pone al usuario como ganador de la partida
                         handleFinPartidaMulti();
                         if(!gestorSesion.getSession().equals(userOut)){
+                            //lo manda a la pantalla de fin de partida
                             finalizarPartida();
                         }
                     }
@@ -950,7 +955,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    System.out.println("TODO OK");
+                    System.out.println("TODO OK al actualizar el ganador");
                 } else if(response.code() == 450){
                     Toast.makeText(JuegoMultijugador.this, "No se ha podido finalizar la partida", Toast.LENGTH_LONG).show();
                 } else{
