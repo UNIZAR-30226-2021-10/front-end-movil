@@ -78,29 +78,9 @@ public class RegistroUsuario extends AppCompatActivity {
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Comprobar que están todos los campos rellenados
-                if(nombre_usuario.getText().toString().isEmpty()){
-                    nombre_usuario.setError("El campo no puede estar vacío");
-                } else if(email.getText().toString().isEmpty()){
-                    email.setError("El campo no puede estar vacío");
-                } else if(password_new.getText().toString().isEmpty()){
-                    password_new.setError("El campo no puede estar vacío");
-                } else if(password_new2.getText().toString().isEmpty()){
-                    password_new2.setError("El campo no puede estar vacío");
-                } else {
-                    // COMPROBAR CONTRASEÑA es igual en ambos campos
-                    if (password_new.getText().toString().equals(password_new2.getText().toString())) {
-                        //Comprobar email válido
-                        if(comprobarEmail(email.getText().toString())){
-                            handleRegister();
-                        }else {
-                            email.setError("El email es invalido, introduzca un email valido por ejemplo: pedro@gmail.com");
-                        }
-                    } else {
-                        // mensaje de error
-                        password_new2.setError("Las contraseñas no son iguales");
-                    }
-                }
+                // Comprobar que están todos los campos rellenados y que el email es válido
+                validarCampos(nombre_usuario.getText().toString(),email.getText().toString()
+                            ,password_new.getText().toString(),password_new2.getText().toString());
             }
         });
 
@@ -113,6 +93,32 @@ public class RegistroUsuario extends AppCompatActivity {
                 startActivityForResult(intent, OPTION_ATRAS);
             }
         });
+    }
+
+    private void validarCampos(String nombre, String email_user,String password1, String password2) {
+
+        if(nombre.isEmpty()){
+            nombre_usuario.setError("El campo no puede estar vacío");
+        } else if(email_user.isEmpty()){
+            email.setError("El campo no puede estar vacío");
+        } else if(password1.isEmpty()){
+            password_new.setError("El campo no puede estar vacío");
+        } else if(password2.isEmpty()){
+            password_new2.setError("El campo no puede estar vacío");
+        } else {
+            // Comprobar que la contraseña es igual en ambos campos
+            if (password1.equals(password2)) {
+                //Comprobar email válido
+                if(comprobarEmail(email_user)){
+                    handleRegister();
+                }else {
+                    email.setError("El email es invalido, introduzca un email valido por ejemplo: pedro@gmail.com");
+                }
+            } else {
+                // mensaje de error
+                password_new2.setError("Las contraseñas no coinciden");
+            }
+        }
     }
 
     /* TODO: coger foto del color naranja, renombrarla, subirla al servidor de imagenes en carpeta usuarios
@@ -135,20 +141,15 @@ public class RegistroUsuario extends AppCompatActivity {
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
                     comprarNaranja();
-                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            new SweetAlertDialog(RegistroUsuario.this,SweetAlertDialog.SUCCESS_TYPE).setTitleText("Registrado Exitosamente!")
-                                    .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
+                    new SweetAlertDialog(RegistroUsuario.this,SweetAlertDialog.SUCCESS_TYPE).setTitleText("Registrado Exitosamente!")
+                            .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
                                         @Override
                                         public void onClick(SweetAlertDialog sweetAlertDialog) {
                                             Intent intent = new Intent (RegistroUsuario.this, MenuPrincipal.class);
                                             startActivityForResult(intent,OPTION_SIGN_UP);
                                         }
-                                    }).show();
-                        }
+                            }).show();
 
-                    },500);
                 } else if (response.code() == 400 ) {
                     Toast.makeText(RegistroUsuario.this, "Ya existe un usuario con ese nickname, introduzca otro.", Toast.LENGTH_LONG).show();
                     nombre_usuario.getText().clear();
