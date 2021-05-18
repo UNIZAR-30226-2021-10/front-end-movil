@@ -1,5 +1,6 @@
 package eina.unizar.front_end_movil;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.JsonArray;
@@ -100,6 +102,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     ArrayList<Jugadores> playersOrdenados = new ArrayList<Jugadores>();
     List<String> emails = new ArrayList<String>();
     List<String> users = new ArrayList<String>();
+    List<String> abandonados = new ArrayList<String>();
 
     private int NUM_RONDAS;
     private int NUM_JUGADORES;
@@ -198,20 +201,60 @@ public class JuegoMultijugador extends AppCompatActivity{
                         }
                     }
                     handleRegistrarPuntos(gestorSesion.getmailSession(), puntosGuardar);
-                    /*
-                    for(int i = 0; i < players.size(); i++){
-                        System.out.println("He entrado al bucle del handle");
-                        for(int j = 0; j < players.size(); j++){
-                            if((players.get(i).getUsername()).equals(emails.get(j))){
-                                handleRegistrarPuntos(emails.get(j), players.get(i).getPuntos());
+                    finalizarPartida();
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener message = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable(){
+                @Override
+                public void run(){
+                    JSONObject message = (JSONObject) args[0];
+                    System.out.println("El mensaje que me ha llegado es el siguiente: ");
+                    System.out.println(message);
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener userDesconectado = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable(){
+                @Override
+                public void run(){
+                    String userOut = (String) args[0];
+                    System.out.println("El usuario que ha abandonado la partida es ");
+                    System.out.println(userOut);
+                    eliminarJugador(userOut);
+                    //tiene que comprobar que hay dos jugadores o mas para poder continuar la partida y sino
+                    abandonados.add("");
+                    int quedan = players.size() - abandonados.size();
+                    if(quedan == 1){
+                        //finalizar la partida para todos y poner al jugador como ganador
+                        msocket.emit("desconexion");
+                        int puntosGuardar = 0;
+                        for(int i = 0; i < players.size(); i++){
+                            if((players.get(i).getUsername()).equals(gestorSesion.getSession())){
+                                puntosGuardar = players.get(i).getPuntos();
+                                ganador = players.get(i).getUsername();
+                                System.out.println("El ganador soy yo porque no abandono:");
+                                System.out.println(ganador);
                             }
                         }
-                    }*/
-                    //esto es de prueba
-                    /*String prueba1 = "martamoralessabroso14@gmail.com";
-                    int puntuacionsss = 100;
-                    handleRegistrarPuntos(prueba1, puntuacionsss);*/
-                    finalizarPartida();
+                        //Registra los puntos y monedas del jugador que se queda en la partida
+                        handleRegistrarPuntos(gestorSesion.getmailSession(), puntosGuardar);
+                        //pone al usuario como ganador de la partida
+                        handleFinPartidaMulti();
+                        if(!gestorSesion.getSession().equals(userOut)){
+                            //lo manda a la pantalla de fin de partida
+                            finalizarPartida();
+                        }
+                    }
                 }
             });
         }
@@ -268,10 +311,11 @@ public class JuegoMultijugador extends AppCompatActivity{
             }
         }
 
-        msocket//.on("message",message)
+        msocket.on("message",message)
                 .on("newPlayer", nuevoJugador)
                 .on("recibirTurno", nuevoTurno)
                 .on("finalizarPartida", jugadoresOrdenados)
+                .on("desconexion", userDesconectado)
                 .on(Socket.EVENT_CONNECT, new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
@@ -385,13 +429,44 @@ public class JuegoMultijugador extends AppCompatActivity{
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AlertDialog.Builder quiereSalir = new AlertDialog.Builder(JuegoMultijugador.this);
+                quiereSalir.setMessage("¿Desea abandonar la partida?");
+                quiereSalir.setCancelable(false);
+                quiereSalir.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //confirma que quiere salir de la partida
+                        //tiene que hacer el emit de desconection
+                        msocket.emit("disconnection");
+                        //tiene que ser eliminado de la tabla juega
+                        handleAbandonarPartida();
+                        //tiene que continuar la partida con un jugador menos
+
+                        //sino se debe continuar pero sin el jugador
+                        Intent intent = new Intent(v.getContext(), DecisionJuego.class);
+                        startActivityForResult(intent, OPTION_ATRAS);
+                    }
+                });
+                quiereSalir.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                AlertDialog titulo = quiereSalir.create();
+                titulo.setTitle("Salir");
+                titulo.show();
+
+
+                //Esto es lo que habia antes del Alert Dialog
+                /*
                 Bundle extras = new Bundle();
                 extras.putString("jugadoresEnSala",String.valueOf(jugadoresEnSala));
                 extras.putString("codigo", codigo);
                 Intent intent = new Intent(v.getContext(), AbandonarPartida.class);
                 intent.putExtras(extras);
                 startActivityForResult(intent, OPTION_ATRAS);
-                System.out.println("TODO OK");
+                System.out.println("TODO OK");*/
             }
         });
 
@@ -693,6 +768,51 @@ public class JuegoMultijugador extends AppCompatActivity{
         }
     }
 
+    public void eliminarJugador(String usuario){
+        if(players.size() == 2){
+            if(usuario1_nombre.getText().equals(usuario)){
+                usuario1_nombre.setText("Abandonó");
+                usuario1_puntos.setText("0");
+            }
+            else if(usuario2_nombre.getText().equals(usuario)){
+                usuario2_nombre.setText("Abandonó");
+                usuario2_puntos.setText("0");
+            }
+        }
+        else if(players.size() == 3){
+            if(usuario1_nombre.getText().equals(usuario)){
+                usuario1_nombre.setText("Abandonó");
+                usuario1_puntos.setText("0");
+            }
+            else if(usuario2_nombre.getText().equals(usuario)) {
+                usuario2_nombre.setText("Abandonó");
+                usuario2_puntos.setText("0");
+            }
+            else if(usuario3_nombre.getText().equals(gestorSesion.getSession())) {
+                usuario3_nombre.setText("Ha abandonado la partida");
+                usuario3_puntos.setText("0");
+            }
+        }
+        else{
+            if(usuario1_nombre.getText().equals(gestorSesion.getSession())){
+                usuario1_nombre.setText("Ha abandonado la partida");
+                usuario1_puntos.setText("0");
+            }
+            else if(usuario2_nombre.getText().equals(gestorSesion.getSession())) {
+                usuario2_nombre.setText("Ha abandonado la partida");
+                usuario2_puntos.setText("0");
+            }
+            else if(usuario3_nombre.getText().equals(gestorSesion.getSession())) {
+                usuario3_nombre.setText("Ha abandonado la partida");
+                usuario3_puntos.setText("0");
+            }
+            else if(usuario4_nombre.getText().equals(gestorSesion.getSession())) {
+                usuario4_nombre.setText("Ha abandonado la partida");
+                usuario4_puntos.setText("0");
+            }
+        }
+    }
+
     private void  handleObtenerInfo(){
         HashMap<String,String> obtener = new HashMap<>();
         obtener.put("codigo", codigo);
@@ -828,11 +948,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    //handleRegistrarMonedas();
-                    //if(ganador.equals(gestorSesion.getSession())){
-                      //  handleRegistrarMonedas();
-                   // }
-                    System.out.println("TODO OK");
+                    System.out.println("TODO OK al actualizar el ganador");
                 } else if(response.code() == 450){
                     Toast.makeText(JuegoMultijugador.this, "No se ha podido finalizar la partida", Toast.LENGTH_LONG).show();
                 } else{
@@ -849,11 +965,12 @@ public class JuegoMultijugador extends AppCompatActivity{
     }
 
     private void  handleRegistrarPuntos(String correo, int puntosJugador){
+        int monedasInsertar = puntosJugador/2;
         HashMap<String,String> ganarMonedas = new HashMap<>();
         //monedas_ganador = puntos_ganador/2;
         ganarMonedas.put("email", correo);
         //ganarMonedas.put("puntos", String.valueOf(puntos_ganador));
-        ganarMonedas.put("monedas", String.valueOf(0));
+        ganarMonedas.put("monedas", String.valueOf(monedasInsertar));
         ganarMonedas.put("puntos", String.valueOf(puntosJugador));
         //ganarMonedas.put("monedas", String.valueOf(monedas_ganador));
         System.out.println("Los puntos que tengo que registrar son:");
@@ -871,6 +988,31 @@ public class JuegoMultijugador extends AppCompatActivity{
                     System.out.println("TODO OK al registrar las monedas");
                 } else{
                     Toast.makeText(JuegoMultijugador.this, "No se ha actualizado al ganador", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(JuegoMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    private void  handleAbandonarPartida(){
+        HashMap<String,String> salirDePartida = new HashMap<>();
+        salirDePartida.put("codigo", codigo);
+        salirDePartida.put("email", gestorSesion.getmailSession());
+
+        Call<JsonObject> call = retrofitInterface.salirPartidaJuega(salirDePartida);
+        call.enqueue(new Callback<JsonObject>() {
+            //Gestionamos la respuesta de la llamada a post
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() == 200) {
+                    System.out.println("TODO OK, se ha abandonado la partida correctamente");
+                } else{
+                    Toast.makeText(JuegoMultijugador.this, "No se ha podido eliminar al usuario de juega", Toast.LENGTH_LONG).show();
                 }
             }
 
