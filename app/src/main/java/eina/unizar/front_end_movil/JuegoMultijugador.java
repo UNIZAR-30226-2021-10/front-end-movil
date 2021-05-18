@@ -141,7 +141,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                         e.printStackTrace();
                     }
                     int entrada = players.get(players.size() - 1).getOrden();
-                    Jugadores jugador = new Jugadores(nickname, 0, avatar, entrada + 1);
+                    Jugadores jugador = new Jugadores(nickname, 0, avatar, entrada + 1, true);
                     players.add(jugador);
                     asignarJugadores();
                     System.out.println("Estos son los jugadores de" + gestorSesion.getSession());
@@ -177,7 +177,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                         players.get(teToca - 2).setPuntos(puntosActualizar); // el que ha jugado antes de ti
                     }
                     asignarPuntos();
-                    //asignarPuntos();
                     //es mi turno de jugar
                     if(players.get(teToca-1).getUsername().equals(gestorSesion.getSession())){
                         siguiente.setVisibility(View.VISIBLE);
@@ -186,6 +185,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                     }
                     num_rondas.setText(String.valueOf(numero_ronda));
                     turno_jugador.setText(players.get(teToca - 1).getUsername());
+
                 }
             });
         }
@@ -243,7 +243,8 @@ public class JuegoMultijugador extends AppCompatActivity{
                     int quedan = players.size() - abandonados.size();
                     if(quedan == 1){
                         //finalizar la partida para todos y poner al jugador como ganador
-                        msocket.emit("desconexion");
+                        //msocket.emit("desconexion");
+                        msocket.emit("disconnection");
                         int puntosGuardar = 0;
                         for(int i = 0; i < players.size(); i++){
                             if((players.get(i).getUsername()).equals(gestorSesion.getSession())){
@@ -261,6 +262,14 @@ public class JuegoMultijugador extends AppCompatActivity{
                             //lo manda a la pantalla de fin de partida
                             finalizarPartida();
                         }
+                    }
+                    else{
+                        for(int i = 0; i < players.size(); i++){
+                            if((players.get(i).getUsername()).equals(userOut)){
+                                players.get(i).setEstaJugando(false);
+                            }
+                        }
+                        NUM_JUGADORES--;
                     }
                 }
             });
@@ -419,6 +428,15 @@ public class JuegoMultijugador extends AppCompatActivity{
                 System.out.println(players.get(0).getPuntos());
                 System.out.println("Los puntos del jugador 2, indice 1 son:");
                 System.out.println(players.get(1).getPuntos());
+                if(!players.get(teToca - 1).isEstaJugando()){
+                    indice = teToca - 1;
+                    System.out.println("El indice antes del if es: ");
+                    System.out.println(indice);
+                    teToca = teToca + 1;
+                    if(teToca == NUM_JUGADORES+1){
+                        teToca = 1;
+                    }
+                }
                 //pasas los puntos actuales del jugador
                 msocket.emit("pasarTurno", teToca, numero_ronda, players.get(indice).getPuntos());
                 num_rondas.setText(String.valueOf(numero_ronda));
@@ -445,13 +463,14 @@ public class JuegoMultijugador extends AppCompatActivity{
                         //confirma que quiere salir de la partida
                         //tiene que hacer el emit de desconection
                         msocket.emit("disconnection");
+                        msocket.disconnect();
+                        msocket.off();
                         //tiene que ser eliminado de la tabla juega
                         handleAbandonarPartida();
                         //tiene que continuar la partida con un jugador menos
-
-                        //sino se debe continuar pero sin el jugador
                         Intent intent = new Intent(v.getContext(), DecisionJuego.class);
                         startActivityForResult(intent, OPTION_ATRAS);
+                        //finish();
                     }
                 });
                 quiereSalir.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -463,7 +482,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                 AlertDialog titulo = quiereSalir.create();
                 titulo.setTitle("Salir");
                 titulo.show();
-
 
                 //Esto es lo que habia antes del Alert Dialog
                 /*
@@ -726,7 +744,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             usuario1_nombre.setText(gestorSesion.getSession());
             usuario1_puntos.setText("0");
             cargarImagenUsuario(gestorSesion.getAvatarSession(), imagenUsuario1);
-            Jugadores jugador = new Jugadores(gestorSesion.getSession(), 0, gestorSesion.getAvatarSession(), 0);
+            Jugadores jugador = new Jugadores(gestorSesion.getSession(), 0, gestorSesion.getAvatarSession(), 0, true);
             players.add(jugador);
             jugadoresEnSala = players.size();
         }
@@ -778,43 +796,43 @@ public class JuegoMultijugador extends AppCompatActivity{
     public void eliminarJugador(String usuario){
         if(players.size() == 2){
             if(usuario1_nombre.getText().equals(usuario)){
-                usuario1_nombre.setText("Abandonó");
+                usuario1_nombre.setText("Desconectado");
                 usuario1_puntos.setText("0");
             }
             else if(usuario2_nombre.getText().equals(usuario)){
-                usuario2_nombre.setText("Abandonó");
+                usuario2_nombre.setText("Desconectado");
                 usuario2_puntos.setText("0");
             }
         }
         else if(players.size() == 3){
             if(usuario1_nombre.getText().equals(usuario)){
-                usuario1_nombre.setText("Abandonó");
+                usuario1_nombre.setText("Desconectado");
                 usuario1_puntos.setText("0");
             }
             else if(usuario2_nombre.getText().equals(usuario)) {
-                usuario2_nombre.setText("Abandonó");
+                usuario2_nombre.setText("Desconectado");
                 usuario2_puntos.setText("0");
             }
             else if(usuario3_nombre.getText().equals(gestorSesion.getSession())) {
-                usuario3_nombre.setText("Ha abandonado la partida");
+                usuario3_nombre.setText("Desconectado");
                 usuario3_puntos.setText("0");
             }
         }
         else{
             if(usuario1_nombre.getText().equals(gestorSesion.getSession())){
-                usuario1_nombre.setText("Ha abandonado la partida");
+                usuario1_nombre.setText("Desconectado");
                 usuario1_puntos.setText("0");
             }
             else if(usuario2_nombre.getText().equals(gestorSesion.getSession())) {
-                usuario2_nombre.setText("Ha abandonado la partida");
+                usuario2_nombre.setText("Desconectado");
                 usuario2_puntos.setText("0");
             }
             else if(usuario3_nombre.getText().equals(gestorSesion.getSession())) {
-                usuario3_nombre.setText("Ha abandonado la partida");
+                usuario3_nombre.setText("Desconectado");
                 usuario3_puntos.setText("0");
             }
             else if(usuario4_nombre.getText().equals(gestorSesion.getSession())) {
-                usuario4_nombre.setText("Ha abandonado la partida");
+                usuario4_nombre.setText("Desconectado");
                 usuario4_puntos.setText("0");
             }
         }
@@ -871,7 +889,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                         String nickname = prueba.get("nickname").getAsString();
                         String image = prueba.get("imagen").getAsString(); //coger el avatar
                         int entrada = prueba.get("orden_entrada").getAsInt(); //coger el avatar
-                        Jugadores jugador2 = new Jugadores(nickname,0, image, entrada);
+                        Jugadores jugador2 = new Jugadores(nickname,0, image, entrada, true);
                         players.add(jugador2);
                         emails.add(email);
                         users.add(nickname);
