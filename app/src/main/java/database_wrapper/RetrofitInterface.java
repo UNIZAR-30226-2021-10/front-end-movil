@@ -106,6 +106,9 @@ public interface RetrofitInterface {
     @POST("/AbandonarPartidaMulti")
     Call<JsonObject> eliminarPartida(@Body HashMap<String,String> map);
 
+    @POST("/FinalMultijugador_Juega2")
+    Call<JsonObject> finMultiJuega(@Body HashMap<String,String> map);
+
     @POST("/GuardarMonedasGanador")
     Call<JsonObject> guardarMonedas(@Body HashMap<String,String> map);
 

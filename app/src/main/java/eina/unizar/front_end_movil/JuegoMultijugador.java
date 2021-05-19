@@ -205,6 +205,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                         }
                     }
                     handleRegistrarPuntos(gestorSesion.getmailSession(), puntosGuardar);
+                    handleFinPartidaMultiJuega(gestorSesion.getmailSession(),puntosGuardar);
                     finalizarPartida();
                 }
             });
@@ -751,11 +752,11 @@ public class JuegoMultijugador extends AppCompatActivity{
                 }
             }
             handleRegistrarPuntos(gestorSesion.getmailSession(), puntosGuardar);
+            handleFinPartidaMultiJuega(gestorSesion.getmailSession(), puntosGuardar);
             Bundle extra = new Bundle();
             String ganador = calcularGanador();
             extra.putString("ganador", ganador);
             handleFinPartidaMulti();
-            //handleFinPartidaMultiJuega();
             //msocket.emit("sendFinPartida",playersOrdenados);
             msocket.emit("sendFinPartida",ganador);
             Intent intent = new Intent(this, FinPartidaMulti.class);
@@ -1093,14 +1094,14 @@ public class JuegoMultijugador extends AppCompatActivity{
     }
 
 
-    /*private void  handleFinPartidaMultiJuega() {
+    private void  handleFinPartidaMultiJuega(String user, int points) {
         HashMap<String, String> finMultiJuega = new HashMap<>();
 
         finMultiJuega.put("codigo", codigo);
-        //finMultiJuega.put("usuario_email", ganador);
-        finMultiJuega.put("puntuacion", Integer.toString(puntos_ganador));
+        finMultiJuega.put("puntos", Integer.toString(points));
+        finMultiJuega.put("email", user);
 
-        Call<JsonObject> call = retrofitInterface.finPartidaMultiJuega(finMultiJuega);
+        Call<JsonObject> call = retrofitInterface.finMultiJuega(finMultiJuega);
         call.enqueue(new Callback<JsonObject>() {
             //Gestionamos la respuesta de la llamada a post
             @Override
@@ -1121,7 +1122,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                 Toast.makeText(JuegoMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-    }*/
+    }
 
     void activar(){
         pregunta.setClickable(true);
