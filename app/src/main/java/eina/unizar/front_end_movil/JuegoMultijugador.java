@@ -130,8 +130,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                     try {
                         nickname = datos.getString("username");
                         avatar = datos.getString("avatar");
-                        //System.out.println("NICKNAME EN EMITTER: " + nickname);
-                        //System.out.println("AVATAR EN EMITTER: " + avatar);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -140,11 +138,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                     players.add(jugador);
                     playersAux.add(jugador);
                     asignarJugadores();
-                    //System.out.println("Estos son los jugadores de" + gestorSesion.getSession());
-                    /*for(int i = 0; i < players.size(); i++){
-                        System.out.println(players.get(i).getUsername());
-                    }*/
-
                 }
             });
         }
@@ -162,8 +155,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                     int puntosActualizar = (int) args[2];
                     teToca = turnoActual;
                     numero_ronda = rondaActual;
-                    //System.out.println("Estos son los puntos que me llegan: ");
-                    //System.out.println(puntosActualizar);
                     System.out.println("Este es el TETOCA que me llega: ");
                     System.out.println(teToca);
                     // Actualizar los puntos
@@ -247,7 +238,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                     //int quedan = players.size() - abandonados.size();
                     if(NUM_JUGADORES == 1){
                         //finalizar la partida para todos y poner al jugador como ganador
-                        //msocket.emit("desconexion");
                         msocket.emit("disconnection");
                         int puntosGuardar = 0;
                         for(int i = 0; i < players.size(); i++){
@@ -517,16 +507,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                 AlertDialog titulo = quiereSalir.create();
                 titulo.setTitle("Salir");
                 titulo.show();
-
-                //Esto es lo que habia antes del Alert Dialog
-                /*
-                Bundle extras = new Bundle();
-                extras.putString("jugadoresEnSala",String.valueOf(jugadoresEnSala));
-                extras.putString("codigo", codigo);
-                Intent intent = new Intent(v.getContext(), AbandonarPartida.class);
-                intent.putExtras(extras);
-                startActivityForResult(intent, OPTION_ATRAS);
-                System.out.println("TODO OK");*/
             }
         });
 
@@ -589,26 +569,6 @@ public class JuegoMultijugador extends AppCompatActivity{
         imagenDados = (ImageButton) findViewById(R.id.dado);
         imagenDados.setClickable(false);
     }
-    /*
-    public String quienEsGanador() {
-        if (numero_puntos_p1 > numero_puntos_p2 && numero_puntos_p1 > numero_puntos_p3 && numero_puntos_p1 > numero_puntos_p4) {
-            ganador = usuario1_nombre.getText().toString();
-            puntos_ganador = numero_puntos_p1;
-            return usuario1_nombre.getText().toString();
-        } else if (numero_puntos_p2 > numero_puntos_p1 && numero_puntos_p2 > numero_puntos_p3 && numero_puntos_p2 > numero_puntos_p4) {
-            ganador = usuario2_nombre.getText().toString();
-            puntos_ganador = numero_puntos_p2;
-            return usuario2_nombre.getText().toString();
-        } else if (numero_puntos_p3 > numero_puntos_p2 && numero_puntos_p3 > numero_puntos_p1 && numero_puntos_p3 > numero_puntos_p4) {
-            ganador = usuario3_nombre.getText().toString();
-            puntos_ganador = numero_puntos_p3;
-            return usuario3_nombre.getText().toString();
-        } else {
-            ganador = usuario4_nombre.getText().toString();
-            puntos_ganador = numero_puntos_p4;
-            return usuario4_nombre.getText().toString();
-        }
-    }*/
 
     public void finalizarPartida(){
         Bundle extra = new Bundle();
@@ -1036,12 +996,9 @@ public class JuegoMultijugador extends AppCompatActivity{
     private void  handleRegistrarPuntos(String correo, int puntosJugador){
         int monedasInsertar = puntosJugador/2;
         HashMap<String,String> ganarMonedas = new HashMap<>();
-        //monedas_ganador = puntos_ganador/2;
         ganarMonedas.put("email", correo);
-        //ganarMonedas.put("puntos", String.valueOf(puntos_ganador));
         ganarMonedas.put("monedas", String.valueOf(monedasInsertar));
         ganarMonedas.put("puntos", String.valueOf(puntosJugador));
-        //ganarMonedas.put("monedas", String.valueOf(monedas_ganador));
         System.out.println("Los puntos que tengo que registrar son:");
         System.out.println(puntosJugador);
         System.out.println("Las monedas que tengo que registrar son:");
