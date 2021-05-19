@@ -39,22 +39,21 @@ import io.socket.engineio.client.transports.WebSocket;
 
 public class PantallaChat extends AppCompatActivity{
 
-    private static final String ipMarta = "http://192.168.1.162:5000/";
-    private static final String ipAndrea = "http://192.168.0.26:5000/";
+    //private static final String ipMarta = "http://192.168.1.162:5000/";
+    //private static final String ipAndrea = "http://192.168.0.26:5000/";
 
-    private static final int OPTION_INSTRUCCIONES = 0;
+    //private static final int OPTION_INSTRUCCIONES = 0;
 
-    private Socket msocket;
-    private GestorSesion gestorSesion;
+    //private Socket msocket;
+    //private GestorSesion gestorSesion;
 
-    private EditText editText;
-    private MessageAdapter messageAdapter;
-    private ListView messagesView;
-    ConstraintLayout pant1;
-    ConstraintLayout pant2;
+    //private EditText editText;
+    //private MessageAdapter messageAdapter;
+    //private ListView messagesView;
+
 
     // const mensajeUserJoin = {sender: 'admin', avatar: admin, text: "Bienvenido al chat "+ user.username, date: "admin" };
-    private Emitter.Listener newMessage = new Emitter.Listener(){
+    /*private Emitter.Listener newMessage = new Emitter.Listener(){
         @Override
         public void call(final Object... args){
             runOnUiThread(new Runnable(){
@@ -86,17 +85,7 @@ public class PantallaChat extends AppCompatActivity{
                 }
             });
         }
-    };
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        msocket.disconnect();
-        msocket.emit("disconnection");
-        msocket.off();
-    }
-
+    };*/
 
     /**
      * Called when the activity is first created.
@@ -106,30 +95,30 @@ public class PantallaChat extends AppCompatActivity{
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.pantalla_chat);
-        getSupportActionBar().hide();
-        gestorSesion = new GestorSesion(PantallaChat.this);
+        //super.onCreate(savedInstanceState);
+        //setContentView(R.layout.pantalla_chat);
+        //getSupportActionBar().hide();
+        //gestorSesion = new GestorSesion(PantallaChat.this);
 
-        editText = (EditText) findViewById(R.id.mensaje_writer);
+        //editText = (EditText) findViewById(R.id.mensaje_writer);
 
-        messageAdapter = new MessageAdapter(this);
-        messagesView = (ListView) findViewById(R.id.lista_mensajes);
-        messagesView.setAdapter(messageAdapter);
+        //messageAdapter = new MessageAdapter(this);
+        //messagesView = (ListView) findViewById(R.id.lista_mensajes);
+        //messagesView.setAdapter(messageAdapter);
         //pant1 = (ConstraintLayout) findViewById(R.id.constraint);
         //pant2 = (ConstraintLayout) findViewById(R.id.constraint2);
         //pant2.setVisibility(View.GONE);
 
         // conexión con sockets
-        try {
+        /*try {
             IO.Options options = new IO.Options();
             options.transports = new String[]{WebSocket.NAME};
             msocket = IO.socket(ipAndrea, options);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
-        }
+        }*/
 
-        msocket.on("message",newMessage)
+        /*msocket.on("message",newMessage)
                 .on(Socket.EVENT_CONNECT, new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
@@ -169,10 +158,10 @@ public class PantallaChat extends AppCompatActivity{
                 //JSONObject response = (JSONObject) args[0];
                 //System.out.println(response);
             }
-        });
+        });*/
 
         // Botón de atrás
-        Button atrasButton = (Button) findViewById(R.id.atras);
+        /*Button atrasButton = (Button) findViewById(R.id.atras);
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -180,20 +169,20 @@ public class PantallaChat extends AppCompatActivity{
                 //pant1.setVisibility(View.GONE);
                 //pant2.setVisibility(View.VISIBLE);
             }
-        });
+        });*/
 
-        ImageButton instButton = (ImageButton) findViewById(R.id.instrucciones);
+        /*ImageButton instButton = (ImageButton) findViewById(R.id.instrucciones);
         instButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent (v.getContext(), InstruccionesJuego.class);
                 startActivityForResult(intent, OPTION_INSTRUCCIONES);
             }
-        });
+        });*/
 
     }
 
-    public void sendMessage(View view) {
+    /*public void sendMessage(View view) {
         String m = editText.getText().toString();
         if (m.length() > 0) {
             // mandar mensaje
@@ -230,49 +219,10 @@ public class PantallaChat extends AppCompatActivity{
             });
             editText.getText().clear();
         }
-    }
-
-
-    public class Mensaje{
-        private String usuario;
-        private String mensaje;
-        private boolean belongsToCurrentUser; // is this message sent by us?
-        private boolean isAdmin; // is this admin
-
-        public Mensaje(String usuario, String mensaje, boolean belongsToCurrentUser, boolean isAdmin) {
-            this.usuario = usuario;
-            this.mensaje = mensaje;
-            this.belongsToCurrentUser = belongsToCurrentUser;
-            this.isAdmin = isAdmin;
-        }
-
-        public String getUsuario() {
-            return usuario;
-        }
-
-        public void setUsuario(String usuario) {
-            this.usuario = usuario;
-        }
-
-        public String getMensaje() {
-            return mensaje;
-        }
-
-        public void setMensaje(String mensaje) {
-            this.mensaje = mensaje;
-        }
-
-        public boolean isBelongsToCurrentUser() {
-            return belongsToCurrentUser;
-        }
-
-        public boolean isAdmin() {
-            return isAdmin;
-        }
-    }
+    }*/
 
     // MessageAdapter.java
-    public class MessageAdapter extends BaseAdapter {
+    /*public class MessageAdapter extends BaseAdapter {
 
         List<Mensaje> messages = new ArrayList<Mensaje>();
         Context context;
@@ -335,7 +285,7 @@ public class PantallaChat extends AppCompatActivity{
     class MessageViewHolder {
         public TextView name;
         public TextView messageBody;
-    }
+    }*/
 
 
 }

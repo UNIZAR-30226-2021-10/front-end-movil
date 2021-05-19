@@ -6,14 +6,18 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -26,13 +30,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
+import Chat.Mensaje;
+import Chat.MessageAdapter;
 import SessionManagement.GestorSesion;
 import SessionManagement.Jugadores;
 import SessionManagement.Question;
@@ -53,12 +62,20 @@ public class JuegoMultijugador extends AppCompatActivity{
     private static final String ipMarta = "http://192.168.1.162:5000/";
     private static final String ipAndrea = "http://192.168.0.26:5000/";
 
+    private ConstraintLayout pantallaMulti;
+    private ConstraintLayout pantallaChat;
+
     private static final String TAG = "JuegoMultijugador";
     private static final int OPTION_ATRAS = 0;
     private static final int OPTION_ACABAR = 1;
-    private static final int OPTION_CHAT = 2;
+    private static final int OPTION_INSTRUCCIONES = 2; // en el chat aparecen las instrucciones
 
     private Socket msocket;
+
+    /** COSAS DEL CHAT **/
+    private EditText mensajeEscribir;
+    private MessageAdapter messageAdapter;
+    private ListView messagesView;
 
     private TextView texto_puntos2;
     private TextView texto_puntos3;
@@ -205,15 +222,36 @@ public class JuegoMultijugador extends AppCompatActivity{
         }
     };
 
-    private Emitter.Listener message = new Emitter.Listener() {
+    // const mensajeUserJoin = {sender: 'admin', avatar: admin, text: "Bienvenido al chat "+ user.username, date: "admin" };
+    private Emitter.Listener newMessage = new Emitter.Listener(){
         @Override
-        public void call(final Object... args) {
+        public void call(final Object... args){
             runOnUiThread(new Runnable(){
                 @Override
                 public void run(){
-                    JSONObject message = (JSONObject) args[0];
-                    System.out.println("El mensaje que me ha llegado es el siguiente: ");
-                    System.out.println(message);
+                    JSONObject datos = (JSONObject) args[0];
+                    String sender = "";
+                    String texto = "";
+                    try {
+                        sender = datos.getString("sender");
+                        texto = datos.getString("text");
+                        System.out.println("NICKNAME EN EMITTER: " + sender);
+                        System.out.println("AVATAR EN EMITTER: " + texto);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    if(!sender.equals(gestorSesion.getSession())) {
+                        Mensaje m = new Mensaje(sender, texto, false, sender.equals("admin"));
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                messageAdapter.add(m);
+                                // scroll the ListView to the last added element
+                                messagesView.setSelection(messagesView.getCount() - 1);
+                            }
+                        });
+                    }
                 }
             });
         }
@@ -337,6 +375,15 @@ public class JuegoMultijugador extends AppCompatActivity{
         retrofitInterface = APIUtils.getAPIService();
         gestorSesion = new GestorSesion(JuegoMultijugador.this);
 
+        pantallaChat = (ConstraintLayout) findViewById(R.id.constraintChat);
+        pantallaMulti = (ConstraintLayout) findViewById(R.id.constraintMulti);
+        pantallaChat.setVisibility(View.GONE);
+
+        // PARA CHAT
+        messageAdapter = new MessageAdapter(this);
+        messagesView = (ListView) findViewById(R.id.lista_mensajes);
+        messagesView.setAdapter(messageAdapter);
+
         Bundle extras = getIntent().getExtras();
         codigo = extras.getString("codigo");
         tipo = extras.getString("tipo");
@@ -360,7 +407,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             }
         }
 
-        msocket.on("message",message)
+        msocket.on("message",newMessage)
                 .on("newPlayer", nuevoJugador)
                 .on("recibirTurno", nuevoTurno)
                 .on("finalizarPartida", jugadoresOrdenados)
@@ -518,13 +565,35 @@ public class JuegoMultijugador extends AppCompatActivity{
             }
         });
 
+        // Botón atrás del botón
+        Button atrasChatButton = (Button) findViewById(R.id.atrasChat);
+        atrasChatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pantallaChat.setVisibility(View.GONE);
+                pantallaMulti.setVisibility(View.VISIBLE);
+            }
+        });
+
         // boton de chat
         ImageButton chatButton = (ImageButton) findViewById(R.id.chat);
         chatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), PantallaChat.class);
-                startActivityForResult(intent, OPTION_CHAT);
+                //Intent intent = new Intent(v.getContext(), PantallaChat.class);
+                //startActivityForResult(intent, OPTION_CHAT);
+                pantallaMulti.setVisibility(View.GONE);
+                pantallaChat.setVisibility(View.VISIBLE);
+            }
+        });
+
+        // VOTON DE INSTRUCCIONES DEL CHAT
+        ImageButton instButton = (ImageButton) findViewById(R.id.instrucciones);
+        instButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent (v.getContext(), InstruccionesJuego.class);
+                startActivityForResult(intent, OPTION_INSTRUCCIONES);
             }
         });
 
@@ -540,6 +609,9 @@ public class JuegoMultijugador extends AppCompatActivity{
     }
 
     public void unirConXML(){
+        // PARA CHAT
+        mensajeEscribir = (EditText) findViewById(R.id.mensaje_writer);
+
         pregunta = (TextView)findViewById(R.id.pregunta);
         resp1 = (TextView)findViewById(R.id.respuesta1);
         resp2 = (TextView)findViewById(R.id.respuesta2);
@@ -1262,6 +1334,57 @@ public class JuegoMultijugador extends AppCompatActivity{
                 Toast.makeText( JuegoMultijugador.this, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    // PARA CHAT
+    public void sendMessage(View view) {
+        String m = mensajeEscribir.getText().toString();
+        if (m.length() > 0) {
+            // mandar mensaje
+            final Mensaje message = new Mensaje(gestorSesion.getSession(), m, true, false);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    messageAdapter.add(message);
+                    // scroll the ListView to the last added element
+                    messagesView.setSelection(messagesView.getCount() - 1);
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+                    Date date = new Date();
+                    String fecha = dateFormat.format(date);
+                    // const mensajeUserJoin = {sender: 'admin', avatar: admin, text: "Bienvenido al chat "+ user.username, date: "admin" };
+                    JSONObject aux = new JSONObject();
+                    try{
+                        aux.put("sender", gestorSesion.getSession()); //sender
+                        aux.put("avatar", gestorSesion.getAvatarSession()); //avatar
+                        aux.put("text",m); //texto
+                        aux.put("date", fecha); //fecha
+
+                    } catch (JSONException e){
+                        e.printStackTrace();
+                    }
+
+                    msocket.emit("sendMessage", aux, new Ack(){
+                        @Override
+                        public void call(Object... args){
+                            //JSONObject response = (JSONObject) args[0];
+                            //System.out.println(response);
+                        }
+                    });
+                }
+            });
+            mensajeEscribir.getText().clear();
+            hideSoftKeyboard();
+        }
+    }
+
+    /**
+     * Hides the soft keyboard
+     */
+    public void hideSoftKeyboard() {
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
     }
 }
 
