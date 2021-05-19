@@ -99,6 +99,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     String tipo;
     int type;
     ArrayList<Jugadores> players = new ArrayList<Jugadores>();
+    ArrayList<Jugadores> playersAux = new ArrayList<Jugadores>();
     ArrayList<Jugadores> playersOrdenados = new ArrayList<Jugadores>();
     List<String> emails = new ArrayList<String>();
     List<String> users = new ArrayList<String>();
@@ -137,6 +138,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                     int entrada = players.get(players.size() - 1).getOrden();
                     Jugadores jugador = new Jugadores(nickname, 0, avatar, entrada + 1, true);
                     players.add(jugador);
+                    playersAux.add(jugador);
                     asignarJugadores();
                     //System.out.println("Estos son los jugadores de" + gestorSesion.getSession());
                     /*for(int i = 0; i < players.size(); i++){
@@ -232,6 +234,11 @@ public class JuegoMultijugador extends AppCompatActivity{
                     String userOut = (String) args[0];
                     System.out.println("El usuario que ha abandonado la partida es ");
                     System.out.println(userOut);
+                    for(int i = 0; i < playersAux.size(); i++){
+                        if((playersAux.get(i).getUsername()).equals(userOut)){
+                            playersAux.get(i).setEstaJugando(false);
+                        }
+                    }
                     eliminarJugador(userOut);
                     //tiene que comprobar que hay dos jugadores o mas para poder continuar la partida y sino
                     NUM_JUGADORES--;
@@ -353,7 +360,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             try {
                 IO.Options options = new IO.Options();
                 options.transports = new String[]{WebSocket.NAME};
-                msocket = IO.socket(ipAndrea, options);
+                msocket = IO.socket(ipMarta, options);
                 System.out.println("SOS");
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
@@ -618,15 +625,6 @@ public class JuegoMultijugador extends AppCompatActivity{
         if(players.size() == 2){
             user1 = players.get(0).getPuntos();
             user2 = players.get(1).getPuntos();
-            /*
-            for(int i = 0; i < players.size(); i++){
-                for(int j = 0; j < players.size(); j++){
-                    if((players.get(i).getUsername()).equals(emails.get(j))){
-                        System.out.println("Voy a entrar a la funcion registrar puntos");
-                        handleRegistrarPuntos(emails.get(j), players.get(i).getPuntos());
-                    }
-                }
-            }*/
 
         }else if(players.size() == 3){
             user1 = players.get(0).getPuntos();
@@ -773,21 +771,32 @@ public class JuegoMultijugador extends AppCompatActivity{
             cargarImagenUsuario(gestorSesion.getAvatarSession(), imagenUsuario1);
             Jugadores jugador = new Jugadores(gestorSesion.getSession(), 0, gestorSesion.getAvatarSession(), 0, true);
             players.add(jugador);
+            playersAux.add(jugador);
             jugadoresEnSala = players.size();
         }
     }
 
     public void asignarPuntos(){
-        for(int i = 0; i < players.size(); i++) {
-            if(i == 0){
-                usuario1_puntos.setText(String.valueOf(players.get(i).getPuntos()));
-            } else if(i == 1){
-                usuario2_puntos.setText(String.valueOf(players.get(i).getPuntos()));
-            } else if(i == 2){
-                usuario3_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+        for(int i = 0; i < playersAux.size(); i++) {
+            if(i == 0 && playersAux.get(i).isEstaJugando()){
+                usuario1_puntos.setText(String.valueOf(playersAux.get(i).getPuntos()));
+            } else if(i == 0 && !playersAux.get(i).isEstaJugando()){
+                usuario1_puntos.setText(String.valueOf(0));
             }
-            else if(i == 3){
-                usuario4_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+            else if(i == 1 && playersAux.get(i).isEstaJugando()){
+                usuario2_puntos.setText(String.valueOf(playersAux.get(i).getPuntos()));
+            } else if(i == 1 && !playersAux.get(i).isEstaJugando()){
+                usuario2_puntos.setText(String.valueOf(0));
+            }
+            else if(i == 2 && playersAux.get(i).isEstaJugando()){
+                usuario3_puntos.setText(String.valueOf(playersAux.get(i).getPuntos()));
+            } else if(i == 2 && !playersAux.get(i).isEstaJugando()){
+                usuario3_puntos.setText(String.valueOf(0));
+            }
+            else if(i == 3 && playersAux.get(i).isEstaJugando()){
+                usuario4_puntos.setText(String.valueOf(playersAux.get(i).getPuntos()));
+            }else if(i == 3 && !playersAux.get(i).isEstaJugando()){
+                usuario4_puntos.setText(String.valueOf(0));
             }
         }
     }
@@ -796,24 +805,24 @@ public class JuegoMultijugador extends AppCompatActivity{
         for(int i = 0; i < players.size(); i++){
             if(i == 0){
                 usuario1_nombre.setText(players.get(i).getUsername());
-                usuario1_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+                usuario1_puntos.setText(String.valueOf(playersAux.get(i).getPuntos()));
                 cargarImagenUsuario(players.get(i).getImagen(), imagenUsuario1);
             }
             else if(i == 1){
                 usuario2_nombre.setText(players.get(i).getUsername());
-                usuario2_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+                usuario2_puntos.setText(String.valueOf(playersAux.get(i).getPuntos()));
                 cargarImagenUsuario(players.get(i).getImagen(), imagenUsuario2);
                 texto_puntos2.setText("puntos");
             }
             else if(i == 2){
                 usuario3_nombre.setText(players.get(i).getUsername());
-                usuario3_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+                usuario3_puntos.setText(String.valueOf(playersAux.get(i).getPuntos()));
                 cargarImagenUsuario(players.get(i).getImagen(), imagenUsuario3);
                 texto_puntos3.setText("puntos");
             }
             else if(i == 3){
                 usuario4_nombre.setText(players.get(i).getUsername());
-                usuario4_puntos.setText(String.valueOf(players.get(i).getPuntos()));
+                usuario4_puntos.setText(String.valueOf(playersAux.get(i).getPuntos()));
                 cargarImagenUsuario(players.get(i).getImagen(), imagenUsuario4);
                 texto_puntos4.setText("puntos");
             }
@@ -861,6 +870,12 @@ public class JuegoMultijugador extends AppCompatActivity{
             else if(usuario4_nombre.getText().equals(gestorSesion.getSession())) {
                 usuario4_nombre.setText("Desconectado");
                 usuario4_puntos.setText("0");
+            }
+        }
+        for(int i = 0; i < playersAux.size(); i++){
+            if(usuario.equals(playersAux.get(i).getUsername())){
+                playersAux.get(i).setPuntos(0);
+                players.get(i).setPuntos(0);
             }
         }
     }
@@ -918,6 +933,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                         int entrada = prueba.get("orden_entrada").getAsInt(); //coger el avatar
                         Jugadores jugador2 = new Jugadores(nickname,0, image, entrada, true);
                         players.add(jugador2);
+                        playersAux.add(jugador2);
                         emails.add(email);
                         users.add(nickname);
                         System.out.println("El usuario añadido es:");
@@ -1221,16 +1237,20 @@ public class JuegoMultijugador extends AppCompatActivity{
                 desactivar();
                 if(teToca == 1){
                     players.get(0).setPuntos(players.get(0).getPuntos() + puntosCat[cat]);
+                    playersAux.get(0).setPuntos(playersAux.get(0).getPuntos() + puntosCat[cat]);
                     System.out.println("Soy el jugador 1");
-                    System.out.println(players.get(0).getPuntos());
+                    System.out.println(playersAux.get(0).getPuntos());
                 } else if(teToca == 2){
                     players.get(1).setPuntos(players.get(1).getPuntos() + puntosCat[cat]);
+                    playersAux.get(1).setPuntos(playersAux.get(1).getPuntos() + puntosCat[cat]);
                     System.out.println("Soy el jugador 2");
                     System.out.println(players.get(1).getPuntos());
                 } else if(teToca == 3){
                     players.get(2).setPuntos(players.get(2).getPuntos() + puntosCat[cat]);
+                    playersAux.get(2).setPuntos(playersAux.get(2).getPuntos() + puntosCat[cat]);
                 } else {
                     players.get(3).setPuntos(players.get(3).getPuntos() + puntosCat[cat]);
+                    playersAux.get(3).setPuntos(playersAux.get(3).getPuntos() + puntosCat[cat]);
                 }
                 siguiente.setClickable(true);
                 comprobarRondas();
