@@ -128,13 +128,6 @@
                 android:value=".FinPartidaMulti" />
         </activity>
         <activity
-            android:name=".PantallaChat"
-            android:parentActivityName=".PantallaChat" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".PantallaChat" />
-        </activity>
-        <activity
             android:name=".PantallaTienda"
             android:parentActivityName=".PantallaTienda" >
             <meta-data

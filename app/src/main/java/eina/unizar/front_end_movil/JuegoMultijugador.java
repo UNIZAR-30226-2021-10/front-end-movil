@@ -232,9 +232,11 @@ public class JuegoMultijugador extends AppCompatActivity{
                     JSONObject datos = (JSONObject) args[0];
                     String sender = "";
                     String texto = "";
+                    String avatar = "";
                     try {
                         sender = datos.getString("sender");
                         texto = datos.getString("text");
+                        avatar = datos.getString("avatar");
                         System.out.println("NICKNAME EN EMITTER: " + sender);
                         System.out.println("AVATAR EN EMITTER: " + texto);
                     } catch (JSONException e) {
@@ -242,7 +244,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                     }
 
                     if(!sender.equals(gestorSesion.getSession())) {
-                        Mensaje m = new Mensaje(sender, texto, false, sender.equals("admin"));
+                        Mensaje m = new Mensaje(sender, texto, false, sender.equals("admin"), avatar);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -1341,7 +1343,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         String m = mensajeEscribir.getText().toString();
         if (m.length() > 0) {
             // mandar mensaje
-            final Mensaje message = new Mensaje(gestorSesion.getSession(), m, true, false);
+            final Mensaje message = new Mensaje(gestorSesion.getSession(), m, true, false, gestorSesion.getAvatarSession());
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

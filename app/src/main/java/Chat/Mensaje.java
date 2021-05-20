@@ -4,14 +4,16 @@ public class Mensaje {
 
     private String usuario;
     private String mensaje;
+    private String imagen;
     private boolean belongsToCurrentUser; // is this message sent by us?
     private boolean isAdmin; // is this admin
 
-    public Mensaje(String usuario, String mensaje, boolean belongsToCurrentUser, boolean isAdmin) {
+    public Mensaje(String usuario, String mensaje, boolean belongsToCurrentUser, boolean isAdmin, String imagen) {
         this.usuario = usuario;
         this.mensaje = mensaje;
         this.belongsToCurrentUser = belongsToCurrentUser;
         this.isAdmin = isAdmin;
+        this.imagen = imagen;
     }
 
     public String getUsuario() {
@@ -36,5 +38,13 @@ public class Mensaje {
 
     public boolean isAdmin() {
         return isAdmin;
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
     }
 }

@@ -2,16 +2,22 @@ package Chat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import eina.unizar.front_end_movil.PantallaChat;
 import eina.unizar.front_end_movil.R;
 
 public class MessageAdapter extends BaseAdapter {
@@ -58,10 +64,12 @@ public class MessageAdapter extends BaseAdapter {
         } else if(!message.isBelongsToCurrentUser() && !message.isAdmin()){ // this message was sent by someone else so let's create an advanced chat bubble on the left
             convertView = messageInflater.inflate(R.layout.their_message, null);
             holder.name = (TextView) convertView.findViewById(R.id.name);
+            holder.avatar = (ImageView) convertView.findViewById(R.id.avatar);
             holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
             convertView.setTag(holder);
             holder.name.setText(message.getUsuario());
             holder.messageBody.setText(message.getMensaje());
+            cargarImagenUusario(message.getImagen(),holder.avatar);
         } else{
             convertView = messageInflater.inflate(R.layout.admin_message, null);
             holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
@@ -72,9 +80,19 @@ public class MessageAdapter extends BaseAdapter {
         return convertView;
     }
 
+    private void cargarImagenUusario(String url, ImageView perfilButton) {
+        Picasso.get().load(url).fit()
+                .error(R.drawable.ic_baseline_error_24)
+                .placeholder(R.drawable.animacion_carga)
+                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                .networkPolicy(NetworkPolicy.NO_CACHE)
+                .into(perfilButton);
+    }
+
 }
 
 class MessageViewHolder {
+    public ImageView avatar;
     public TextView name;
     public TextView messageBody;
 }
