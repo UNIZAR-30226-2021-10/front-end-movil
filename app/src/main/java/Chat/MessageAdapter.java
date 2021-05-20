@@ -57,12 +57,28 @@ public class MessageAdapter extends BaseAdapter {
         Mensaje message = messages.get(i);
 
         if (message.isBelongsToCurrentUser()) { // this message was sent by us so let's create a basic chat bubble on the right
-            convertView = messageInflater.inflate(R.layout.my_message, null);
+            if(message.getNumJugador() == 0){
+                convertView = messageInflater.inflate(R.layout.my_message0, null);
+            } else if(message.getNumJugador() == 1){
+                convertView = messageInflater.inflate(R.layout.my_message1, null);
+            } else if(message.getNumJugador() == 2){
+                convertView = messageInflater.inflate(R.layout.my_message2, null);
+            } else{
+                convertView = messageInflater.inflate(R.layout.my_message3, null);
+            }
             holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
             convertView.setTag(holder);
             holder.messageBody.setText(message.getMensaje());
         } else if(!message.isBelongsToCurrentUser() && !message.isAdmin()){ // this message was sent by someone else so let's create an advanced chat bubble on the left
-            convertView = messageInflater.inflate(R.layout.their_message, null);
+            if(message.getNumJugador() == 0){
+                convertView = messageInflater.inflate(R.layout.their_message0, null);
+            } else if(message.getNumJugador() == 1){
+                convertView = messageInflater.inflate(R.layout.their_message1, null);
+            } else if(message.getNumJugador() == 2){
+                convertView = messageInflater.inflate(R.layout.their_message2, null);
+            } else{
+                convertView = messageInflater.inflate(R.layout.their_message3, null);
+            }
             holder.name = (TextView) convertView.findViewById(R.id.name);
             holder.avatar = (ImageView) convertView.findViewById(R.id.avatar);
             holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);

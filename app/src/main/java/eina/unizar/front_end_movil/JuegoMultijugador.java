@@ -242,9 +242,15 @@ public class JuegoMultijugador extends AppCompatActivity{
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
+                    int orden = 0;
                     if(!sender.equals(gestorSesion.getSession())) {
-                        Mensaje m = new Mensaje(sender, texto, false, sender.equals("admin"), avatar);
+                        for(int i = 0; i < playersAux.size(); i++){
+                            // guardar el orden en el que está para el chat
+                            if(playersAux.get(i).getUsername().equals(sender)){
+                                orden = i;
+                            }
+                        }
+                        Mensaje m = new Mensaje(sender, texto, false, sender.equals("admin"), avatar, orden);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -1343,7 +1349,14 @@ public class JuegoMultijugador extends AppCompatActivity{
         String m = mensajeEscribir.getText().toString();
         if (m.length() > 0) {
             // mandar mensaje
-            final Mensaje message = new Mensaje(gestorSesion.getSession(), m, true, false, gestorSesion.getAvatarSession());
+            int orden = 0;
+            for(int i = 0; i < playersAux.size(); i++){
+                // guardar el orden en el que está para el chat
+                if(playersAux.get(i).getUsername().equals(gestorSesion.getSession())){
+                    orden = i;
+                }
+            }
+            final Mensaje message = new Mensaje(gestorSesion.getSession(), m, true, false, gestorSesion.getAvatarSession(), orden);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
