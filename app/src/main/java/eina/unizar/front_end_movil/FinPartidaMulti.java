@@ -13,6 +13,7 @@ public class FinPartidaMulti extends AppCompatActivity {
     private static final int OPTION_SALIR = 0;
 
     private TextView ganador;
+    private TextView mensaje1;
 
     /**
      * Called when the activity is first created.
@@ -29,6 +30,11 @@ public class FinPartidaMulti extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         ganador = (TextView)findViewById(R.id.ganador);
         ganador.setText(extras.getString("ganador"));
+        mensaje1 = (TextView)findViewById(R.id.mensaje);
+
+        if(ganador.equals("")){
+            mensaje1.setText("¡Ha habido un empate entre varios jugadores!");
+        }
 
         // Botón de salir
         Button salirButton = (Button) findViewById(R.id.salir);
