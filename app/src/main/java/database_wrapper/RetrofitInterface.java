@@ -46,8 +46,9 @@ public interface RetrofitInterface {
     @POST("/CambiarContrasenya")
     Call<JsonObject> executeChangePassword(@Body HashMap<String,String> map);
 
-    @GET("/Historial")
-    Call<JsonArray> getGames(@Query("mail") String email);
+    //@GET("/Historial")
+    @GET("/Historial_Completo")
+    Call<JsonArray> getGames(@Query("email") String email);
 
     @GET("/Historial_Puntuacion")
     Call<JsonArray> getPointsFromGames(@Query("email") String email);

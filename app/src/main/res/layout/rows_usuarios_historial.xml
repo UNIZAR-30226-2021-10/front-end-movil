@@ -9,8 +9,7 @@
     <ImageView
         android:id="@+id/foto_perfil"
         android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:background="@mipmap/imagenusr3"/>
+        android:layout_height="70dp" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="250dp"
@@ -34,11 +33,51 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="128dp"
+            android:layout_marginLeft="128dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="74dp"
+            android:layout_marginRight="74dp"
+            android:layout_marginBottom="36dp"
+            android:fontFamily="sans-serif-black"
+            android:text="Puesto: "
+            android:textColor="@android:color/black"
+            android:textSize="13dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="128dp"
+            android:layout_marginLeft="128dp"
+            android:layout_marginTop="33dp"
+            android:layout_marginEnd="72dp"
+            android:layout_marginRight="72dp"
+            android:layout_marginBottom="19dp"
+            android:fontFamily="sans-serif-black"
+            android:text="Rondas: "
+            android:textColor="@android:color/black"
+            android:textSize="13dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
             android:id="@+id/fecha"
-            android:layout_width="204dp"
+            android:layout_width="99dp"
             android:layout_height="14dp"
-            android:layout_marginStart="46dp"
-            android:layout_marginLeft="46dp"
+            android:layout_marginStart="45dp"
+            android:layout_marginLeft="45dp"
+            android:layout_marginEnd="106dp"
+            android:layout_marginRight="106dp"
             android:layout_marginBottom="56dp"
             android:textColor="@android:color/black"
             android:textSize="13dp"
@@ -67,14 +106,48 @@
 
         <TextView
             android:id="@+id/puntos"
-            android:layout_width="67dp"
+            android:layout_width="50dp"
             android:layout_height="18dp"
             android:layout_marginStart="78dp"
             android:layout_marginLeft="78dp"
             android:layout_marginTop="15dp"
-            android:layout_marginEnd="105dp"
-            android:layout_marginRight="105dp"
+            android:layout_marginEnd="122dp"
+            android:layout_marginRight="122dp"
             android:layout_marginBottom="37dp"
+            android:textColor="@android:color/black"
+            android:textSize="13dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/puesto"
+            android:layout_width="55dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="176dp"
+            android:layout_marginLeft="176dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="19dp"
+            android:layout_marginRight="19dp"
+            android:layout_marginBottom="36dp"
+            android:textColor="@android:color/black"
+            android:textSize="13dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/rondas"
+            android:layout_width="55dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="178dp"
+            android:layout_marginLeft="178dp"
+            android:layout_marginTop="33dp"
+            android:layout_marginEnd="17dp"
+            android:layout_marginRight="17dp"
+            android:layout_marginBottom="19dp"
             android:textColor="@android:color/black"
             android:textSize="13dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -102,13 +175,13 @@
 
         <TextView
             android:id="@+id/jugadores"
-            android:layout_width="56dp"
+            android:layout_width="40dp"
             android:layout_height="17dp"
             android:layout_marginStart="88dp"
             android:layout_marginLeft="88dp"
             android:layout_marginTop="33dp"
-            android:layout_marginEnd="106dp"
-            android:layout_marginRight="106dp"
+            android:layout_marginEnd="122dp"
+            android:layout_marginRight="122dp"
             android:layout_marginBottom="20dp"
             android:textColor="@android:color/black"
             android:textSize="13dp"
