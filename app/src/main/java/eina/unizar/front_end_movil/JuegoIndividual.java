@@ -1,7 +1,9 @@
 package eina.unizar.front_end_movil;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -116,12 +118,30 @@ public class JuegoIndividual extends AppCompatActivity{
         imagenDados.setClickable(false);
 
         // boton de atrás
+
         Button atrasButton = (Button) findViewById(R.id.atras);
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), AbandonarPartida.class);
-                startActivityForResult(intent, OPTION_ATRAS);
+                    AlertDialog.Builder quiereSalir = new AlertDialog.Builder(JuegoIndividual.this);
+                    quiereSalir.setMessage("¿Desea abandonar la partida?");
+                    quiereSalir.setCancelable(false);
+                    quiereSalir.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(v.getContext(), DecisionJuego.class);
+                            startActivityForResult(intent, OPTION_ATRAS);
+                        }
+                    });
+                    quiereSalir.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    AlertDialog titulo = quiereSalir.create();
+                    titulo.setTitle("Salir");
+                    titulo.show();
             }
         });
 
