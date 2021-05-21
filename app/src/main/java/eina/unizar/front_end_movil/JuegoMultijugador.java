@@ -60,7 +60,7 @@ import retrofit2.http.Body;
 public class JuegoMultijugador extends AppCompatActivity{
 
     private static final String ipMarta = "http://192.168.1.162:5000/";
-    private static final String ipAndrea = "http://192.168.0.26:5000/";
+    private static final String ipAndrea = "https://websocketstrivial.herokuapp.com/";
 
     private ConstraintLayout pantallaMulti;
     private ConstraintLayout pantallaChat;
@@ -250,7 +250,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                                 orden = i;
                             }
                         }
-                        Mensaje m = new Mensaje(sender, texto, false, sender.equals("admin"), avatar, orden);
+                        final Mensaje m = new Mensaje(sender, texto, false, sender.equals("admin"), avatar, orden);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -524,7 +524,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         Button atrasButton = (Button) findViewById(R.id.atras);
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
                 if(players.size() != NUM_JUGADORES){
                     // si es el único jugador
                     Toast.makeText(JuegoMultijugador.this, "No te puedes marchar hasta que no estén todos los jugadores", Toast.LENGTH_LONG).show();
@@ -1346,7 +1346,7 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     // PARA CHAT
     public void sendMessage(View view) {
-        String m = mensajeEscribir.getText().toString();
+        final String m = mensajeEscribir.getText().toString();
         if (m.length() > 0) {
             // mandar mensaje
             int orden = 0;

@@ -122,7 +122,7 @@ public class JuegoIndividual extends AppCompatActivity{
         Button atrasButton = (Button) findViewById(R.id.atras);
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
                     AlertDialog.Builder quiereSalir = new AlertDialog.Builder(JuegoIndividual.this);
                     quiereSalir.setMessage("¿Desea abandonar la partida?");
                     quiereSalir.setCancelable(false);
