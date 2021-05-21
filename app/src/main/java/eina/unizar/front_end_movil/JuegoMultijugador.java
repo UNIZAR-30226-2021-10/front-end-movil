@@ -14,33 +14,27 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-
 import Chat.Mensaje;
 import Chat.MessageAdapter;
 import SessionManagement.GestorSesion;
@@ -57,11 +51,9 @@ import io.socket.engineio.client.transports.WebSocket;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.http.Body;
 
 public class JuegoMultijugador extends AppCompatActivity{
 
-    private static final String ipMarta = "http://192.168.1.162:5000/";
     private static final String ipAndrea = "https://websocketstrivial.herokuapp.com/";
 
     private ConstraintLayout pantallaMulti;
@@ -107,7 +99,6 @@ public class JuegoMultijugador extends AppCompatActivity{
     private ImageButton imagenDados;
     private Random rndNumber = new Random();
     private Random rndQuestion = new Random();
-    private boolean haEmpezado = false;
 
     private Button empezar;
     private Button siguiente;
@@ -121,7 +112,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     int type;
     ArrayList<Jugadores> players = new ArrayList<Jugadores>();
     ArrayList<Jugadores> playersAux = new ArrayList<Jugadores>();
-    ArrayList<Jugadores> playersOrdenados = new ArrayList<Jugadores>();
+    JSONArray playersOrdenados = new JSONArray();
     List<String> emails = new ArrayList<String>();
     List<String> users = new ArrayList<String>();
 
@@ -130,9 +121,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     private int ID_PARTIDA;
     int numero_ronda = 1;
     int teToca = 0;
-    int puntos_ganador;
     int jugadoresEnSala;
-    int puntosAPasar;
 
     private RetrofitInterface retrofitInterface;
     private GestorSesion gestorSesion;
@@ -145,7 +134,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                 @Override
                 public void run(){
                     JSONObject datos = (JSONObject) args[0];
-                    System.out.println(datos);
                     String nickname = "";
                     String avatar = "";
                     try {
@@ -176,17 +164,13 @@ public class JuegoMultijugador extends AppCompatActivity{
                     int puntosActualizar = (int) args[2];
                     teToca = turnoActual;
                     numero_ronda = rondaActual;
-                    System.out.println("Este es el TETOCA que me llega: ");
-                    System.out.println(teToca);
                     // Actualizar los puntos
-
                     if (teToca == 0) {
                         // el que juega antes del primero es el ultimo jugador
                         players.get(NUM_JUGADORES - 1).setPuntos(puntosActualizar);
                     } else {
                         players.get(teToca - 1).setPuntos(puntosActualizar); // el que ha jugado antes de ti
                     }
-
                     asignarPuntos();
                     //es mi turno de jugar
                     if(players.get(teToca).getUsername().equals(gestorSesion.getSession())){
@@ -196,7 +180,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                     }
                     num_rondas.setText(String.valueOf(numero_ronda));
                     turno_jugador.setText(players.get(teToca).getUsername());
-
                 }
             });
         }
@@ -209,15 +192,14 @@ public class JuegoMultijugador extends AppCompatActivity{
                 @Override
                 public void run(){
                     // LLEGA EL JSON !!!!!
-                    JSONArray ganadorPartida = (JSONArray) args[0];
-                    System.out.println("El ganador que me ha llegado es: ");
-                    //System.out.println(ganadorPartida);
+                    playersOrdenados = (JSONArray) args[0];
                     try {
-                        JSONObject j  = ganadorPartida.getJSONObject(0);
+                        JSONObject j  = playersOrdenados.getJSONObject(0);
                         ganador = j.get("username").toString();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+
                     int puntosGuardar = 0;
                     for(int i = 0; i < players.size(); i++){
                         if((players.get(i).getUsername()).equals(gestorSesion.getSession())){
@@ -247,8 +229,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                         sender = datos.getString("sender");
                         texto = datos.getString("text");
                         avatar = datos.getString("avatar");
-                        System.out.println("NICKNAME EN EMITTER: " + sender);
-                        System.out.println("AVATAR EN EMITTER: " + texto);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -282,8 +262,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                 @Override
                 public void run(){
                     String userOut = (String) args[0];
-                    System.out.println("El usuario que ha abandonado la partida es ");
-                    System.out.println(userOut);
                     for(int i = 0; i < playersAux.size(); i++){
                         if((playersAux.get(i).getUsername()).equals(userOut)){
                             playersAux.get(i).setEstaJugando(false);
@@ -292,8 +270,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                     eliminarJugador(userOut);
                     //tiene que comprobar que hay dos jugadores o mas para poder continuar la partida y sino
                     NUM_JUGADORES--;
-                    //abandonados.add("");
-                    //int quedan = players.size() - abandonados.size();
                     if(NUM_JUGADORES == 1){
                         //finalizar la partida para todos y poner al jugador como ganador
                         msocket.emit("disconnection");
@@ -302,8 +278,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                             if((players.get(i).getUsername()).equals(gestorSesion.getSession())){
                                 puntosGuardar = players.get(i).getPuntos();
                                 ganador = players.get(i).getUsername();
-                                System.out.println("El ganador soy yo porque no abandono:");
-                                System.out.println(ganador);
                             }
                         }
                         //Registra los puntos y monedas del jugador que se queda en la partida
@@ -316,7 +290,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                         }
                     }
                     else{
-                        System.out.println("Tetoca " + teToca);
                         int indice = 0;
                         // borra al usuario del struct
                         for(int i = 0; i < players.size(); i++){
@@ -327,13 +300,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                             }
                         }
                         actualizarTeToca(indice);
-                        System.out.println("Tetoca actualizado " + teToca);
-                        System.out.println("Se ha ido " + indice);
-                        System.out.println("El orden de jugadores ahora queda así:");
-                        for(int i = 0; i < players.size(); i++){
-                            players.get(i).setOrden(i);
-                            System.out.println(players.get(i).getUsername());
-                        }
                     }
                 }
             });
@@ -341,27 +307,17 @@ public class JuegoMultijugador extends AppCompatActivity{
     };
 
     public void actualizarTeToca(int seHaIdo){
-        if(teToca == 0){
-            if(seHaIdo == 0){
-                // pasar turno
-            }
-        } else if(teToca == 1){
+        if(teToca == 1){
             if(seHaIdo == 0){
                 teToca--;
-            } else if(seHaIdo == 1){
-                //pasar turno --> SE PUEDE HACER CUANDO TE VAS
             }
         } else if(teToca == 2){
             if(seHaIdo == 0 || seHaIdo == 1){
                 teToca--;
-            } else if(seHaIdo == 3){
-                // pasar turno
             }
         } else if(teToca == 3){
             if(seHaIdo == 0 ||seHaIdo == 1 || seHaIdo == 2){
                 teToca--;
-            } else{
-                // pasar turno
             }
         }
     }
@@ -374,7 +330,6 @@ public class JuegoMultijugador extends AppCompatActivity{
         msocket.disconnect();
         msocket.emit("disconnection");
         msocket.off();
-        //mSocket.off("message", onNewMessage);
     }
 
     /**
@@ -413,41 +368,20 @@ public class JuegoMultijugador extends AppCompatActivity{
         if(type == 1) {
             handleUnirseJuega();
         }
-
-        {
-            try {
-                IO.Options options = new IO.Options();
-                options.transports = new String[]{WebSocket.NAME};
-                msocket = IO.socket(ipAndrea, options);
-                System.out.println("SOS");
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
+        try {
+            IO.Options options = new IO.Options();
+            options.transports = new String[]{WebSocket.NAME};
+            msocket = IO.socket(ipAndrea, options);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
+
 
         msocket.on("message",newMessage)
                 .on("newPlayer", nuevoJugador)
                 .on("recibirTurno", nuevoTurno)
                 .on("finalizarPartida", jugadoresOrdenados)
-                .on("desconexion", userDesconectado)
-                .on(Socket.EVENT_CONNECT, new Emitter.Listener() {
-                    @Override
-                    public void call(Object... args) {
-                        for (Object obj : args) {
-                            System.out.println("POR FIN!!!!!!");
-                            Log.d(TAG," NOT Errors :: " + obj);
-                        }
-                    }
-                })
-                .on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
-                    @Override
-                    public void call(Object... args) {
-                        for (Object obj : args) {
-                            Log.d(TAG,"Errors :: " + obj);
-                        }
-                    }
-                });
-
+                .on("desconexion", userDesconectado);
 
         msocket.connect();
 
@@ -464,10 +398,7 @@ public class JuegoMultijugador extends AppCompatActivity{
 
         msocket.emit("join", aux, new Ack(){
             @Override
-            public void call(Object... args){
-                //JSONObject response = (JSONObject) args[0];
-                //System.out.println(response);
-            }
+            public void call(Object... args){ }
         });
 
         //llamar a la bd para conseguir el numRondas y numJugadores
@@ -479,7 +410,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                 public void onClick(View v) {
                     if(players.size() == NUM_JUGADORES){
                         resetear();
-                        haEmpezado = true;
                         num_rondas.setText(String.valueOf(numero_ronda));
                         turno_jugador.setText(players.get(teToca).getUsername());
                         rollDice();
@@ -491,7 +421,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                         Toast.makeText(JuegoMultijugador.this, "Faltan jugadores por unirse a la partida", Toast.LENGTH_LONG).show();
                     }
                 }
-            }); // para quitar el botón
+            });
         }
         else{
             empezar.setVisibility(View.GONE);
@@ -504,23 +434,17 @@ public class JuegoMultijugador extends AppCompatActivity{
             public void onClick(View v) {
                 resetear();
                 desactivar();
-                //int indice = teToca - 1;
                 siguiente.setVisibility(View.GONE);
                 siguiente.setClickable(false);
-                System.out.println("El teToca antes del if es: ");
-                System.out.println(teToca);
                 int indice = teToca;
                 teToca = teToca + 1;
                 if(teToca == NUM_JUGADORES){
                     teToca = 0;
                     indice = NUM_JUGADORES - 1;
                 }
-                System.out.println("El teToca despues del if es: ");
-                System.out.println(teToca);
                 if(teToca == 0){
                     numero_ronda++;
                 }
-                //numero_ronda++;
                 //pasas los puntos actuales del jugador
                 msocket.emit("pasarTurno", teToca, numero_ronda, players.get(indice).getPuntos());
                 num_rondas.setText(String.valueOf(numero_ronda));
@@ -567,7 +491,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                             //tiene que continuar la partida con un jugador menos
                             Intent intent = new Intent(v.getContext(), DecisionJuego.class);
                             startActivityForResult(intent, OPTION_ATRAS);
-                            //finish();
 
                         }
                     });
@@ -599,8 +522,6 @@ public class JuegoMultijugador extends AppCompatActivity{
         chatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(v.getContext(), PantallaChat.class);
-                //startActivityForResult(intent, OPTION_CHAT);
                 pantallaMulti.setVisibility(View.GONE);
                 pantallaChat.setVisibility(View.VISIBLE);
             }
@@ -677,44 +598,8 @@ public class JuegoMultijugador extends AppCompatActivity{
         startActivityForResult(intent, OPTION_ACABAR);
     }
 
-    public String calcularGanador(){
-        int user1 = 0;
-        int user2 = 0;
-        int user3 = -1;
-        int user4 = -2;
-        if(players.size() == 2){
-            user1 = players.get(0).getPuntos();
-            user2 = players.get(1).getPuntos();
-
-        }else if(players.size() == 3){
-            user1 = players.get(0).getPuntos();
-            user2 = players.get(1).getPuntos();
-            user3 = players.get(2).getPuntos();
-        }else if(players.size() == 4){
-            user1 = players.get(0).getPuntos();
-            user2 = players.get(1).getPuntos();
-            user3 = players.get(2).getPuntos();
-            user4 = players.get(3).getPuntos();
-        }
-
-        if (user1 > user2 && user1 > user3 && user1 > user4) {
-            ganador = players.get(0).getUsername();
-            puntos_ganador = user1;
-        }else if (user2 > user1 && user2 > user3 && user2 > user4) {
-            ganador = players.get(1).getUsername();
-            puntos_ganador = user2;
-        }else if (user3 > user1 && user3 > user2 && user3 > user4) {
-            ganador = players.get(2).getUsername();
-            puntos_ganador = user3;
-        }else if (user4 > user1 && user4 > user3 && user4 > user2) {
-            ganador = players.get(3).getUsername();
-            puntos_ganador = user4;
-        }
-        return ganador;
-    }
-
     public void comprobarRondas(){
-        if (numero_ronda == NUM_RONDAS && players.get(teToca).getUsername().equals(gestorSesion.getSession())) {
+        if (numero_ronda == NUM_RONDAS && players.get(teToca).getUsername().equals(gestorSesion.getSession()) && teToca == NUM_JUGADORES-1) {
             int puntosGuardar = 0;
             for(int i = 0; i < players.size(); i++){
                 if((players.get(i).getUsername()).equals(gestorSesion.getSession())){
@@ -723,13 +608,17 @@ public class JuegoMultijugador extends AppCompatActivity{
             }
             handleRegistrarPuntos(gestorSesion.getmailSession(), puntosGuardar);
             handleFinPartidaMultiJuega(gestorSesion.getmailSession(), puntosGuardar);
-            JSONArray p = ordenarJugadores();
+            playersOrdenados = ordenarJugadores();
             Bundle extra = new Bundle();
-            String ganador = calcularGanador();
+            try {
+                JSONObject j = playersOrdenados.getJSONObject(0);
+                ganador = j.get("username").toString();
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
             extra.putString("ganador", ganador);
             handleFinPartidaMulti();
-            //msocket.emit("sendFinPartida",playersOrdenados);
-            msocket.emit("sendFinPartida",p);
+            msocket.emit("sendFinPartida",playersOrdenados);
             Intent intent = new Intent(this, FinPartidaMulti.class);
             intent.putExtras(extra);
             startActivityForResult(intent, OPTION_ACABAR);
@@ -738,16 +627,13 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     public JSONArray ordenarJugadores(){
         JSONArray jugadores = new JSONArray();
-
         ArrayList<JugadoresFinal> p = new ArrayList<>();
         for(int i = 0; i < playersAux.size(); i++){
             JugadoresFinal newP = new JugadoresFinal(playersAux.get(i).getUsername(), playersAux.get(i).getPuntos(), playersAux.get(i).getImagen());
             p.add(newP);
         }
-
         // los ordena según puntos
         Collections.sort(p);
-
         for(int j = 0; j < p.size(); j++){
             JSONObject aux = new JSONObject();
             try{
@@ -896,9 +782,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                     ID_PARTIDA = jsonObject.get("idpartida").getAsInt();
                     NUM_JUGADORES = jsonObject.get("numJugadores").getAsInt();
                     NUM_RONDAS = jsonObject.get("rondas").getAsInt();
-                    //System.out.println("TODO OK");
-                    //System.out.println("Este es el handleObtenerInfo");
-                    //System.out.println(ID_PARTIDA);
                     //obtener jugadores de la partida
                     if(type != 1){
                         handleObtenerJugadores();
@@ -917,9 +800,6 @@ public class JuegoMultijugador extends AppCompatActivity{
     }
 
     private void handleObtenerJugadores(){
-        //System.out.println("Este es el handleObtenerJugadores");
-        //System.out.println(ID_PARTIDA);
-
         Call<JsonArray> call = retrofitInterface.obtenerJugadores(String.valueOf(ID_PARTIDA));
         call.enqueue(new Callback<JsonArray>() {
             //Gestionamos la respuesta de la llamada a post
@@ -938,23 +818,9 @@ public class JuegoMultijugador extends AppCompatActivity{
                         playersAux.add(jugador2);
                         emails.add(email);
                         users.add(nickname);
-                        //System.out.println("El usuario añadido es:");
-                        //System.out.println(email);
-                        System.out.println("JUGADOR AÑADIDO DESDE JOIN " + jugador2.getUsername());
                     }
-                    //System.out.println("Los usuarios que hay son:");
-                    //System.out.println(emails);
                     jugadoresEnSala = players.size();
-                    /*System.out.println("ANTES SORT");
-                    for(int i = 0; i< players.size(); i++){
-                        System.out.println(players.get(i).getUsername());
-                    }*/
                     Collections.sort(players);
-                    /*System.out.println("DESPUES SORT");
-                    for(int i = 0; i< players.size(); i++){
-                        System.out.println(players.get(i).getUsername());
-                    }
-                    System.out.println("TODO OK obtener jugadores");*/
                     // Poner el primer jugador y la ronda
                     num_rondas.setText(String.valueOf(1));
                     turno_jugador.setText(players.get(0).getUsername());
@@ -977,13 +843,9 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     private void handleUnirseJuega(){
         HashMap<String,String> unirseJuega = new HashMap<>();
-
         unirseJuega.put("codigo",codigo);
-        //System.out.println(gestorSesion.getmailSession());
-        //System.out.println(String.valueOf(0));
         unirseJuega.put("email", gestorSesion.getmailSession());
         unirseJuega.put("puntos",String.valueOf(0));
-
 
         Call<JsonObject> call = retrofitInterface.UnirseMultijugadorJuega(unirseJuega);
         call.enqueue(new Callback<JsonObject>() {
@@ -991,7 +853,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    //System.out.println("TODO OK");
+
                 } else if(response.code() == 450){
                     Toast.makeText(JuegoMultijugador.this, "No se ha podido unir a la partida", Toast.LENGTH_LONG).show();
                 } else{
@@ -1011,7 +873,6 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     private void  handleFinPartidaMulti(){
         HashMap<String,String> finPartidaMulti = new HashMap<>();
-
         finPartidaMulti.put("ganador", ganador);
         finPartidaMulti.put("codigo",codigo);
 
@@ -1021,7 +882,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    System.out.println("TODO OK al actualizar el ganador");
+
                 } else if(response.code() == 450){
                     Toast.makeText(JuegoMultijugador.this, "No se ha podido finalizar la partida", Toast.LENGTH_LONG).show();
                 } else{
@@ -1043,19 +904,13 @@ public class JuegoMultijugador extends AppCompatActivity{
         ganarMonedas.put("email", correo);
         ganarMonedas.put("monedas", String.valueOf(monedasInsertar));
         ganarMonedas.put("puntos", String.valueOf(puntosJugador));
-       /* System.out.println("Los puntos que tengo que registrar son:");
-        System.out.println(puntosJugador);
-        System.out.println("Las monedas que tengo que registrar son:");
-        System.out.println(0);*/
 
         Call<JsonObject> call = retrofitInterface.insertNewData(ganarMonedas);
-        //Call<JsonObject> call = retrofitInterface.guardarMonedas(ganarMonedas);
         call.enqueue(new Callback<JsonObject>() {
             //Gestionamos la respuesta de la llamada a post
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    System.out.println("TODO OK al registrar las monedas");
                 } else{
                     Toast.makeText(JuegoMultijugador.this, "No se ha actualizado al ganador", Toast.LENGTH_LONG).show();
                 }
@@ -1080,7 +935,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    System.out.println("TODO OK, se ha abandonado la partida correctamente");
+
                 } else{
                     Toast.makeText(JuegoMultijugador.this, "No se ha podido eliminar al usuario de juega", Toast.LENGTH_LONG).show();
                 }
@@ -1097,7 +952,6 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     private void  handleFinPartidaMultiJuega(String user, int points) {
         HashMap<String, String> finMultiJuega = new HashMap<>();
-
         finMultiJuega.put("codigo", codigo);
         finMultiJuega.put("puntos", Integer.toString(points));
         finMultiJuega.put("email", user);
@@ -1108,7 +962,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    //System.out.println("TODO OK");
+
                 } else if (response.code() == 450) {
                     Toast.makeText(JuegoMultijugador.this, "No se ha podido encontrar partida", Toast.LENGTH_LONG).show();
                 } else if (response.code() == 440) {
@@ -1240,32 +1094,24 @@ public class JuegoMultijugador extends AppCompatActivity{
                     suma = puntos + puntosCat1;
                     players.get(0).setPuntos(suma);
                     playersAux.get(0).setPuntos(suma);
-                    System.out.println("Soy el jugador 1");
-                    System.out.println(playersAux.get(0).getPuntos());
-                    System.out.println(players.get(0).getPuntos());
                 } else if(teToca == 1){
                     puntos = players.get(1).getPuntos();
                     puntosCat1 = puntosCat[cat];
                     suma = puntos + puntosCat1;
                     players.get(1).setPuntos(suma);
                     playersAux.get(1).setPuntos(suma);
-                    System.out.println("Soy el jugador 2");
-                    System.out.println(players.get(1).getPuntos());
-                    System.out.println(players.get(1).getPuntos());
                 } else if(teToca == 2){
                     puntos = players.get(2).getPuntos();
                     puntosCat1 = puntosCat[cat];
                     suma = puntos + puntosCat1;
                     players.get(2).setPuntos(suma);
                     playersAux.get(2).setPuntos(suma);
-                    System.out.println(players.get(2).getPuntos());
                 } else {
                     puntos = players.get(3).getPuntos();
                     puntosCat1 = puntosCat[cat];
                     suma = puntos + puntosCat1;
                     players.get(3).setPuntos(suma);
                     playersAux.get(3).setPuntos(suma);
-                    System.out.println(players.get(3).getPuntos());
                 }
                 siguiente.setClickable(true);
                 comprobarRondas();
@@ -1275,7 +1121,6 @@ public class JuegoMultijugador extends AppCompatActivity{
 
 
     public void obtenerPregunta(final int random){
-        System.out.println(categorias[random-1]);
         Call<JsonObject> call = retrofitInterface.getQuestion(categorias[random-1]);
 
         call.enqueue(new Callback<JsonObject>() {
@@ -1343,8 +1188,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                     msocket.emit("sendMessage", aux, new Ack(){
                         @Override
                         public void call(Object... args){
-                            //JSONObject response = (JSONObject) args[0];
-                            //System.out.println(response);
+
                         }
                     });
                 }

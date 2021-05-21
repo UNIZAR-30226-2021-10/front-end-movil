@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +36,7 @@ import retrofit2.Response;
 public class PerfilUsuario extends AppCompatActivity {
 
     private static final int OPTION_CERRAR_SESION = 0;
+    private static final int OPTION_ATRAS = 1;
     private static final int OPTION_AJUSTES = 2;
     private static final int OPTION_PERFIL = 3;
 
@@ -117,7 +117,8 @@ public class PerfilUsuario extends AppCompatActivity {
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                Intent intent = new Intent(v.getContext(), DecisionJuego.class);
+                startActivityForResult(intent, OPTION_ATRAS);
             }
         });
     }
