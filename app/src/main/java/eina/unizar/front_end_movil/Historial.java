@@ -1,14 +1,11 @@
 package eina.unizar.front_end_movil;
 
 import android.content.Context;
-import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -16,23 +13,15 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-
 import SessionManagement.GestorSesion;
-import SessionManagement.Question;
 import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;
 import retrofit2.Call;
@@ -166,12 +155,10 @@ public class Historial extends AppCompatActivity implements AdapterView.OnItemSe
                                 break;
                             }
                         }
-                        //System.out.println(jugadores);
                         String ganador = jugadores.get(0).getAsJsonObject().get("username").getAsString();
                         String imagenGanador = jugadores.get(0).getAsJsonObject().get("avatar").getAsString();
 
                         if(numJ.equals("1")){
-                            //System.out.println("INDIVIDUAL");
                             fechasInd.add(fecha);
                             numJugadoresInd.add(numJ);
                             ganadoresInd.add(ganador);
@@ -180,7 +167,6 @@ public class Historial extends AppCompatActivity implements AdapterView.OnItemSe
                             rondasInd.add(rondasP);
                             puestosInd.add(puesto);
                         } else{
-                            //System.out.println("MULTIJUGADOR");
                             fotosMulti.add(imagenGanador);
                             puntuacionesMulti.add(puntuacionMia);
                             fechasMulti.add(fecha);
@@ -200,7 +186,6 @@ public class Historial extends AppCompatActivity implements AdapterView.OnItemSe
 
                     adaptador = new ListViewAdapterHistory(Historial.this, fotos, fechas, puntuaciones, numJugadores, ganadores, rondas, puestos);
                     listaPartidas.setAdapter(adaptador);
-                    //getPuntuacion();*/
                 }else if(response.code() == 400){
                     Toast.makeText( Historial.this, "No hay partidas todavía", Toast.LENGTH_LONG).show();
                 }
@@ -216,19 +201,12 @@ public class Historial extends AppCompatActivity implements AdapterView.OnItemSe
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         /* para cuando clica una opción*/
-        System.out.println(position);
         opcion = position;
         if(opcion == 0){
-            System.out.println("TODAS 2");
-            System.out.println("Numero de todas " + fechas.size());
             adaptador = new ListViewAdapterHistory(Historial.this, fotos, fechas, puntuaciones, numJugadores, ganadores, rondas, puestos);
         } else if(opcion == 1){
-            System.out.println("INDIVIDUAL 2");
-            System.out.println("Numero de individuales " + fechasInd.size());
             adaptador = new ListViewAdapterHistory(Historial.this, fotosInd, fechasInd, puntuacionesInd, numJugadoresInd, ganadoresInd, rondasInd, puestosInd);
         } else{
-            System.out.println("MULTIJUGADOR 2");
-            System.out.println("Numero de multi " + fechasMulti.size());
             adaptador = new ListViewAdapterHistory(Historial.this, fotosMulti, fechasMulti, puntuacionesMulti, numJugadoresMulti, ganadoresMulti, rondasMulti, puestosMulti);
         }
         listaPartidas.setAdapter(adaptador);

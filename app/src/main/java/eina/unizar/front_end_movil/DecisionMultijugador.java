@@ -2,33 +2,16 @@ package eina.unizar.front_end_movil;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
-
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-//import java.net.URI;
-import java.net.URI;
 import java.util.HashMap;
-
-import io.socket.client.Ack;
-import io.socket.client.IO;
-import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
-
 import SessionManagement.GestorSesion;
 import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;
@@ -42,7 +25,6 @@ public class DecisionMultijugador extends AppCompatActivity {
     private static final int OPTION_ACCEDER = 0;
     private static final int OPTION_CREAR_NUEVA = 1;
     private static final int OPTION_INSTRUCCIONES = 2;
-    private static final int OPTION_ATRAS = 2;
 
     EditText codigoPartida;
     String codigoInsertado;
@@ -107,8 +89,7 @@ public class DecisionMultijugador extends AppCompatActivity {
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent (v.getContext(), DecisionJuego.class);
-                startActivityForResult(intent, OPTION_ATRAS);
+                finish();
             }
         });
 
@@ -125,8 +106,6 @@ public class DecisionMultijugador extends AppCompatActivity {
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
                     handleObtenerInfo();
-                    //handleUnirseJuega();
-                    System.out.println("TODO OK en obtener partida");
                 } else if(response.code() == 400){
                     Toast.makeText(DecisionMultijugador.this, "La partida introducida no existe", Toast.LENGTH_LONG).show();
                 }
@@ -155,10 +134,6 @@ public class DecisionMultijugador extends AppCompatActivity {
                     JsonObject jsonObject = response.body().getAsJsonObject("idpartida");
                     ID_PARTIDA = jsonObject.get("idpartida").getAsInt();
                     NUM_JUGADORES = jsonObject.get("numJugadores").getAsInt();
-                    System.out.println(NUM_JUGADORES);
-                    System.out.println("TODO OK");
-                    System.out.println("Este es el handleObtenerInfo");
-                    System.out.println(ID_PARTIDA);
                     handleContarJugadores();
                 } else{
                     Toast.makeText(DecisionMultijugador.this, "No se ha podido obtener informacion", Toast.LENGTH_LONG).show();
@@ -186,12 +161,8 @@ public class DecisionMultijugador extends AppCompatActivity {
                 if (response.code() == 200) {
                     JsonArray jsonObject = response.body().getAsJsonArray();
                     for(JsonElement j : jsonObject){
-                        JsonObject prueba = j.getAsJsonObject();
-                        String email = prueba.get("email").getAsString();
                         jugadoresEnSala++;
                     }
-                    System.out.println("TODO OK contar jugadores");
-                    System.out.println(jugadoresEnSala);
                     //falta saber cuantos jugadores hay en la sala para poder entrar
                     if(jugadoresEnSala < NUM_JUGADORES){
                         handleUnirseJuega();
@@ -216,8 +187,6 @@ public class DecisionMultijugador extends AppCompatActivity {
         HashMap<String,String> unirseJuega = new HashMap<>();
 
         unirseJuega.put("codigo",codigoInsertado);
-        System.out.println(gestorSesion.getmailSession());
-        System.out.println(String.valueOf(0));
         unirseJuega.put("email", gestorSesion.getmailSession());
         unirseJuega.put("puntos",String.valueOf(0));
 

@@ -25,8 +25,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class EnviarCodigoVerificacion extends AppCompatActivity{
+
     private static final int OPTION_CONFIRMAR = 0;
-    private static final int OPTION_ATRAS = 1;
 
     private EditText email;
     private EditText codigo_verificacion;
@@ -128,8 +128,7 @@ public class EnviarCodigoVerificacion extends AppCompatActivity{
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), CambiarPassword.class);
-                startActivityForResult(intent, OPTION_ATRAS);
+                finish();
             }
         });
     }

@@ -32,7 +32,7 @@ public class FinPartidaMulti extends AppCompatActivity {
         ganador.setText(extras.getString("ganador"));
         mensaje1 = (TextView)findViewById(R.id.mensaje);
 
-        if(ganador.equals("")){
+        if(extras.getString("ganador").equals("")){
             mensaje1.setText("¡Ha habido un empate entre varios jugadores!");
         }
 

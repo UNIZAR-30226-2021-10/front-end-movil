@@ -1,17 +1,11 @@
 package eina.unizar.front_end_movil;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,10 +36,7 @@ import retrofit2.Response;
 
 public class PerfilUsuario extends AppCompatActivity {
 
-    private String ip = "192.168.0.26"; //TODO: cambiar para poder usarlo todos
-
     private static final int OPTION_CERRAR_SESION = 0;
-    private static final int OPTION_ATRAS = 1;
     private static final int OPTION_AJUSTES = 2;
     private static final int OPTION_PERFIL = 3;
 
@@ -55,10 +46,6 @@ public class PerfilUsuario extends AppCompatActivity {
     private MainAdapter mainAdapter;
     private ArrayList<String> imagenesCosas = new ArrayList<>();
     private ArrayList<String> nombreCosas = new ArrayList<>();
-
-    private ListView listaObjetos;
-
-
 
     private GestorSesion gestorSesion;
     private RetrofitInterface retrofitInterface;
@@ -130,8 +117,7 @@ public class PerfilUsuario extends AppCompatActivity {
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), DecisionJuego.class);
-                startActivityForResult(intent, OPTION_ATRAS);
+                finish();
             }
         });
     }
@@ -174,7 +160,6 @@ public class PerfilUsuario extends AppCompatActivity {
                     for(JsonElement j : jsonObject){
                         JsonObject prueba = j.getAsJsonObject();
                         String imagen = prueba.get("Imagen").getAsString();
-                        String imagenLocal = imagen.replaceAll("localhost", ip);
                         String imagenNube = imagen.replaceAll("http://localhost:3060", "https://trivial-images.herokuapp.com");
                         nombreCosas.add(prueba.get("Nombre").getAsString());
                         imagenesCosas.add(imagenNube);

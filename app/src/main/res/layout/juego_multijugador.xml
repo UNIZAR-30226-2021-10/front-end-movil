@@ -129,14 +129,14 @@
 
         <TextView
             android:id="@+id/categoria"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="205dp"
-            android:layout_marginLeft="205dp"
-            android:layout_marginTop="265dp"
-            android:layout_marginEnd="206dp"
-            android:layout_marginRight="206dp"
-            android:layout_marginBottom="439dp"
+            android:layout_width="129dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="141dp"
+            android:layout_marginLeft="141dp"
+            android:layout_marginTop="262dp"
+            android:layout_marginEnd="141dp"
+            android:layout_marginRight="141dp"
+            android:layout_marginBottom="441dp"
             android:fontFamily="sans-serif-black"
             android:gravity="center"
             android:textSize="20dp"
@@ -151,6 +151,7 @@
             android:layout_height="54dp"
             android:layout_marginTop="315dp"
             android:layout_marginBottom="381dp"
+            android:background="@android:color/white"
             android:fontFamily="sans-serif"
             android:gravity="center"
             android:textColor="@android:color/black"
@@ -583,7 +584,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+   <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintChat"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

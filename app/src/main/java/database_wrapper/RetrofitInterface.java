@@ -1,6 +1,5 @@
 package database_wrapper;
 
-import android.widget.ArrayAdapter;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -14,7 +13,6 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Body;
-import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 public interface RetrofitInterface {
@@ -46,12 +44,8 @@ public interface RetrofitInterface {
     @POST("/CambiarContrasenya")
     Call<JsonObject> executeChangePassword(@Body HashMap<String,String> map);
 
-    //@GET("/Historial")
     @GET("/Historial_Completo")
     Call<JsonArray> getGames(@Query("email") String email);
-
-    @GET("/Historial_Puntuacion")
-    Call<JsonArray> getPointsFromGames(@Query("email") String email);
 
     @POST("/PantallaTienda")
     Call<JsonArray> getObjectsShop(@Body HashMap<String,String> map);
@@ -61,7 +55,6 @@ public interface RetrofitInterface {
 
     @POST("/ObjetoTienda_RestarMonedas")
     Call<JsonObject> updateCoins(@Body HashMap<String,String> map);
-
 
     @POST("CrearMultijugador_Partida")
     Call<JsonObject> crearPartidaMultijugador(@Body HashMap<String,String> map);
@@ -84,9 +77,6 @@ public interface RetrofitInterface {
     @POST("/Multijugador_PartidaCode")
     Call<JsonObject> multiPartidaCode(@Body HashMap<String,String> map);
 
-    @POST("/FinalMultijugador_Juega")
-    Call<JsonObject> finPartidaMultiJuega(@Body HashMap<String,String> map);
-
     @FormUrlEncoded
     @POST("/UpdateItemsUsuario")
     Call<Void> updateItemsFromUser(@Field("email") String email, @Field("equipados")ArrayList<Integer> equipados
@@ -104,16 +94,7 @@ public interface RetrofitInterface {
     @POST("/AbandonarPartidaMulti")
     Call<JsonObject> salirPartidaJuega(@Body HashMap<String,String> map);
 
-    @POST("/AbandonarPartidaMulti")
-    Call<JsonObject> eliminarPartida(@Body HashMap<String,String> map);
-
     @POST("/FinalMultijugador_Juega2")
     Call<JsonObject> finMultiJuega(@Body HashMap<String,String> map);
-
-    @POST("/GuardarMonedasGanador")
-    Call<JsonObject> guardarMonedas(@Body HashMap<String,String> map);
-
-    @POST("/obtenerEmail")
-    Call<JsonObject> emailDeUsuario(@Body HashMap<String,String> map);
 
 }

@@ -21,8 +21,6 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import database_wrapper.RetrofitInterface;
-
 public class CambiarPassword extends AppCompatActivity {
 
     private static final int OPTION_ENVIAR_CORREO = 0;
@@ -35,7 +33,6 @@ public class CambiarPassword extends AppCompatActivity {
     String mensaje;
     int code;
 
-    private RetrofitInterface retrofitInterface;
     //REGEX para comprobar el email
     private  final Pattern EMAIL_ADDRESS_PATTERN = Pattern.compile(
             "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
@@ -47,11 +44,6 @@ public class CambiarPassword extends AppCompatActivity {
                     ")+"
     );
 
-    /**
-     * Called when the activity is first created.
-     *
-     * @param savedInstanceState
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
 

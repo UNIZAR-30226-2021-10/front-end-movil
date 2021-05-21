@@ -8,23 +8,16 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class DecisionIndividual extends AppCompatActivity implements OnItemSelectedListener {
 
     private static final int OPTION_COMENZAR = 0;
-    private static final int OPTION_ATRAS = 1;
     private static final int OPTION_INSTRUCCIONES = 2;
 
     Bundle extras = new Bundle();
 
-    /**
-     * Called when the activity is first created.
-     *
-     * @param savedInstanceState
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
 

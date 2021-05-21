@@ -66,7 +66,7 @@ public class CambiarAvatar extends AppCompatActivity {
     //Listas y vectores que contienen los items del usuario y los items que lleva puesto
     private ArrayList<ItemAvatar> itemsUsuario;
     //Vector para los items equipados del usuario que posteriormente se renderizaran en el Canvas
-    private Bitmap []itemsUsuarioEquipados = new Bitmap[4];
+    private final Bitmap []itemsUsuarioEquipados = new Bitmap[4];
 
     //RecyclerView y recyclerviewAdapter(AvatarAdapter) para hacer de puente entre listaItem y los items de la BD y el layOutManager para asignar
     //los items al layout personalizado "avatar_cardview.xml"
@@ -90,11 +90,7 @@ public class CambiarAvatar extends AppCompatActivity {
     //ImageView del Avatar
     private  ImageView imagenAvatar;
 
-    /**
-     * Called when the activity is first created.
-     *
-     * @param savedInstanceState
-     */
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -112,7 +108,6 @@ public class CambiarAvatar extends AppCompatActivity {
         fillData();
         //Cargamos el Avatar actual que el usuario tenga.
         cargarAvatar();
-
 
         Button okButton = (Button) findViewById((R.id.ok));
         okButton.setOnClickListener(new View.OnClickListener() {
@@ -233,7 +228,6 @@ public class CambiarAvatar extends AppCompatActivity {
                         //Si se está usando la API en la nube pasarle image
                         String image = jsonObject.get("Imagen").getAsString().replaceAll("http://localhost:3060", "https://trivial-images.herokuapp.com");
                         //Si se está usando la API en local pasarle imagelocal
-                        String imageLocal = jsonObject.get("Imagen").getAsString().replaceAll("localhost", "192.168.1.34");
                         itemsUsuario.add(new ItemAvatar(jsonObject.get("Nombre").getAsString(),
                                 jsonObject.get("Tipo").getAsString(), image, jsonObject.get("equipado").getAsString().equals("1"),
                                 jsonObject.get("iditem").getAsString()));
@@ -316,9 +310,9 @@ public class CambiarAvatar extends AppCompatActivity {
     class DrawingAvatar extends View {
 
         //Bitmap sobre el que se va a dibujar
-         private Bitmap bmOverlay;
+         private final Bitmap bmOverlay;
          //CANVAS
-         private Canvas canvas ;
+         private final Canvas canvas ;
 
 
         public DrawingAvatar(Context context) {
@@ -345,7 +339,6 @@ public class CambiarAvatar extends AppCompatActivity {
                       }else{
                           itemsUsuarioEquipados[traduccion.get(tipo)] = null;
                       }
-                      //System.out.println(Arrays.toString(itemsUsuarioEquipados));
                       onUpdateCanvas();
                   }
 
@@ -359,9 +352,6 @@ public class CambiarAvatar extends AppCompatActivity {
 
                   }
               });
-
-
-
         }
 
         public void onUpdateCanvas() {
@@ -385,7 +375,6 @@ public class CambiarAvatar extends AppCompatActivity {
         }
 
         public void onClearCanvas() {
-            Path path = new Path();
             Paint clearPaint = new Paint();
             clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             canvas.drawRect(0, 0, 0, 0, clearPaint);
@@ -394,7 +383,7 @@ public class CambiarAvatar extends AppCompatActivity {
 
     public static class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.AvatarViewHolder>{
 
-        private ArrayList<ItemAvatar> mList;
+        private final ArrayList<ItemAvatar> mList;
         private OnItemClickListener mListener;
 
         public interface OnItemClickListener {
@@ -441,8 +430,7 @@ public class CambiarAvatar extends AppCompatActivity {
         @Override
         public AvatarViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.avatar_cardview,parent,false);
-            AvatarViewHolder avatarViewHolder = new AvatarViewHolder(view, mListener);
-            return avatarViewHolder;
+            return new AvatarViewHolder(view, mListener);
         }
 
         @Override

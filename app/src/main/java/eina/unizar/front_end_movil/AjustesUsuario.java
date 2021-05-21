@@ -2,21 +2,14 @@ package eina.unizar.front_end_movil;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.gson.JsonObject;
-
 import java.util.HashMap;
-import java.util.regex.Pattern;
-
 import SessionManagement.GestorSesion;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import database_wrapper.APIUtils;
@@ -40,22 +33,7 @@ public class AjustesUsuario extends AppCompatActivity {
     private GestorSesion gestorSesion;
     
     private RetrofitInterface retrofitInterface;
-    //REGEX para comprobar el email
-    private  final Pattern EMAIL_ADDRESS_PATTERN = Pattern.compile(
-            "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
-                    "\\@" +
-                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
-                    "(" +
-                    "\\." +
-                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
-                    ")+"
-    );
 
-    /**
-     * Called when the activity is first created.
-     *
-     * @param savedInstanceState
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -77,7 +55,6 @@ public class AjustesUsuario extends AppCompatActivity {
         password_new = (EditText) findViewById(R.id.password_new);
         // EDIT TEXT DE REPETICION DE CONTRASEÑA NUEVA
         password_new2 = (EditText) findViewById(R.id.password_new2);
-        //obtenerContrasenya();
 
 
         // Botón de sign up
@@ -143,7 +120,6 @@ public class AjustesUsuario extends AppCompatActivity {
                     new SweetAlertDialog(AjustesUsuario.this, SweetAlertDialog.SUCCESS_TYPE).setTitleText("Datos guardados exitosamente!").setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
                         @Override
                         public void onClick(SweetAlertDialog sweetAlertDialog) {
-                            System.err.println("ESTOY AQUI");
                             gestorSesion.updateNickname(nombre_usuario.getText().toString());
                             Intent intent = new Intent(AjustesUsuario.this, PerfilUsuario.class);
                             startActivityForResult(intent, OPTION_GUARDAR);

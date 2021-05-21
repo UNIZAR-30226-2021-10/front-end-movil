@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,11 +18,7 @@ public class DecisionJuego extends AppCompatActivity {
     private static final int OPTION_RANKING = 5;
     private static final int OPTION_HISTORIAL = 6;
 
-    /**
-     * Called when the activity is first created.
-     *
-     * @param savedInstanceState
-     */
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
 

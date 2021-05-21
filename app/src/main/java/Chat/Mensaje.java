@@ -53,8 +53,4 @@ public class Mensaje {
     public int getNumJugador() {
         return numJugador;
     }
-
-    public void setNumJugador(int numJugador) {
-        this.numJugador = numJugador;
-    }
 }
