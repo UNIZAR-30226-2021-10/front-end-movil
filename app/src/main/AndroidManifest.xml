@@ -79,13 +79,6 @@
                 android:value=".DecisionIndividual" />
         </activity>
         <activity
-            android:name=".AbandonarPartida"
-            android:parentActivityName=".AbandonarPartida" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".AbandonarPartida" />
-        </activity>
-        <activity
             android:name=".JuegoIndividual"
             android:parentActivityName=".JuegoIndividual" >
             <meta-data

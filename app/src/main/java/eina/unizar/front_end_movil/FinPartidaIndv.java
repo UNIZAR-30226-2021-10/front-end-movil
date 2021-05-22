@@ -2,25 +2,17 @@ package eina.unizar.front_end_movil;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.gson.JsonObject;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
-
 import SessionManagement.GestorSesion;
-import cn.pedant.SweetAlert.SweetAlertDialog;
 import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;
 import retrofit2.Call;
@@ -116,7 +108,7 @@ public class FinPartidaIndv extends AppCompatActivity {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    System.out.println("TODO OK");
+
                 } else if(response.code() == 450){
                     Toast.makeText(FinPartidaIndv.this, "No se ha podido encontrar partida", Toast.LENGTH_LONG).show();
                 } else if(response.code() == 440) {
@@ -147,7 +139,6 @@ public class FinPartidaIndv extends AppCompatActivity {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    System.out.println("TODO OK");
                     int monedasUsuario = Integer.parseInt(gestorSesion.getKEY_SESSION_COINS());
                     int puntosUsuario = Integer.parseInt(gestorSesion.getpointsSession());
                     int newPoints = puntosUsuario + PUNTOS_TOTALES;

@@ -45,11 +45,7 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
     int code;
     String codigo;
 
-    /**
-     * Called when the activity is first created.
-     *
-     * @param savedInstanceState
-     */
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -78,9 +74,6 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
         crearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Random r = new Random();
-                //code = r.nextInt(100000 - 10000 + 1) + 10000;
-                //codigo = Integer.toString(code);
                 generarCodigo();
                 handleRegistrarPartida();
             }
@@ -132,8 +125,6 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
         Date date = new Date();
         String fecha = dateFormat.format(date);
 
-        System.out.println("num jugadores: " + NUM_JUGADORES + " rondas: " + NUM_RONDAS);
-
         nuevaPartida.put("fecha",fecha);
         nuevaPartida.put("numJugadores", Integer.toString(NUM_JUGADORES));
         nuevaPartida.put("rondas", Integer.toString(NUM_RONDAS));
@@ -146,7 +137,6 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-                    System.out.println("TODO OK");
                     extras.putString("codigo", codigo);
                     extras.putString("tipo", String.valueOf(1));
                     Intent intent = new Intent (CrearPartidaMultijugador.this, JuegoMultijugador.class);

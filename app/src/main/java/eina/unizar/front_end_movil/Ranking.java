@@ -119,7 +119,6 @@ public class Ranking extends AppCompatActivity {
                 if(response.code() == 200){
                     JsonArray jsonObject = response.body().getAsJsonArray();
                     for(JsonElement j : jsonObject){
-                        //System.out.println(j);
                         JsonObject prueba = j.getAsJsonObject();
                         String imagen_url = prueba.get("imagen").getAsString();
                         imagen_url = imagen_url.replaceAll("http://localhost:3060", "https://trivial-images.herokuapp.com");
@@ -157,7 +156,6 @@ public class Ranking extends AppCompatActivity {
                     listaUsuarios.setAdapter(adapterRanking);
 
                 }else if(response.code() == 400){
-                    //System.out.println("AQUI 4");
                     Toast.makeText( Ranking.this, "No hay usuarios?", Toast.LENGTH_LONG).show();
                 }
             }

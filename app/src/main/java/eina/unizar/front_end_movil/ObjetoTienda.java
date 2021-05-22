@@ -1,6 +1,5 @@
 package eina.unizar.front_end_movil;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,8 +22,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ObjetoTienda extends AppCompatActivity {
-
-    private static final int OPTION_COMPRAR = 0;
 
     private ImageView image;
     private TextView monedas_usuario;
@@ -84,8 +81,6 @@ public class ObjetoTienda extends AppCompatActivity {
                                         .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
                                             @Override
                                             public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                                /*Intent intent = new Intent(ObjetoTienda.this, PantallaTienda.class);
-                                                startActivityForResult(intent, OPTION_COMPRAR);*/
                                                 finish();
                                             }
                                         }).show();
@@ -97,8 +92,6 @@ public class ObjetoTienda extends AppCompatActivity {
                                         .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
                                             @Override
                                             public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                                /*Intent intent = new Intent(ObjetoTienda.this, PantallaTienda.class);
-                                                startActivityForResult(intent, OPTION_COMPRAR);*/
                                                 finish();
                                             }
                                         }).show();
@@ -130,7 +123,6 @@ public class ObjetoTienda extends AppCompatActivity {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if(response.code() == 200){
-                    System.out.println("TODO OK");
                     updateMonedas();
                 }else if(response.code() == 400){
                     Toast.makeText( ObjetoTienda.this, "No se ha conseguido comprar el objeto", Toast.LENGTH_LONG).show();
@@ -155,11 +147,9 @@ public class ObjetoTienda extends AppCompatActivity {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if(response.code() == 200){
-                    System.out.println("TODO OK");
                     int monedasUsuario = Integer.parseInt(gestorSesion.getKEY_SESSION_COINS());
                     int newCoins = monedasUsuario - precio;
                     gestorSesion.updateCoins(Integer.toString(newCoins));
-                    System.out.println(newCoins);
                 }else if(response.code() == 410){
                     Toast.makeText( ObjetoTienda.this, "No se ha podido cambiar monedas", Toast.LENGTH_LONG).show();
                 } else{

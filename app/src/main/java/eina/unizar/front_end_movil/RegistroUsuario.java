@@ -1,7 +1,6 @@
 package eina.unizar.front_end_movil;
 
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -115,10 +114,6 @@ public class RegistroUsuario extends AppCompatActivity {
         });
     }
 
-    /* TODO: coger foto del color naranja, renombrarla, subirla al servidor de imagenes en carpeta usuarios
-       y meter el link en la base de datos
-     */
-
     private void handleRegister() {
 
         HashMap<String,String> newUser = new HashMap<>();
@@ -183,9 +178,8 @@ public class RegistroUsuario extends AppCompatActivity {
             //Gestionamos la respuesta de la llamada a post
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-
                 if (response.code() == 200) {
-                    System.out.println("TODO OK");
+
                 } else{
                     Toast.makeText(RegistroUsuario.this, "No se ha podido insertar en tabla tiene", Toast.LENGTH_LONG).show();
                     nombre_usuario.getText().clear();

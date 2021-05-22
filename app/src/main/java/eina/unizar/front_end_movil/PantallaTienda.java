@@ -1,18 +1,12 @@
 package eina.unizar.front_end_movil;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.HashMap;
 import SessionManagement.GestorSesion;
@@ -34,8 +27,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class PantallaTienda extends AppCompatActivity {
-
-    private String ip = "192.168.0.26"; //TODO: cambiar para poder usarlo todos
 
     private static final int OPTION_OBJETO = 0;
 
@@ -96,11 +87,6 @@ public class PantallaTienda extends AppCompatActivity {
 
         retrofitInterface = APIUtils.getAPIService();
 
-        // Drive = "https://drive.google.com/file/d/1yBy5abUvTuvAMk5aeKDnlljuWMcBG0Ur/view?usp=sharing"
-        // Imagen prueba = "http://192.168.0.26:3060/tienda/color_amarillo.png"
-        //String url = generateUrl("https://drive.google.com/file/d/1yBy5abUvTuvAMk5aeKDnlljuWMcBG0Ur/view?usp=sharing");
-        //Picasso.get().load("http://192.168.0.26:3060/tienda/color_amarillo.png").into(imageView);
-
         rv_colores = findViewById(R.id.recyclerview_colores);
         rv_cabeza = findViewById(R.id.recyclerview_cabeza);
         rv_cara = findViewById(R.id.recyclerview_cara);
@@ -117,12 +103,6 @@ public class PantallaTienda extends AppCompatActivity {
         });
     }
 
-    /*public String generateUrl(String s){
-        String[] p=s.split("/");
-        String imageLink="https://drive.google.com/uc?export=download&id="+p[5];
-        return imageLink;
-    }*/
-
 
     public void inicializar(){
         mainmodels_colores = new ArrayList<>();
@@ -136,31 +116,26 @@ public class PantallaTienda extends AppCompatActivity {
     }
 
     public void poblarListas(){
-        Bitmap bitMap;
         // CABEZA
         for(int i = 0; i < nombresCabeza.size(); i++){
-            //bitMap = getBitmapFromURL(imagenCabeza.get(i));
             MainModel model = new MainModel(imagenCabeza.get(i), nombresCabeza.get(i), precioCabeza.get(i));
             mainmodels_cabeza.add(model);
         }
 
         // COLORES
         for(int i = 0; i < nombresColores.size(); i++){
-            //bitMap = getBitmapFromURL(imagenColores.get(i));
             MainModel model = new MainModel(imagenColores.get(i), nombresColores.get(i), precioColores.get(i));
             mainmodels_colores.add(model);
         }
 
         // CUERPO
         for(int i = 0; i < nombresCuerpo.size(); i++){
-            //bitMap = getBitmapFromURL(imagenCuerpo.get(i));
             MainModel model = new MainModel(imagenCuerpo.get(i), nombresCuerpo.get(i), precioCuerpo.get(i));
             mainmodels_cuerpo.add(model);
         }
 
         // CARA
         for(int i = 0; i < nombresCara.size(); i++){
-            //bitMap = getBitmapFromURL(imagenCara.get(i));
             MainModel model = new MainModel(imagenCara.get(i), nombresCara.get(i), precioCara.get(i));
             mainmodels_cara.add(model);
         }
@@ -272,28 +247,31 @@ public class PantallaTienda extends AppCompatActivity {
 
                     JsonArray jsonObject = response.body().getAsJsonArray();
                     for(JsonElement j : jsonObject){
-                        //System.out.println(j);
                         JsonObject prueba = j.getAsJsonObject();
                         String imagen = prueba.get("Imagen").getAsString();
                         imagen = imagen.replaceAll("http://localhost:3060", "https://trivial-images.herokuapp.com");
-                        if(prueba.get("Tipo").getAsString().equals("color")){
-                            precioColores.add(prueba.get("Precio").getAsInt());
-                            nombresColores.add(prueba.get("Nombre").getAsString());
-                            imagenColores.add(imagen);
-                        } else if(prueba.get("Tipo").getAsString().equals("cara")){
-                            precioCara.add(prueba.get("Precio").getAsInt());
-                            nombresCara.add(prueba.get("Nombre").getAsString());
-                            imagenCara.add(imagen);
-                        } else if(prueba.get("Tipo").getAsString().equals("cuerpo")){
-                            precioCuerpo.add(prueba.get("Precio").getAsInt());
-                            nombresCuerpo.add(prueba.get("Nombre").getAsString());
-                            imagenCuerpo.add(imagen);
-                        } else if(prueba.get("Tipo").getAsString().equals("cabeza")){
-                            precioCabeza.add(prueba.get("Precio").getAsInt());
-                            nombresCabeza.add(prueba.get("Nombre").getAsString());
-                            imagenCabeza.add(imagen);
+                        switch (prueba.get("Tipo").getAsString()) {
+                            case "color":
+                                precioColores.add(prueba.get("Precio").getAsInt());
+                                nombresColores.add(prueba.get("Nombre").getAsString());
+                                imagenColores.add(imagen);
+                                break;
+                            case "cara":
+                                precioCara.add(prueba.get("Precio").getAsInt());
+                                nombresCara.add(prueba.get("Nombre").getAsString());
+                                imagenCara.add(imagen);
+                                break;
+                            case "cuerpo":
+                                precioCuerpo.add(prueba.get("Precio").getAsInt());
+                                nombresCuerpo.add(prueba.get("Nombre").getAsString());
+                                imagenCuerpo.add(imagen);
+                                break;
+                            case "cabeza":
+                                precioCabeza.add(prueba.get("Precio").getAsInt());
+                                nombresCabeza.add(prueba.get("Nombre").getAsString());
+                                imagenCabeza.add(imagen);
+                                break;
                         }
-                        //System.out.println(prueba);
                     }
                     inicializar();
                 } else{
@@ -344,89 +322,6 @@ public class PantallaTienda extends AppCompatActivity {
         }
         esPrimeraVez = false;
     }
-
-
-
-    /*
-
-        listaComp = (ListView) findViewById(R.id.listaComplementos);
-        adapterComp = new ListViewAdapter(this, imagenesComp);
-        listaComp.setAdapter(adapterComp);
-    }
-
-    public class ListViewAdapter extends BaseAdapter {
-        // Declare Variables
-        Context context;
-        LayoutInflater inflater;
-        String[] nombres;
-        RecyclerView[] listas;
-
-        public ListViewAdapter(Context context, String[] nombres, RecyclerView[] listas) {
-            this.context = context;
-            this.nombres = nombres;
-            this.listas = listas;
-        }
-
-        @Override
-        public int getCount() {
-            return nombres.length;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        public View getView(int position, View convertView, ViewGroup parent) {
-            // Declare Variables
-            TextView texto;
-            RecyclerView rv;
-
-            //http://developer.android.com/intl/es/reference/android/view/LayoutInflater.html
-            inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            View itemView = inflater.inflate(R.layout.rows_lista_tienda, parent, false);
-
-            // Locate the TextViews in listview_item.xml
-            texto = (TextView) itemView.findViewById(R.id.titulo_categoria);
-            rv = (RecyclerView) itemView.findViewById(R.id.recyclerview);
-
-            // Capture position and set to the TextViews
-            texto.setText(nombres[position]);
-
-            mainmodels_colores = new ArrayList<>();
-
-            return itemView;
-        }
-    }*/
-
-    /*public static Bitmap getBitmapFromURL(String url_image){
-        HttpURLConnection connection = null;
-        try {
-            /*StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            //connection.setDoInput(true);
-            //connection.connect();
-            URL url = new URL(url_image);
-            connection = (HttpURLConnection) url.openConnection();
-            //InputStream input = new BufferedInputStream(connection.getInputStream());
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            Log.e("Bitmap","returned");
-            return myBitmap;
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("Exception",e.getMessage());
-            return null;
-        } finally{
-            connection.disconnect();
-        }
-    }*/
 }
 
 

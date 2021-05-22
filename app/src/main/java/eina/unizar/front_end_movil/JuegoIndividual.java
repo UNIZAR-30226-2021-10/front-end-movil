@@ -13,8 +13,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.gson.JsonObject;
-import java.util.HashMap;
-
 import SessionManagement.Question;
 import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;
@@ -290,7 +288,6 @@ public class JuegoIndividual extends AppCompatActivity{
 
 
     public void obtenerPregunta(final int random){
-        final Question[] q = new Question[1];
         Call<JsonObject> call = retrofitInterface.getQuestion(categorias[random-1]);
 
         call.enqueue(new Callback<JsonObject>() {
@@ -315,7 +312,6 @@ public class JuegoIndividual extends AppCompatActivity{
                     if(!yaEsta){
                         int randomQuestion = rndQuestion.nextInt(4) + 1;
                         preguntasCogidas[indice] = jsonObject.get("idpregunta").getAsInt();
-                        //System.out.println(preguntasCogidas[indice]);
                         indice++;
                         ponerPregunta(q.getStatement(), q.getCorrect(), q.getIncorrect1(), q.getIncorrect2(), q.getIncorrect3(), randomQuestion, random-1);
                     }

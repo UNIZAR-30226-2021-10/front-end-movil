@@ -56,10 +56,6 @@ public class MenuPrincipal extends AppCompatActivity {
         //EDIT TEXT DE CONTRASEÑA
         password = (EditText) findViewById(R.id.texto_contasenya);
 
-        // Probar mensajes de error para contraseña -- antes de base de datos
-        //final String contrasenyaCorrecta = "1234";
-        //final String usuarioCorrecto = "w";
-
         // Botón de acceder/iniciar sesión
         Button accederButton = (Button) findViewById(R.id.acceder);
         accederButton.setOnClickListener(new View.OnClickListener() {
