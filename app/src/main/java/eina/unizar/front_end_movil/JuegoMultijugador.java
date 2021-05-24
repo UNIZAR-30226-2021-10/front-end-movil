@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -41,6 +43,7 @@ import SessionManagement.GestorSesion;
 import SessionManagement.Jugadores;
 import SessionManagement.JugadoresFinal;
 import SessionManagement.Question;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import database_wrapper.APIUtils;
 import database_wrapper.RetrofitInterface;
 import io.socket.client.Ack;
@@ -54,7 +57,10 @@ import retrofit2.Response;
 
 public class JuegoMultijugador extends AppCompatActivity{
 
-    private static final String ipAndrea = "https://websocketstrivial.herokuapp.com/";
+    //private static final String ipAndrea = "https://websocketstrivial.herokuapp.com/";
+
+    private static final String ipAndrea = "http://192.168.0.26:5000/";
+
 
     private ConstraintLayout pantallaMulti;
     private ConstraintLayout pantallaChat;
@@ -365,9 +371,9 @@ public class JuegoMultijugador extends AppCompatActivity{
         unirConXML();
 
         creadorPartida();
-        if(type == 1) {
-            handleUnirseJuega();
-        }
+        //if(type == 1) {
+            //handleUnirseJuega();
+        //}
         try {
             IO.Options options = new IO.Options();
             options.transports = new String[]{WebSocket.NAME};
@@ -398,11 +404,30 @@ public class JuegoMultijugador extends AppCompatActivity{
 
         msocket.emit("join", aux, new Ack(){
             @Override
-            public void call(Object... args){ }
+            public void call(Object... args){
+                String callback = (String) args[0];
+                if(!callback.equals("ok")){
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            new SweetAlertDialog(JuegoMultijugador.this,SweetAlertDialog.ERROR_TYPE).setTitleText("Ya estás jugando esta partida en otro dispositivo")
+                                    .setConfirmButton("Vale", new SweetAlertDialog.OnSweetClickListener() {
+                                        @Override
+                                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                            finish();
+                                        }
+                                    }).show();
+                        }
+                    },500);
+                } else {
+                    handleUnirseJuega();
+                }
+
+            }
         });
 
         //llamar a la bd para conseguir el numRondas y numJugadores
-        handleObtenerInfo();
+        //handleObtenerInfo();
 
         if(type == 1){
             empezar.setOnClickListener(new View.OnClickListener() {
@@ -478,11 +503,20 @@ public class JuegoMultijugador extends AppCompatActivity{
                                     teToca = 0;
                                 }
                                 // pasas el turno al siguiente con 0 puntos
-                                msocket.emit("pasarTurno", teToca, numero_ronda, 0);
+                                msocket.emit("pasarTurno", teToca, numero_ronda, 0, new Ack(){
+                                    @Override
+                                    public void call(Object... args){
+                                        System.out.println("ANTES DE DISCONNECTION dentro de pasarTurno");
+                                        msocket.emit("disconnection");
+                                        msocket.disconnect();
+                                        msocket.off();
+                                    }
+                                });
                             }
 
                             //confirma que quiere salir de la partida
                             //tiene que hacer el emit de desconection
+                            System.out.println("ANTES DE DISCONNECTION no es su turno");
                             msocket.emit("disconnection");
                             msocket.disconnect();
                             msocket.off();
@@ -617,6 +651,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                 e.printStackTrace();
             }
             extra.putString("ganador", ganador);
+            System.out.println(ganador);
             handleFinPartidaMulti();
             msocket.emit("sendFinPartida",playersOrdenados);
             Intent intent = new Intent(this, FinPartidaMulti.class);
@@ -853,7 +888,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.code() == 200) {
-
+                    handleObtenerInfo();
                 } else if(response.code() == 450){
                     Toast.makeText(JuegoMultijugador.this, "No se ha podido unir a la partida", Toast.LENGTH_LONG).show();
                 } else{

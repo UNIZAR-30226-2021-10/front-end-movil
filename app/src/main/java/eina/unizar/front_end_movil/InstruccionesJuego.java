@@ -24,12 +24,12 @@ public class InstruccionesJuego extends AppCompatActivity {
 
         TextView inst = (TextView) findViewById(R.id.instrucciones);
         inst.setMovementMethod(new ScrollingMovementMethod());
-        String texto = "\t Modos de juego: individual y multijugador. \n\n" +
+        String texto = "Modos de juego: individual y multijugador. \n\n" +
                 "Al empezar una partida individual le deberás dar al botón \"Empezar\" y eso lanzará el dado e iniciará " +
                 "la partida. Si estás en modo multijugador la partida empezará automáticamente cuando " +
                 "todos los jugadores estén en la partida. \n\n" +
                 "Deberás responder a la pregunta que te toque y el propio juego te indicará si es la " +
-                "correcta en cuanto clique en ella. Debrás darle al bot´on \"Siguiente\" para pasar a la siguiente ronda. \n\n" +
+                "correcta en cuanto cliques en ella. Debrás darle al boton \"Siguiente\" para pasar a la siguiente ronda. \n\n" +
                 "El dado consta de seis colores. Cada uno de ellos " +
                 "está asociado a una categoria diferente de manera. Las preguntas son multirespuesta y solo una de las opciones " +
                 "expuestas es la correcta. Las categorías son las siguientes y te darán los siguientes puntos:\n" +
@@ -48,7 +48,7 @@ public class InstruccionesJuego extends AppCompatActivity {
                 "también posponer la partida y volver más tarde a ella.\n\n" +
                 "Las partidas multijugador tienen un máximo de cuatro " +
                 "jugadores y gana el jugador que más puntos obtiene. Puedes crear una " +
-                "partida o unirte a una ya existentecon un código (todas las partidas lo tienen, pregúntale " +
+                "partida o unirte a una ya existente con un código (todas las partidas lo tienen, pregúntale " +
                 "a tus amigos por el código de la partida que han creado). Además, el modo multijugador " +
                 "consta de un chat que te permite hablar con tus rivales. ";
         inst.setText(texto);
