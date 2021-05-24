@@ -57,9 +57,9 @@ import retrofit2.Response;
 
 public class JuegoMultijugador extends AppCompatActivity{
 
-    //private static final String ipAndrea = "https://websocketstrivial.herokuapp.com/";
+    private static final String ipAndrea = "https://websocketstrivial.herokuapp.com/";
 
-    private static final String ipAndrea = "http://192.168.0.26:5000/";
+    //private static final String ipAndrea = "http://192.168.0.26:5000/";
 
 
     private ConstraintLayout pantallaMulti;
@@ -106,7 +106,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     private Random rndNumber = new Random();
     private Random rndQuestion = new Random();
 
-    private Button empezar;
+    //private Button empezar;
     private Button siguiente;
 
     String[] categorias = {"Art and Literature", "Geography", "History", "Film and TV", "Science", "Sport and Leisure"};
@@ -153,6 +153,16 @@ public class JuegoMultijugador extends AppCompatActivity{
                     players.add(jugador);
                     playersAux.add(jugador);
                     asignarJugadores();
+                    // EMPEZAR PARTIDA SI ERES EL PRIMERO!!!
+                    //es mi turno de jugar
+                    // Si están todos y es mi turno porque soy el primero
+                    if(players.size() == NUM_JUGADORES && players.get(teToca).getUsername().equals(gestorSesion.getSession())){
+                        siguiente.setVisibility(View.VISIBLE);
+                        siguiente.setClickable(true);
+                        rollDice();
+                    }
+                    num_rondas.setText(String.valueOf(numero_ronda));
+                    turno_jugador.setText(players.get(teToca).getUsername());
                 }
             });
         }
@@ -212,6 +222,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                             puntosGuardar = players.get(i).getPuntos();
                         }
                     }
+                    System.out.println("Se acaba la partida " + gestorSesion.getmailSession());
                     handleRegistrarPuntos(gestorSesion.getmailSession(), puntosGuardar);
                     handleFinPartidaMultiJuega(gestorSesion.getmailSession(),puntosGuardar);
                     finalizarPartida();
@@ -287,6 +298,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                             }
                         }
                         //Registra los puntos y monedas del jugador que se queda en la partida
+                        System.out.println("Soy el unico que queda");
                         handleRegistrarPuntos(gestorSesion.getmailSession(), puntosGuardar);
                         //pone al usuario como ganador de la partida
                         handleFinPartidaMulti();
@@ -429,7 +441,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         //llamar a la bd para conseguir el numRondas y numJugadores
         //handleObtenerInfo();
 
-        if(type == 1){
+        /*if(type == 1){
             empezar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -451,7 +463,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         else{
             empezar.setVisibility(View.GONE);
             empezar.setClickable(false);
-        }
+        }*/
 
 
         siguiente.setOnClickListener(new View.OnClickListener() {
@@ -503,25 +515,23 @@ public class JuegoMultijugador extends AppCompatActivity{
                                     teToca = 0;
                                 }
                                 // pasas el turno al siguiente con 0 puntos
-                                msocket.emit("pasarTurno", teToca, numero_ronda, 0, new Ack(){
-                                    @Override
-                                    public void call(Object... args){
-                                        System.out.println("ANTES DE DISCONNECTION dentro de pasarTurno");
-                                        msocket.emit("disconnection");
-                                        msocket.disconnect();
-                                        msocket.off();
-                                    }
-                                });
+                                msocket.emit("pasarTurno", teToca, numero_ronda, 0);
+                                System.out.println("ANTES DE DISCONNECTION es su turno");
+                                msocket.emit("disconnection");
+                                msocket.disconnect();
+                                msocket.off();
+                            } else{
+                                System.out.println("ANTES DE DISCONNECTION no es su turno");
+                                msocket.emit("disconnection");
+                                msocket.disconnect();
+                                msocket.off();
                             }
 
                             //confirma que quiere salir de la partida
                             //tiene que hacer el emit de desconection
-                            System.out.println("ANTES DE DISCONNECTION no es su turno");
-                            msocket.emit("disconnection");
-                            msocket.disconnect();
-                            msocket.off();
+
                             //tiene que ser eliminado de la tabla juega
-                            handleAbandonarPartida();
+                            //handleAbandonarPartida(); !!!! AQUÍ
                             //tiene que continuar la partida con un jugador menos
                             Intent intent = new Intent(v.getContext(), DecisionJuego.class);
                             startActivityForResult(intent, OPTION_ATRAS);
@@ -618,7 +628,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         siguiente.setVisibility(View.INVISIBLE); // quitarlo hasta que le den a empezar
         siguiente.setClickable(false);
 
-        empezar = (Button) findViewById(R.id.empezar);
+        //empezar = (Button) findViewById(R.id.empezar);
 
         imagenDados = (ImageButton) findViewById(R.id.dado);
         imagenDados.setClickable(false);
@@ -640,6 +650,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                     puntosGuardar = players.get(i).getPuntos();
                 }
             }
+            System.out.println("Soy el ultimo que juega y llamo a handle registrar puntos");
             handleRegistrarPuntos(gestorSesion.getmailSession(), puntosGuardar);
             handleFinPartidaMultiJuega(gestorSesion.getmailSession(), puntosGuardar);
             playersOrdenados = ordenarJugadores();
@@ -817,9 +828,12 @@ public class JuegoMultijugador extends AppCompatActivity{
                     ID_PARTIDA = jsonObject.get("idpartida").getAsInt();
                     NUM_JUGADORES = jsonObject.get("numJugadores").getAsInt();
                     NUM_RONDAS = jsonObject.get("rondas").getAsInt();
+                    num_rondas.setText(String.valueOf(1));
                     //obtener jugadores de la partida
                     if(type != 1){
                         handleObtenerJugadores();
+                    } else{
+                        turno_jugador.setText(players.get(0).getUsername());
                     }
                 } else{
                     Toast.makeText(JuegoMultijugador.this, "No se ha podido obtener informacion", Toast.LENGTH_LONG).show();
@@ -856,9 +870,8 @@ public class JuegoMultijugador extends AppCompatActivity{
                     }
                     jugadoresEnSala = players.size();
                     Collections.sort(players);
-                    // Poner el primer jugador y la ronda
-                    num_rondas.setText(String.valueOf(1));
                     turno_jugador.setText(players.get(0).getUsername());
+                    // Poner el primer jugador y la ronda
                     if(type != 1) {
                         asignarJugadores();
                     }
@@ -939,6 +952,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         ganarMonedas.put("email", correo);
         ganarMonedas.put("monedas", String.valueOf(monedasInsertar));
         ganarMonedas.put("puntos", String.valueOf(puntosJugador));
+        System.out.println("DENTRO DE HANDLE REGISTRAR PUNTOS");
 
         Call<JsonObject> call = retrofitInterface.insertNewData(ganarMonedas);
         call.enqueue(new Callback<JsonObject>() {
