@@ -61,7 +61,6 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     //private static final String ipAndrea = "http://192.168.0.26:5000/";
 
-
     private ConstraintLayout pantallaMulti;
     private ConstraintLayout pantallaChat;
 
@@ -148,21 +147,22 @@ public class JuegoMultijugador extends AppCompatActivity{
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    int entrada = players.get(players.size() - 1).getOrden();
+                    int entrada = playersAux.get(playersAux.size() - 1).getOrden();
                     Jugadores jugador = new Jugadores(nickname, 0, avatar, entrada + 1, true);
-                    players.add(jugador);
+                    //players.add(jugador);
                     playersAux.add(jugador);
+                    jugadoresEnSala = playersAux.size();
                     asignarJugadores();
                     // EMPEZAR PARTIDA SI ERES EL PRIMERO!!!
                     //es mi turno de jugar
                     // Si están todos y es mi turno porque soy el primero
-                    if(players.size() == NUM_JUGADORES && players.get(teToca).getUsername().equals(gestorSesion.getSession())){
+                    if(playersAux.size() == NUM_JUGADORES && playersAux.get(teToca).getUsername().equals(gestorSesion.getSession())){
                         siguiente.setVisibility(View.VISIBLE);
                         siguiente.setClickable(true);
                         rollDice();
                     }
                     num_rondas.setText(String.valueOf(numero_ronda));
-                    turno_jugador.setText(players.get(teToca).getUsername());
+                    turno_jugador.setText(playersAux.get(teToca).getUsername());
                 }
             });
         }
@@ -183,19 +183,19 @@ public class JuegoMultijugador extends AppCompatActivity{
                     // Actualizar los puntos
                     if (teToca == 0) {
                         // el que juega antes del primero es el ultimo jugador
-                        players.get(NUM_JUGADORES - 1).setPuntos(puntosActualizar);
+                        playersAux.get(NUM_JUGADORES - 1).setPuntos(puntosActualizar);
                     } else {
-                        players.get(teToca - 1).setPuntos(puntosActualizar); // el que ha jugado antes de ti
+                        playersAux.get(teToca - 1).setPuntos(puntosActualizar); // el que ha jugado antes de ti
                     }
                     asignarPuntos();
                     //es mi turno de jugar
-                    if(players.get(teToca).getUsername().equals(gestorSesion.getSession())){
+                    if(playersAux.get(teToca).getUsername().equals(gestorSesion.getSession())){
                         siguiente.setVisibility(View.VISIBLE);
                         siguiente.setClickable(true);
                         rollDice();
                     }
                     num_rondas.setText(String.valueOf(numero_ronda));
-                    turno_jugador.setText(players.get(teToca).getUsername());
+                    turno_jugador.setText(playersAux.get(teToca).getUsername());
                 }
             });
         }
@@ -217,9 +217,9 @@ public class JuegoMultijugador extends AppCompatActivity{
                     }
 
                     int puntosGuardar = 0;
-                    for(int i = 0; i < players.size(); i++){
-                        if((players.get(i).getUsername()).equals(gestorSesion.getSession())){
-                            puntosGuardar = players.get(i).getPuntos();
+                    for(int i = 0; i < playersAux.size(); i++){
+                        if((playersAux.get(i).getUsername()).equals(gestorSesion.getSession())){
+                            puntosGuardar = playersAux.get(i).getPuntos();
                         }
                     }
                     System.out.println("Se acaba la partida " + gestorSesion.getmailSession());
@@ -279,22 +279,25 @@ public class JuegoMultijugador extends AppCompatActivity{
                 @Override
                 public void run(){
                     String userOut = (String) args[0];
+                    int indice = 0;
                     for(int i = 0; i < playersAux.size(); i++){
                         if((playersAux.get(i).getUsername()).equals(userOut)){
                             playersAux.get(i).setEstaJugando(false);
+                            playersAux.get(i).setPuntos(0);
+                            indice = i;
                         }
                     }
                     eliminarJugador(userOut);
                     //tiene que comprobar que hay dos jugadores o mas para poder continuar la partida y sino
-                    NUM_JUGADORES--;
-                    if(NUM_JUGADORES == 1){
+                    jugadoresEnSala--;
+                    if(jugadoresEnSala == 1){
                         //finalizar la partida para todos y poner al jugador como ganador
                         msocket.emit("disconnection");
                         int puntosGuardar = 0;
-                        for(int i = 0; i < players.size(); i++){
-                            if((players.get(i).getUsername()).equals(gestorSesion.getSession())){
-                                puntosGuardar = players.get(i).getPuntos();
-                                ganador = players.get(i).getUsername();
+                        for(int i = 0; i < playersAux.size(); i++){
+                            if((playersAux.get(i).getUsername()).equals(gestorSesion.getSession())){
+                                puntosGuardar = playersAux.get(i).getPuntos();
+                                ganador = playersAux.get(i).getUsername();
                             }
                         }
                         //Registra los puntos y monedas del jugador que se queda en la partida
@@ -308,16 +311,15 @@ public class JuegoMultijugador extends AppCompatActivity{
                         }
                     }
                     else{
-                        int indice = 0;
                         // borra al usuario del struct
-                        for(int i = 0; i < players.size(); i++){
-                            if((players.get(i).getUsername()).equals(userOut)){
+                        /*for(int i = 0; i < playersAux.size(); i++){
+                            if((playersAux.get(i).getUsername()).equals(userOut)){
                                 // para saber quién se ha ido
                                 indice = i;
-                                players.remove(i);
+                                playersAux.remove(i);
                             }
-                        }
-                        actualizarTeToca(indice);
+                        }*/
+                        //actualizarTeToca(indice);
                     }
                 }
             });
@@ -474,6 +476,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                 siguiente.setVisibility(View.GONE);
                 siguiente.setClickable(false);
                 int indice = teToca;
+                // Pasa el turno una vez
                 teToca = teToca + 1;
                 if(teToca == NUM_JUGADORES){
                     teToca = 0;
@@ -482,10 +485,40 @@ public class JuegoMultijugador extends AppCompatActivity{
                 if(teToca == 0){
                     numero_ronda++;
                 }
+                // mirar si el siguiente está jugando --> 3 jugadores
+                if(playersAux.size() >= 3){
+                    if(!playersAux.get(teToca).isEstaJugando()) { // si no esta jugando pasar el turno
+                        indice = teToca;
+                        // Pasa el turno una vez
+                        teToca = teToca + 1;
+                        if (teToca == NUM_JUGADORES) {
+                            teToca = 0;
+                            indice = NUM_JUGADORES - 1;
+                        }
+                        if (teToca == 0) {
+                            numero_ronda++;
+                        }
+
+                        if (playersAux.size() == 4) { // si son cuatro y el siguiente no esta jugando
+                            if (!playersAux.get(teToca).isEstaJugando()) { // si no esta jugando pasar el turno
+                                indice = teToca;
+                                // Pasa el turno una vez
+                                teToca = teToca + 1;
+                                if (teToca == NUM_JUGADORES) {
+                                    teToca = 0;
+                                    indice = NUM_JUGADORES - 1;
+                                }
+                                if (teToca == 0) {
+                                    numero_ronda++;
+                                }
+                            }
+                        }
+                    }
+                }
                 //pasas los puntos actuales del jugador
-                msocket.emit("pasarTurno", teToca, numero_ronda, players.get(indice).getPuntos());
+                msocket.emit("pasarTurno", teToca, numero_ronda, playersAux.get(indice).getPuntos());
                 num_rondas.setText(String.valueOf(numero_ronda));
-                turno_jugador.setText(players.get(teToca).getUsername()); // pone el siguiente jugador
+                turno_jugador.setText(playersAux.get(teToca).getUsername()); // pone el siguiente jugador
                 asignarPuntos();
             }
         });
@@ -497,7 +530,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                if(players.size() != NUM_JUGADORES){
+                if(playersAux.size() != NUM_JUGADORES){
                     // si es el único jugador
                     Toast.makeText(JuegoMultijugador.this, "No te puedes marchar hasta que no estén todos los jugadores", Toast.LENGTH_LONG).show();
                 } else {
@@ -508,7 +541,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             // tiene que saltar su turno si le tocaba
-                            if (players.get(teToca).getUsername().equals(gestorSesion.getSession())) {
+                            if (playersAux.get(teToca).getUsername().equals(gestorSesion.getSession())) {
                                 // es mi turno actualmente
                                 teToca = teToca + 1;
                                 if (teToca == NUM_JUGADORES) {
@@ -516,16 +549,13 @@ public class JuegoMultijugador extends AppCompatActivity{
                                 }
                                 // pasas el turno al siguiente con 0 puntos
                                 msocket.emit("pasarTurno", teToca, numero_ronda, 0);
-                                System.out.println("ANTES DE DISCONNECTION es su turno");
-                                msocket.emit("disconnection");
-                                msocket.disconnect();
-                                msocket.off();
-                            } else{
-                                System.out.println("ANTES DE DISCONNECTION no es su turno");
-                                msocket.emit("disconnection");
-                                msocket.disconnect();
-                                msocket.off();
                             }
+
+                            System.out.println("ANTES DE DISCONNECTION no es su turno");
+                            msocket.emit("disconnection");
+                            msocket.disconnect();
+                            msocket.off();
+
 
                             //confirma que quiere salir de la partida
                             //tiene que hacer el emit de desconection
@@ -643,11 +673,11 @@ public class JuegoMultijugador extends AppCompatActivity{
     }
 
     public void comprobarRondas(){
-        if (numero_ronda == NUM_RONDAS && players.get(teToca).getUsername().equals(gestorSesion.getSession()) && teToca == NUM_JUGADORES-1) {
+        if (numero_ronda == NUM_RONDAS && playersAux.get(teToca).getUsername().equals(gestorSesion.getSession()) && teToca == NUM_JUGADORES-1) {
             int puntosGuardar = 0;
-            for(int i = 0; i < players.size(); i++){
-                if((players.get(i).getUsername()).equals(gestorSesion.getSession())){
-                    puntosGuardar = players.get(i).getPuntos();
+            for(int i = 0; i < playersAux.size(); i++){
+                if((playersAux.get(i).getUsername()).equals(gestorSesion.getSession())){
+                    puntosGuardar = playersAux.get(i).getPuntos();
                 }
             }
             System.out.println("Soy el ultimo que juega y llamo a handle registrar puntos");
@@ -666,6 +696,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             handleFinPartidaMulti();
             msocket.emit("sendFinPartida",playersOrdenados);
             Intent intent = new Intent(this, FinPartidaMulti.class);
+            System.out.println("GANADOR DE VERDAD ES " + ganador);
             intent.putExtras(extra);
             startActivityForResult(intent, OPTION_ACABAR);
         }
@@ -700,9 +731,9 @@ public class JuegoMultijugador extends AppCompatActivity{
             usuario1_puntos.setText("0");
             cargarImagenUsuario(gestorSesion.getAvatarSession(), imagenUsuario1);
             Jugadores jugador = new Jugadores(gestorSesion.getSession(), 0, gestorSesion.getAvatarSession(), 0, true);
-            players.add(jugador);
+            //players.add(jugador);
             playersAux.add(jugador);
-            jugadoresEnSala = players.size();
+            jugadoresEnSala = playersAux.size();
         }
     }
 
@@ -732,35 +763,35 @@ public class JuegoMultijugador extends AppCompatActivity{
     }
 
     public void asignarJugadores(){
-        for(int i = 0; i < players.size(); i++){
+        for(int i = 0; i < playersAux.size(); i++){
             if(i == 0){
-                usuario1_nombre.setText(players.get(i).getUsername());
+                usuario1_nombre.setText(playersAux.get(i).getUsername());
                 usuario1_puntos.setText(String.valueOf(playersAux.get(i).getPuntos()));
-                cargarImagenUsuario(players.get(i).getImagen(), imagenUsuario1);
+                cargarImagenUsuario(playersAux.get(i).getImagen(), imagenUsuario1);
             }
             else if(i == 1){
-                usuario2_nombre.setText(players.get(i).getUsername());
+                usuario2_nombre.setText(playersAux.get(i).getUsername());
                 usuario2_puntos.setText(String.valueOf(playersAux.get(i).getPuntos()));
-                cargarImagenUsuario(players.get(i).getImagen(), imagenUsuario2);
+                cargarImagenUsuario(playersAux.get(i).getImagen(), imagenUsuario2);
                 texto_puntos2.setText("puntos");
             }
             else if(i == 2){
-                usuario3_nombre.setText(players.get(i).getUsername());
+                usuario3_nombre.setText(playersAux.get(i).getUsername());
                 usuario3_puntos.setText(String.valueOf(playersAux.get(i).getPuntos()));
-                cargarImagenUsuario(players.get(i).getImagen(), imagenUsuario3);
+                cargarImagenUsuario(playersAux.get(i).getImagen(), imagenUsuario3);
                 texto_puntos3.setText("puntos");
             }
             else if(i == 3){
-                usuario4_nombre.setText(players.get(i).getUsername());
+                usuario4_nombre.setText(playersAux.get(i).getUsername());
                 usuario4_puntos.setText(String.valueOf(playersAux.get(i).getPuntos()));
-                cargarImagenUsuario(players.get(i).getImagen(), imagenUsuario4);
+                cargarImagenUsuario(playersAux.get(i).getImagen(), imagenUsuario4);
                 texto_puntos4.setText("puntos");
             }
         }
     }
 
     public void eliminarJugador(String usuario){
-        if(players.size() == 2){
+        if(playersAux.size() == 2){
             if(usuario1_nombre.getText().equals(usuario)){
                 usuario1_nombre.setText("Desconectado");
                 usuario1_puntos.setText("0");
@@ -770,7 +801,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                 usuario2_puntos.setText("0");
             }
         }
-        else if(players.size() == 3){
+        else if(playersAux.size() == 3){
             if(usuario1_nombre.getText().equals(usuario)){
                 usuario1_nombre.setText("Desconectado");
                 usuario1_puntos.setText("0");
@@ -802,16 +833,16 @@ public class JuegoMultijugador extends AppCompatActivity{
                 usuario4_puntos.setText("0");
             }
         }
-        for(int i = 0; i < playersAux.size(); i++){
+        /*for(int i = 0; i < playersAux.size(); i++){
             if(usuario.equals(playersAux.get(i).getUsername())){
                 playersAux.get(i).setPuntos(0);
             }
-        }
-        for(int i = 0; i < players.size(); i++){
+        }*/
+        /*for(int i = 0; i < players.size(); i++){
             if(usuario.equals(players.get(i).getUsername())){
                 players.get(i).setPuntos(0);
             }
-        }
+        }*/
     }
 
     private void  handleObtenerInfo(){
@@ -833,7 +864,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                     if(type != 1){
                         handleObtenerJugadores();
                     } else{
-                        turno_jugador.setText(players.get(0).getUsername());
+                        turno_jugador.setText(playersAux.get(0).getUsername());
                     }
                 } else{
                     Toast.makeText(JuegoMultijugador.this, "No se ha podido obtener informacion", Toast.LENGTH_LONG).show();
@@ -863,14 +894,14 @@ public class JuegoMultijugador extends AppCompatActivity{
                         String image = prueba.get("imagen").getAsString(); //coger el avatar
                         int entrada = prueba.get("orden_entrada").getAsInt(); //coger el avatar
                         Jugadores jugador2 = new Jugadores(nickname,0, image, entrada, true);
-                        players.add(jugador2);
+                        //players.add(jugador2);
                         playersAux.add(jugador2);
                         emails.add(email);
                         users.add(nickname);
                     }
-                    jugadoresEnSala = players.size();
-                    Collections.sort(players);
-                    turno_jugador.setText(players.get(0).getUsername());
+                    jugadoresEnSala = playersAux.size();
+                    Collections.sort(playersAux);
+                    turno_jugador.setText(playersAux.get(0).getUsername());
                     // Poner el primer jugador y la ronda
                     if(type != 1) {
                         asignarJugadores();
@@ -922,6 +953,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     private void  handleFinPartidaMulti(){
         HashMap<String,String> finPartidaMulti = new HashMap<>();
         finPartidaMulti.put("ganador", ganador);
+        System.out.println("GANADOR DENTRO DE FIN PARTIDA MULTI " + ganador);
         finPartidaMulti.put("codigo",codigo);
 
         Call<JsonObject> call = retrofitInterface.FinalPartidaMultijugador(finPartidaMulti);
@@ -1138,28 +1170,28 @@ public class JuegoMultijugador extends AppCompatActivity{
                 int puntosCat1;
                 int suma;
                 if(teToca == 0){
-                    puntos = players.get(0).getPuntos();
+                    puntos = playersAux.get(0).getPuntos();
                     puntosCat1 = puntosCat[cat];
                     suma = puntos + puntosCat1;
-                    players.get(0).setPuntos(suma);
+                    //players.get(0).setPuntos(suma);
                     playersAux.get(0).setPuntos(suma);
                 } else if(teToca == 1){
-                    puntos = players.get(1).getPuntos();
+                    puntos = playersAux.get(1).getPuntos();
                     puntosCat1 = puntosCat[cat];
                     suma = puntos + puntosCat1;
-                    players.get(1).setPuntos(suma);
+                    //players.get(1).setPuntos(suma);
                     playersAux.get(1).setPuntos(suma);
                 } else if(teToca == 2){
-                    puntos = players.get(2).getPuntos();
+                    puntos = playersAux.get(2).getPuntos();
                     puntosCat1 = puntosCat[cat];
                     suma = puntos + puntosCat1;
-                    players.get(2).setPuntos(suma);
+                    //players.get(2).setPuntos(suma);
                     playersAux.get(2).setPuntos(suma);
                 } else {
-                    puntos = players.get(3).getPuntos();
+                    puntos = playersAux.get(3).getPuntos();
                     puntosCat1 = puntosCat[cat];
                     suma = puntos + puntosCat1;
-                    players.get(3).setPuntos(suma);
+                    //players.get(3).setPuntos(suma);
                     playersAux.get(3).setPuntos(suma);
                 }
                 siguiente.setClickable(true);

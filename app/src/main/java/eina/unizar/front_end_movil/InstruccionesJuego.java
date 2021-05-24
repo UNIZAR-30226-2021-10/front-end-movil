@@ -29,13 +29,13 @@ public class InstruccionesJuego extends AppCompatActivity {
                 "la partida. Si estás en modo multijugador la partida empezará automáticamente cuando " +
                 "todos los jugadores estén en la partida. \n\n" +
                 "Deberás responder a la pregunta que te toque y el propio juego te indicará si es la " +
-                "correcta en cuanto cliques en ella. Debrás darle al boton \"Siguiente\" para pasar a la siguiente ronda. \n\n" +
+                "correcta en cuanto cliques en ella. Deberás darle al boton \"Siguiente\" para pasar a la siguiente ronda. \n\n" +
                 "El dado consta de seis colores. Cada uno de ellos " +
                 "está asociado a una categoria diferente. Las preguntas son multirespuesta y solo una de las opciones " +
                 "es la correcta. Las categorías son las siguientes y te darán los siguientes puntos:\n" +
                 "Geografía (azul): 30 puntos.\n" +
                 "Arte y Literatura (marrón): 20 puntos.\n" +
-                "HIstoria (amarillo): 25 puntos.\n" +
+                "Historia (amarillo): 25 puntos.\n" +
                 "Cine (rosa): 15 puntos.\n" +
                 "Ciencias y Naturaleza (verde): 5 puntos.\n" +
                 "Deportes y Pasatiempos (naranja): 10 puntos.\n\n" +
