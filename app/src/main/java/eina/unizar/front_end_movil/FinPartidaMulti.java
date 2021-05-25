@@ -30,6 +30,7 @@ public class FinPartidaMulti extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         ganador = (TextView)findViewById(R.id.ganador);
+        System.out.println("DENTRO DE FINAL PARTIDA " + ganador);
         ganador.setText(extras.getString("ganador"));
 
         // Botón de salir

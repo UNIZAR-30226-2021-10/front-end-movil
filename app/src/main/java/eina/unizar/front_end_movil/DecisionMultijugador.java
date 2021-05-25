@@ -165,7 +165,14 @@ public class DecisionMultijugador extends AppCompatActivity {
                     }
                     //falta saber cuantos jugadores hay en la sala para poder entrar
                     if(jugadoresEnSala < NUM_JUGADORES){
-                        handleUnirseJuega();
+                        //handleUnirseJuega();
+                        Intent intent = new Intent (DecisionMultijugador.this, JuegoMultijugador.class);
+                        Bundle extras = new Bundle();
+                        extras.putString("codigo",codigoInsertado);
+                        extras.putString("tipo", String.valueOf(2)); //cambiar a valor 2
+                        intent.putExtras(extras);
+                        startActivityForResult(intent, OPTION_ACCEDER);
+                        System.out.println("TODO OK");
                     }
                     else{
                         Toast.makeText(DecisionMultijugador.this, "La partida ya está llena", Toast.LENGTH_LONG).show();
