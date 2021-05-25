@@ -128,6 +128,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     int teToca = 0;
     int jugadoresEnSala;
     boolean meTocaYa;
+    int rondasJugadas;
 
     private RetrofitInterface retrofitInterface;
     private GestorSesion gestorSesion;
@@ -182,6 +183,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                     int puntosActualizar = (int) args[2];
                     teToca = turnoActual;
                     numero_ronda = rondaActual;
+                    rondasJugadas++;
                     // Actualizar los puntos
                     if (teToca == 0) {
                         // el que juega antes del primero es el ultimo jugador
@@ -294,6 +296,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                 @Override
                 public void run(){
                     String userOut = (String) args[0];
+                    NUM_JUGADORES--;
                     int indice = 0;
                     for(int i = 0; i < playersAux.size(); i++){
                         if((playersAux.get(i).getUsername()).equals(userOut)){
@@ -487,6 +490,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 meTocaYa = false;
+                rondasJugadas++;
                 resetear();
                 desactivar();
                 siguiente.setVisibility(View.GONE);
@@ -695,7 +699,8 @@ public class JuegoMultijugador extends AppCompatActivity{
     }
 
     public void comprobarRondas(){
-        if (numero_ronda == NUM_RONDAS && playersAux.get(teToca).getUsername().equals(gestorSesion.getSession()) && teToca == jugadoresEnSala-1) {
+        if (rondasJugadas ==  NUM_JUGADORES * NUM_RONDAS) {
+        //if (numero_ronda == NUM_RONDAS && playersAux.get(teToca).getUsername().equals(gestorSesion.getSession()) && teToca == jugadoresEnSala-1) {
             int puntosGuardar = 0;
             for(int i = 0; i < playersAux.size(); i++){
                 if((playersAux.get(i).getUsername()).equals(gestorSesion.getSession())){
