@@ -488,12 +488,12 @@ public class JuegoMultijugador extends AppCompatActivity{
                 // mirar si el siguiente está jugando --> 3 jugadores
                 if(playersAux.size() >= 3){
                     if(!playersAux.get(teToca).isEstaJugando()) { // si no esta jugando pasar el turno
-                        indice = teToca;
+                        //indice = teToca;
                         // Pasa el turno una vez
                         teToca = teToca + 1;
                         if (teToca == NUM_JUGADORES) {
                             teToca = 0;
-                            indice = NUM_JUGADORES - 1;
+                            //indice = NUM_JUGADORES - 1;
                         }
                         if (teToca == 0) {
                             numero_ronda++;
@@ -501,12 +501,12 @@ public class JuegoMultijugador extends AppCompatActivity{
 
                         if (playersAux.size() == 4) { // si son cuatro y el siguiente no esta jugando
                             if (!playersAux.get(teToca).isEstaJugando()) { // si no esta jugando pasar el turno
-                                indice = teToca;
+                                //indice = teToca;
                                 // Pasa el turno una vez
                                 teToca = teToca + 1;
                                 if (teToca == NUM_JUGADORES) {
                                     teToca = 0;
-                                    indice = NUM_JUGADORES - 1;
+                                    //indice = NUM_JUGADORES - 1;
                                 }
                                 if (teToca == 0) {
                                     numero_ronda++;
@@ -673,7 +673,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     }
 
     public void comprobarRondas(){
-        if (numero_ronda == NUM_RONDAS && playersAux.get(teToca).getUsername().equals(gestorSesion.getSession()) && teToca == NUM_JUGADORES-1) {
+        if (numero_ronda == NUM_RONDAS && playersAux.get(teToca).getUsername().equals(gestorSesion.getSession()) && teToca == jugadoresEnSala-1) {
             int puntosGuardar = 0;
             for(int i = 0; i < playersAux.size(); i++){
                 if((playersAux.get(i).getUsername()).equals(gestorSesion.getSession())){
