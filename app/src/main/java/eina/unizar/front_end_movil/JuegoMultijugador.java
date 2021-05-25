@@ -127,6 +127,7 @@ public class JuegoMultijugador extends AppCompatActivity{
     int numero_ronda = 1;
     int teToca = 0;
     int jugadoresEnSala;
+    boolean meTocaYa;
 
     private RetrofitInterface retrofitInterface;
     private GestorSesion gestorSesion;
@@ -160,6 +161,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                         siguiente.setVisibility(View.VISIBLE);
                         siguiente.setClickable(true);
                         rollDice();
+                        meTocaYa = true;
                     }
                     num_rondas.setText(String.valueOf(numero_ronda));
                     turno_jugador.setText(playersAux.get(teToca).getUsername());
@@ -183,9 +185,22 @@ public class JuegoMultijugador extends AppCompatActivity{
                     // Actualizar los puntos
                     if (teToca == 0) {
                         // el que juega antes del primero es el ultimo jugador
-                        playersAux.get(NUM_JUGADORES - 1).setPuntos(puntosActualizar);
+                        boolean teHeEncontrado = false;
+                        for(int i = 1; i <= playersAux.size() && !teHeEncontrado; i++){
+                            if(playersAux.get(NUM_JUGADORES-i).isEstaJugando()){
+                                playersAux.get(NUM_JUGADORES - i).setPuntos(puntosActualizar);
+                                teHeEncontrado = true;
+                            }
+                        }
+
                     } else {
-                        playersAux.get(teToca - 1).setPuntos(puntosActualizar); // el que ha jugado antes de ti
+                        boolean teHeEncontrado = false;
+                        for(int i = 1; i <= playersAux.size() && !teHeEncontrado; i++){
+                            if(playersAux.get(teToca-i).isEstaJugando()){
+                                playersAux.get(teToca - i).setPuntos(puntosActualizar); // el que ha jugado antes de ti
+                                teHeEncontrado = true;
+                            }
+                        }
                     }
                     asignarPuntos();
                     //es mi turno de jugar
@@ -471,6 +486,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         siguiente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                meTocaYa = false;
                 resetear();
                 desactivar();
                 siguiente.setVisibility(View.GONE);
@@ -530,55 +546,61 @@ public class JuegoMultijugador extends AppCompatActivity{
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                if(playersAux.size() != NUM_JUGADORES){
-                    // si es el único jugador
-                    Toast.makeText(JuegoMultijugador.this, "No te puedes marchar hasta que no estén todos los jugadores", Toast.LENGTH_LONG).show();
-                } else {
-                    AlertDialog.Builder quiereSalir = new AlertDialog.Builder(JuegoMultijugador.this);
-                    quiereSalir.setMessage("¿Desea abandonar la partida?");
-                    quiereSalir.setCancelable(false);
-                    quiereSalir.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // tiene que saltar su turno si le tocaba
-                            if (playersAux.get(teToca).getUsername().equals(gestorSesion.getSession())) {
-                                // es mi turno actualmente
-                                teToca = teToca + 1;
-                                if (teToca == NUM_JUGADORES) {
-                                    teToca = 0;
+                if(!meTocaYa){
+                    if(playersAux.size() != NUM_JUGADORES){
+                        // si es el único jugador
+                        Toast.makeText(JuegoMultijugador.this, "No te puedes marchar hasta que no estén todos los jugadores", Toast.LENGTH_LONG).show();
+                    } else {
+                        AlertDialog.Builder quiereSalir = new AlertDialog.Builder(JuegoMultijugador.this);
+                        quiereSalir.setMessage("¿Desea abandonar la partida?");
+                        quiereSalir.setCancelable(false);
+                        quiereSalir.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // tiene que saltar su turno si le tocaba
+                                if (playersAux.get(teToca).getUsername().equals(gestorSesion.getSession())) {
+                                    // es mi turno actualmente
+                                    teToca = teToca + 1;
+                                    if (teToca == NUM_JUGADORES) {
+                                        teToca = 0;
+                                    }
+                                    // pasas el turno al siguiente con 0 puntos
+                                    msocket.emit("pasarTurno", teToca, numero_ronda, 0);
                                 }
-                                // pasas el turno al siguiente con 0 puntos
-                                msocket.emit("pasarTurno", teToca, numero_ronda, 0);
+
+                                System.out.println("ANTES DE DISCONNECTION no es su turno");
+                                msocket.emit("disconnection");
+                                msocket.disconnect();
+                                msocket.off();
+
+
+                                //confirma que quiere salir de la partida
+                                //tiene que hacer el emit de desconection
+
+                                //tiene que ser eliminado de la tabla juega
+                                //handleAbandonarPartida(); !!!! AQUÍ
+                                //tiene que continuar la partida con un jugador menos
+                                Intent intent = new Intent(v.getContext(), DecisionJuego.class);
+                                startActivityForResult(intent, OPTION_ATRAS);
+
                             }
-
-                            System.out.println("ANTES DE DISCONNECTION no es su turno");
-                            msocket.emit("disconnection");
-                            msocket.disconnect();
-                            msocket.off();
-
-
-                            //confirma que quiere salir de la partida
-                            //tiene que hacer el emit de desconection
-
-                            //tiene que ser eliminado de la tabla juega
-                            //handleAbandonarPartida(); !!!! AQUÍ
-                            //tiene que continuar la partida con un jugador menos
-                            Intent intent = new Intent(v.getContext(), DecisionJuego.class);
-                            startActivityForResult(intent, OPTION_ATRAS);
-
-                        }
-                    });
-                    quiereSalir.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
-                    AlertDialog titulo = quiereSalir.create();
-                    titulo.setTitle("Salir");
-                    titulo.show();
+                        });
+                        quiereSalir.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                        AlertDialog titulo = quiereSalir.create();
+                        titulo.setTitle("Salir");
+                        titulo.show();
+                    }
+                }
+                else{
+                    Toast.makeText(JuegoMultijugador.this, "Debes contestar para poder marcharte de la partida", Toast.LENGTH_LONG).show();
                 }
             }
+
         });
 
         // Botón atrás del botón
