@@ -123,12 +123,13 @@ public class JuegoMultijugador extends AppCompatActivity{
 
     private int NUM_RONDAS;
     private int NUM_JUGADORES;
+    private int NUM_JUGADORES_siempre;
     private int ID_PARTIDA;
     int numero_ronda = 1;
     int teToca = 0;
     int jugadoresEnSala;
     boolean meTocaYa;
-    int rondasJugadas;
+    int rondasJugadas = 1;
 
     private RetrofitInterface retrofitInterface;
     private GestorSesion gestorSesion;
@@ -151,14 +152,13 @@ public class JuegoMultijugador extends AppCompatActivity{
                     }
                     int entrada = playersAux.get(playersAux.size() - 1).getOrden();
                     Jugadores jugador = new Jugadores(nickname, 0, avatar, entrada + 1, true);
-                    //players.add(jugador);
                     playersAux.add(jugador);
                     jugadoresEnSala = playersAux.size();
                     asignarJugadores();
                     // EMPEZAR PARTIDA SI ERES EL PRIMERO!!!
                     //es mi turno de jugar
                     // Si están todos y es mi turno porque soy el primero
-                    if(playersAux.size() == NUM_JUGADORES && playersAux.get(teToca).getUsername().equals(gestorSesion.getSession())){
+                    if(playersAux.size() == NUM_JUGADORES_siempre && playersAux.get(teToca).getUsername().equals(gestorSesion.getSession())){
                         siguiente.setVisibility(View.VISIBLE);
                         siguiente.setClickable(true);
                         rollDice();
@@ -189,8 +189,8 @@ public class JuegoMultijugador extends AppCompatActivity{
                         // el que juega antes del primero es el ultimo jugador
                         boolean teHeEncontrado = false;
                         for(int i = 1; i <= playersAux.size() && !teHeEncontrado; i++){
-                            if(playersAux.get(NUM_JUGADORES-i).isEstaJugando()){
-                                playersAux.get(NUM_JUGADORES - i).setPuntos(puntosActualizar);
+                            if(playersAux.get(NUM_JUGADORES_siempre-i).isEstaJugando()){
+                                playersAux.get(NUM_JUGADORES_siempre - i).setPuntos(puntosActualizar);
                                 teHeEncontrado = true;
                             }
                         }
@@ -198,8 +198,14 @@ public class JuegoMultijugador extends AppCompatActivity{
                     } else {
                         boolean teHeEncontrado = false;
                         for(int i = 1; i <= playersAux.size() && !teHeEncontrado; i++){
-                            if(playersAux.get(teToca-i).isEstaJugando()){
-                                playersAux.get(teToca - i).setPuntos(puntosActualizar); // el que ha jugado antes de ti
+                            int indice = teToca - i;
+                            if(indice == -1){
+                                indice = NUM_JUGADORES_siempre-1;
+                            } else if(indice == -2){
+                                indice = NUM_JUGADORES_siempre-2;
+                            }
+                            if(playersAux.get(indice).isEstaJugando()){
+                                playersAux.get(indice).setPuntos(puntosActualizar); // el que ha jugado antes de ti
                                 teHeEncontrado = true;
                             }
                         }
@@ -297,12 +303,10 @@ public class JuegoMultijugador extends AppCompatActivity{
                 public void run(){
                     String userOut = (String) args[0];
                     NUM_JUGADORES--;
-                    int indice = 0;
                     for(int i = 0; i < playersAux.size(); i++){
                         if((playersAux.get(i).getUsername()).equals(userOut)){
                             playersAux.get(i).setEstaJugando(false);
                             playersAux.get(i).setPuntos(0);
-                            indice = i;
                         }
                     }
                     eliminarJugador(userOut);
@@ -328,38 +332,10 @@ public class JuegoMultijugador extends AppCompatActivity{
                             finalizarPartida();
                         }
                     }
-                    else{
-                        // borra al usuario del struct
-                        /*for(int i = 0; i < playersAux.size(); i++){
-                            if((playersAux.get(i).getUsername()).equals(userOut)){
-                                // para saber quién se ha ido
-                                indice = i;
-                                playersAux.remove(i);
-                            }
-                        }*/
-                        //actualizarTeToca(indice);
-                    }
                 }
             });
         }
     };
-
-    public void actualizarTeToca(int seHaIdo){
-        if(teToca == 1){
-            if(seHaIdo == 0){
-                teToca--;
-            }
-        } else if(teToca == 2){
-            if(seHaIdo == 0 || seHaIdo == 1){
-                teToca--;
-            }
-        } else if(teToca == 3){
-            if(seHaIdo == 0 ||seHaIdo == 1 || seHaIdo == 2){
-                teToca--;
-            }
-        }
-    }
-
 
     @Override
     public void onDestroy() {
@@ -403,9 +379,7 @@ public class JuegoMultijugador extends AppCompatActivity{
         unirConXML();
 
         creadorPartida();
-        //if(type == 1) {
-            //handleUnirseJuega();
-        //}
+
         try {
             IO.Options options = new IO.Options();
             options.transports = new String[]{WebSocket.NAME};
@@ -458,34 +432,6 @@ public class JuegoMultijugador extends AppCompatActivity{
             }
         });
 
-        //llamar a la bd para conseguir el numRondas y numJugadores
-        //handleObtenerInfo();
-
-        /*if(type == 1){
-            empezar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(players.size() == NUM_JUGADORES){
-                        resetear();
-                        num_rondas.setText(String.valueOf(numero_ronda));
-                        turno_jugador.setText(players.get(teToca).getUsername());
-                        rollDice();
-                        empezar.setVisibility(View.GONE);
-                        empezar.setClickable(false);
-                        siguiente.setVisibility(View.VISIBLE);
-                    }
-                    else{
-                        Toast.makeText(JuegoMultijugador.this, "Faltan jugadores por unirse a la partida", Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
-        }
-        else{
-            empezar.setVisibility(View.GONE);
-            empezar.setClickable(false);
-        }*/
-
-
         siguiente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -498,9 +444,9 @@ public class JuegoMultijugador extends AppCompatActivity{
                 int indice = teToca;
                 // Pasa el turno una vez
                 teToca = teToca + 1;
-                if(teToca == NUM_JUGADORES){
+                if(teToca == NUM_JUGADORES_siempre){
                     teToca = 0;
-                    indice = NUM_JUGADORES - 1;
+                    //indice = NUM_JUGADORES_siempre - 1;
                 }
                 if(teToca == 0){
                     numero_ronda++;
@@ -508,12 +454,10 @@ public class JuegoMultijugador extends AppCompatActivity{
                 // mirar si el siguiente está jugando --> 3 jugadores
                 if(playersAux.size() >= 3){
                     if(!playersAux.get(teToca).isEstaJugando()) { // si no esta jugando pasar el turno
-                        //indice = teToca;
                         // Pasa el turno una vez
                         teToca = teToca + 1;
-                        if (teToca == NUM_JUGADORES) {
+                        if (teToca == NUM_JUGADORES_siempre) {
                             teToca = 0;
-                            //indice = NUM_JUGADORES - 1;
                         }
                         if (teToca == 0) {
                             numero_ronda++;
@@ -524,7 +468,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                                 //indice = teToca;
                                 // Pasa el turno una vez
                                 teToca = teToca + 1;
-                                if (teToca == NUM_JUGADORES) {
+                                if (teToca == NUM_JUGADORES_siempre) {
                                     teToca = 0;
                                     //indice = NUM_JUGADORES - 1;
                                 }
@@ -551,7 +495,7 @@ public class JuegoMultijugador extends AppCompatActivity{
             @Override
             public void onClick(final View v) {
                 if(!meTocaYa){
-                    if(playersAux.size() != NUM_JUGADORES){
+                    if(playersAux.size() != NUM_JUGADORES_siempre){
                         // si es el único jugador
                         Toast.makeText(JuegoMultijugador.this, "No te puedes marchar hasta que no estén todos los jugadores", Toast.LENGTH_LONG).show();
                     } else {
@@ -565,7 +509,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                                 if (playersAux.get(teToca).getUsername().equals(gestorSesion.getSession())) {
                                     // es mi turno actualmente
                                     teToca = teToca + 1;
-                                    if (teToca == NUM_JUGADORES) {
+                                    if (teToca == NUM_JUGADORES_siempre) {
                                         teToca = 0;
                                     }
                                     // pasas el turno al siguiente con 0 puntos
@@ -578,12 +522,6 @@ public class JuegoMultijugador extends AppCompatActivity{
                                 msocket.off();
 
 
-                                //confirma que quiere salir de la partida
-                                //tiene que hacer el emit de desconection
-
-                                //tiene que ser eliminado de la tabla juega
-                                //handleAbandonarPartida(); !!!! AQUÍ
-                                //tiene que continuar la partida con un jugador menos
                                 Intent intent = new Intent(v.getContext(), DecisionJuego.class);
                                 startActivityForResult(intent, OPTION_ATRAS);
 
@@ -885,6 +823,7 @@ public class JuegoMultijugador extends AppCompatActivity{
                     JsonObject jsonObject = response.body().getAsJsonObject("idpartida");
                     ID_PARTIDA = jsonObject.get("idpartida").getAsInt();
                     NUM_JUGADORES = jsonObject.get("numJugadores").getAsInt();
+                    NUM_JUGADORES_siempre = jsonObject.get("numJugadores").getAsInt();
                     NUM_RONDAS = jsonObject.get("rondas").getAsInt();
                     num_rondas.setText(String.valueOf(1));
                     //obtener jugadores de la partida

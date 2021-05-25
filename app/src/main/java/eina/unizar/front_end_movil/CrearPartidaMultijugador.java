@@ -84,8 +84,7 @@ public class CrearPartidaMultijugador extends AppCompatActivity implements OnIte
         atrasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), DecisionMultijugador.class);
-                startActivityForResult(intent, OPTION_ATRAS);
+                finish();
             }
         });
 
