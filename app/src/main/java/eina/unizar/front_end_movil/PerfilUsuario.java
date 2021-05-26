@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -137,9 +138,8 @@ public class PerfilUsuario extends AppCompatActivity {
             MainModel model = new MainModel(imagenesCosas.get(i), nombreCosas.get(i), 0);
             mainmodel.add(model);
         }
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this,
-                LinearLayoutManager.HORIZONTAL,false);
-
+        LinearLayoutManager layoutManager = new GridLayoutManager(this,4,
+                GridLayoutManager.VERTICAL,false);
         recycler_view.setLayoutManager(layoutManager);
         recycler_view.setItemAnimator(new DefaultItemAnimator());
 
